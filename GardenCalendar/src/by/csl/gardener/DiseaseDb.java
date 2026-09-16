@@ -27,6 +27,7 @@ public final class DiseaseDb {
             DiseaseDataA.fill(list);
             DiseaseDataB.fill(list);
             DiseaseDataC.fill(list);
+            DiseaseDataPests.fill(list);
             bundled = list;
         }
         return bundled;

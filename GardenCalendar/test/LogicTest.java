@@ -93,7 +93,7 @@ public class LogicTest {
 
         System.out.println("\n=== 1c. Справочник болезней ===");
         List<Disease> dzAll = DiseaseDb.all(null);
-        check("болезней в справочнике (≥150)", dzAll.size() >= 150, "найдено " + dzAll.size());
+        check("болезней+вредителей в справочнике (≥200)", dzAll.size() >= 200, "найдено " + dzAll.size());
         Map<String, Integer> perPlant = new HashMap<>();
         int badMats = 0, shortCure = 0, noPrev = 0;
         for (Disease dz : dzAll) {
@@ -120,10 +120,24 @@ public class LogicTest {
             else noPhotoList.append(dz.image).append(' ');
         }
         // Храповик: каждая партия фото уменьшает долг; расти снова он не должен.
-        int photoDebtMax = 59;
-        check("фото есть у болезней (долг фото ≤ " + photoDebtMax + ")",
+        int photoDebtMax = 106;
+        check("фото есть у болезней и вредителей (долг фото ≤ " + photoDebtMax + ")",
             dzAll.size() - photos <= photoDebtMax,
             "есть " + photos + "/" + dzAll.size() + ", ждут фото: " + noPhotoList);
+
+        // Вредители: полноценные карточки с повреждениями, сезонной профилактикой и лечением
+        int pestCount = 0, pestShortCure = 0, pestNoSeason = 0, pestNoPhoto = 0;
+        for (Disease dz : dzAll) {
+            if (!dz.kind.startsWith("Вредитель")) continue;
+            pestCount++;
+            if (dz.cure == null || dz.cure.length < 4) pestShortCure++;
+            if (dz.spring.isEmpty() || dz.summer.isEmpty() || dz.autumn.isEmpty()) pestNoSeason++;
+            if (dz.image == null || !dz.image.startsWith("dzv_")) pestNoPhoto++;
+        }
+        check("вредителей в справочнике (≥40)", pestCount >= 40, "найдено " + pestCount);
+        check("лечение вредителей ≥4 шагов у каждого", pestShortCure == 0, "коротких: " + pestShortCure);
+        check("профилактика вредителей весна+лето+осень", pestNoSeason == 0, "пустых сезонов: " + pestNoSeason);
+        check("у каждого вредителя назначено фото dzv_*", pestNoPhoto == 0, "без фото: " + pestNoPhoto);
 
         // Отметки болезней у культур → профилактика в весенних и осенних работах
         Storage stPrev = new Storage(new Context());
