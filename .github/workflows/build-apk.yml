@@ -50,7 +50,20 @@ jobs:
         run: bash GardenCalendar/test.sh
 
       - name: Build & sign APK
-        run: bash GardenCalendar/build.sh
+        run: |
+          set +e
+          bash GardenCalendar/build.sh 2>&1 | tee /tmp/build-apk.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "=== build.sh завершился с кодом $code; последние строки лога: ==="
+            tail -60 /tmp/build-apk.log
+            # публикуем хвост лога как аннотации — видно на странице ревизии/коммита
+            tail -40 /tmp/build-apk.log | while IFS= read -r l; do
+              safe="${l//%/%%}"; safe="${safe//$'\r'/}"
+              printf '::error title=build.sh(exit %s)::%s\n' "$code" "$safe"
+            done
+            exit "$code"
+          fi
 
       - name: APK info
         run: |
