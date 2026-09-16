@@ -50,16 +50,7 @@ jobs:
         run: bash GardenCalendar/test.sh
 
       - name: Build & sign APK
-        run: |
-          set +e
-          bash -x GardenCalendar/build.sh > /tmp/build-apk.log 2>&1
-          code=$?
-          tail -30 /tmp/build-apk.log
-          if [ "$code" -ne 0 ]; then
-            B64=$(tail -c 12000 /tmp/build-apk.log | base64 -w0)
-            echo "::error::B64LOG_EXIT_${code}:${B64}"
-          fi
-          exit "$code"
+        run: bash GardenCalendar/build.sh
 
       - name: APK info
         run: |
