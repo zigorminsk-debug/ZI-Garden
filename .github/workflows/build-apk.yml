@@ -1,0 +1,68 @@
+name: Build APK
+
+# Автосборка APK после любых изменений кода: тесты -> aapt2/javac/d8 -> подпись -> артефакт.
+on:
+  push:
+    branches: [ main, 'arena/**' ]
+    paths-ignore:
+      - '**.md'
+      - 'uploads/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'uploads/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # нужно для публикации релиза по тегу
+
+jobs:
+  build-apk:
+    name: Тесты + сборка APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Android SDK (platform 34, build-tools 34.0.0)
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+
+      - name: JVM logic tests (LogicTest)
+        run: bash GardenCalendar/test.sh
+
+      - name: Build & sign APK
+        run: bash GardenCalendar/build.sh
+
+      - name: APK info
+        run: |
+          ls -lh GardenCalendar/out/*.apk
+          echo '--- badging ---'
+          head -8 GardenCalendar/out/badging.txt
+          echo '--- signature ---'
+          head -5 GardenCalendar/out/verify.txt
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZI-Garden-csl.by-v2.5-apk
+          path: GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create GitHub Release (on version tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk
+          generate_release_notes: true
