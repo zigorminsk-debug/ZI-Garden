@@ -120,10 +120,31 @@ public class LogicTest {
             else noPhotoList.append(dz.image).append(' ');
         }
         // Храповик: каждая партия фото уменьшает долг; расти снова он не должен.
-        int photoDebtMax = 89;
+        int photoDebtMax = 79;
         check("фото есть у болезней (долг фото ≤ " + photoDebtMax + ")",
             dzAll.size() - photos <= photoDebtMax,
             "есть " + photos + "/" + dzAll.size() + ", ждут фото: " + noPhotoList);
+
+        // Отметки болезней у культур → профилактика в весенних и осенних работах
+        Storage stPrev = new Storage(new Context());
+        stPrev.setPlants(new HashSet<>(java.util.Arrays.asList("apple")));
+        stPrev.setPlantDiseases("apple", new HashSet<>(java.util.Arrays.asList("apple_scab")));
+        boolean prSpring = false, prAutumn = false;
+        for (Task tPrev : new Planner(stPrev, null).tasks(400)) {
+            if (tPrev.id.equals("dzprev:apple_scab:spring")) prSpring = true;
+            if (tPrev.id.equals("dzprev:apple_scab:autumn")) prAutumn = true;
+        }
+        check("отмеченная болезнь даёт задачи профилактики весной и осенью", prSpring && prAutumn,
+                "spring=" + prSpring + ", autumn=" + prAutumn);
+        stPrev.setPlantDiseases("apple", new HashSet<String>());
+        boolean prGone = true;
+        for (Task tPrev : new Planner(stPrev, null).tasks(400)) {
+            if (tPrev.id.startsWith("dzprev:")) prGone = false;
+        }
+        check("снятая отметка болезни убирает задачу профилактики", prGone, "");
+        Set<String> dzMarks = stPrev.plantDiseases("apple");
+        check("отметки болезней хранятся изолированно от списка культур",
+                dzMarks.isEmpty() && stPrev.plants().contains("apple"), "");
         String dzJson = DiseaseDb.toJson(dzAll, 1);
         List<Disease> dzBack = DiseaseDb.fromJson(dzJson);
         check("JSON справочника сериализуется и читается (файл обновлений)", dzBack.size() == dzAll.size(), dzBack.size() + " из " + dzAll.size());

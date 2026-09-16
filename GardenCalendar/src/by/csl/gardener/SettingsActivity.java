@@ -196,7 +196,7 @@ public class SettingsActivity extends Activity {
         } else if (Build.VERSION.SDK_INT >= 33 && !Notifications.permissionGranted(this)) {
             textView.setText("⚠️ Разрешение на уведомления не выдано — система не покажет их. Разрешите уведомления для приложения в настройках Android.");
         } else {
-            textView.setText(String.format(Locale.US, "Поставлено напоминаний: %d · время %02d:%02d · за %d дн. до работы", Integer.valueOf(i), Integer.valueOf(this.store.notifyHour()), Integer.valueOf(this.store.notifyMinute()), Integer.valueOf(this.store.leadDays())));
+            textView.setText(String.format(Locale.US, "Поставлено напоминаний: %d · время %02d:%02d · за %d дн. до работы · тишина 21:00–8:00", Integer.valueOf(i), Integer.valueOf(this.store.notifyHour()), Integer.valueOf(this.store.notifyMinute()), Integer.valueOf(this.store.leadDays())));
         }
     }
 

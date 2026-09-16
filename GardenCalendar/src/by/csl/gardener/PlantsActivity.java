@@ -21,6 +21,7 @@ import java.util.Set;
 public class PlantsActivity extends Activity {
     private final List<CheckBox> boxes = new ArrayList();
     private final Map<String, CheckBox> byId = new HashMap();
+    private final Map<String, LinearLayout> dzBoxes = new HashMap();
     private Region reg;
     private Storage store;
 
@@ -34,7 +35,7 @@ public class PlantsActivity extends Activity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(1);
         linearLayout.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f));
-        TextView text = Ui.text(this, "Отметьте культуры, которые растут на участке. Календарь построит работы только по ним. Регион: " + this.reg.displayName + ". «ⓘ» или долгий тап по культуре — справка и выбор сроков созревания сортов (можно несколько). «✔» — культура хорошо подходит здесь, «⚠» — нетипична.", 13.0f, getResources().getColor(R.color.text_sub), false);
+        TextView text = Ui.text(this, "Отметьте культуры, которые растут на участке. Календарь построит работы только по ним. Регион: " + this.reg.displayName + ". «ⓘ» или долгий тап по культуре — справка и выбор сроков созревания сортов (можно несколько). «✔» — культура хорошо подходит здесь, «⚠» — нетипична. Под отмеченной культурой раскрываются чекбоксы болезней: отмечайте, что болело в этом сезоне, — и календарь добавит профилактику в весенние и осенние работы следующего года.", 13.0f, getResources().getColor(R.color.text_sub), false);
         text.setPadding(0, 0, 0, Ui.dp(this, 10.0f));
         linearLayout.addView(text);
         LinkedHashMap<String, List<Plant>> linkedHashMap = new LinkedHashMap<>();
@@ -78,6 +79,9 @@ public class PlantsActivity extends Activity {
                 this.boxes.add(checkBox);
                 this.byId.put(plant2.id, checkBox);
                 card.addView(linearLayout2);
+                LinearLayout dzPanel = dzPanel(plant2.id, checkBox.isChecked());
+                this.dzBoxes.put(plant2.id, dzPanel);
+                card.addView(dzPanel);
             }
             linearLayout.addView(card);
         }
@@ -109,6 +113,47 @@ public class PlantsActivity extends Activity {
     void m4lambda$onCreate$2$bycslgardenerPlantsActivity(TextView textView, CompoundButton compoundButton, boolean z) {
         save();
         updateCount(textView);
+        LinearLayout panel = this.dzBoxes.get((String) compoundButton.getTag());
+        if (panel != null) {
+            panel.setVisibility(z ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    /** Панель чекбоксов болезней культуры: пользователь отмечает, что болело в сезоне. */
+    private LinearLayout dzPanel(final String plantId, boolean visible) {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(1);
+        box.setPadding(Ui.dp(this, 28.0f), 0, Ui.dp(this, 6.0f), Ui.dp(this, 6.0f));
+        box.setVisibility(visible ? View.VISIBLE : View.GONE);
+        List<Disease> list = DiseaseDb.forPlant(this, plantId);
+        if (list.isEmpty()) {
+            return box;
+        }
+        box.addView(Ui.text(this, "Болело в этом сезоне (→ профилактика в весенние и осенние работы):", 11.0f, getResources().getColor(R.color.text_sub), false));
+        for (final Disease d : list) {
+            final CheckBox cb = new CheckBox(this);
+            cb.setTextSize(12.5f);
+            cb.setText(d.name);
+            cb.setChecked(this.store.plantDiseases(plantId).contains(d.id));
+            cb.setPadding(Ui.dp(this, 2.0f), Ui.dp(this, 2.0f), Ui.dp(this, 2.0f), Ui.dp(this, 2.0f));
+            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public final void onCheckedChanged(CompoundButton compoundButton, boolean z) {
+                    PlantsActivity.this.onDiseaseToggled(plantId, d.id, z);
+                }
+            });
+            box.addView(cb);
+        }
+        return box;
+    }
+
+    void onDiseaseToggled(String plantId, String diseaseId, boolean on) {
+        Set<String> set = new HashSet<>(this.store.plantDiseases(plantId));
+        if (on) {
+            set.add(diseaseId);
+        } else {
+            set.remove(diseaseId);
+        }
+        this.store.setPlantDiseases(plantId, set);
     }
 
     protected void onResume() {

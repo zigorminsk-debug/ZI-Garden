@@ -13,6 +13,14 @@ public class AlarmReceiver extends BroadcastReceiver {
         Notification.Builder builder;
         String sb;
         String str;
+        if (Notifications.isQuietNow()) {
+            // Тихие часы (21:00–8:00): не будим пользователя — перепланируем на утро
+            try {
+                context.startService(new Intent(context, (Class<?>) RescheduleService.class));
+            } catch (Exception unused) {
+            }
+            return;
+        }
         Notifications.ensureChannel(context);
         String stringExtra = intent.getStringExtra(Notifications.EXTRA_TASK);
         String stringExtra2 = intent.getStringExtra(Notifications.EXTRA_TITLE);

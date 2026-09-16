@@ -85,6 +85,7 @@ public class Planner {
                 }
             }
         }
+        addDiseasePrevention(out, start, plants, days);
         Collections.sort(out, new Comparator<Task>() {
             @Override
             public int compare(Task a, Task b) {
@@ -151,6 +152,64 @@ public class Planner {
             task.items.add(item);
         }
         evaluateWeather(task, calendar);
+        return task;
+    }
+
+    /**
+     * Профилактика болезней, отмеченных пользователем в «Моих растениях»:
+     * весеннее окно (конец марта — до распускания почек) и осеннее (конец октября — после листопада),
+     * чтобы болезнь прошлого сезона не вернулась в новом.
+     */
+    private void addDiseasePrevention(List<Task> out, Calendar start, Set<String> plants, int days) {
+        List<Disease> all = DiseaseDb.all(null);
+        for (String pid : plants) {
+            Set<String> marks = store.plantDiseases(pid);
+            if (marks.isEmpty()) continue;
+            Plant plant = Plant.byId(pid);
+            if (plant == null) continue;
+            for (Disease d : all) {
+                if (!d.plantId.equals(pid) || !marks.contains(d.id)) continue;
+                for (int season = 0; season < 2; season++) {
+                    int tm = season == 0 ? 3 : 10; // весна — март, осень — октябрь
+                    Calendar cursor = (Calendar) start.clone();
+                    for (int i = 0; i < days; i++) {
+                        int shift = region.phenoShiftDays;
+                        Calendar eval = shift == 0 ? cursor : Dates.plusDays(cursor, shift);
+                        if (eval.get(Calendar.MONTH) + 1 == tm && eval.get(Calendar.DAY_OF_MONTH) == 25) {
+                            out.add(buildPrev(d, plant, cursor, season == 0));
+                            break;
+                        }
+                        cursor = Dates.plusDays(cursor, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    private Task buildPrev(Disease d, Plant plant, Calendar c, boolean spring) {
+        Task task = new Task();
+        task.id = "dzprev:" + d.id + (spring ? ":spring" : ":autumn");
+        task.plantId = plant.id;
+        task.plantName = plant.name;
+        task.op = Operation.SPRAY;
+        task.title = "Профилактика: " + d.name + (spring ? " (весеннее окно)" : " (осеннее окно)");
+        task.text = "«" + d.name + "» отмечена у этой культуры в прошедшем сезоне "
+                + "(метки — в «Мои растения»). Чтобы болезнь не вернулась в новом году:\n\n"
+                + (spring ? d.spring : d.autumn)
+                + "\n\nКогда болезнь побеждена — снимите отметку: задача исчезнет из плана.";
+        task.year = c.get(Calendar.YEAR);
+        task.month = c.get(Calendar.MONTH) + 1;
+        task.day = c.get(Calendar.DAY_OF_MONTH);
+        task.priority = 13;
+        task.rainBlocks = spring;      // весной — опрыскивание; осенью — санитария, дождь не критичен
+        task.minTemp = spring ? 3.0d : -100.0d; // искореняющие обработки от +3 °C
+        task.maxTemp = 100.0d;
+        task.solutionL = 10.0d;
+        task.currency = this.region.symbol;
+        task.window = (spring ? "Весна · профилактика (" : "Осень · профилактика (")
+                + windowText(task.year, task.month, Rule.decade(task.day)) + ")";
+        task.done = this.store.isDone(task.id, task.year);
+        evaluateWeather(task, c);
         return task;
     }
 

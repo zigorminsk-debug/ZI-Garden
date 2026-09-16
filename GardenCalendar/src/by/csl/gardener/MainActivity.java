@@ -63,6 +63,11 @@ public class MainActivity extends Activity {
                 MainActivity.this.m10lambda$onCreate$5$bycslgardenerMainActivity(view);
             }
         });
+        findViewById(R.id.btn_weather).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.loadWeather(false);
+            }
+        });
         if (Build.VERSION.SDK_INT >= 33 && !Notifications.permissionGranted(this)) {
             requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, REQ_NOTIFY);
         }
@@ -236,7 +241,11 @@ public class MainActivity extends Activity {
         if (weather == null || !weather.hasForecast()) {
             textView2.setText(this.loading ? "Загрузка прогноза…" : "Прогноз не загружен — нажмите «Обновить погоду»");
             textView3.setText("");
+            textView3.setVisibility(View.GONE);
+            textView4.setVisibility(View.GONE);
         } else {
+            textView3.setVisibility(View.VISIBLE);
+            textView4.setVisibility(View.VISIBLE);
             StringBuilder sb2 = new StringBuilder();
             sb2.append(Weather.iconFor(this.weather.currentCode));
             sb2.append(" Сейчас: ");
@@ -336,6 +345,7 @@ public class MainActivity extends Activity {
 
     private void loadWeather(final boolean z) {
         this.loading = true;
+        m1lambda$showPendingTask$0$bycslgardenerMainActivity(); // показать «Загрузка прогноза…»
         final double lat = this.store.lat();
         final double lon = this.store.lon();
         final String city = this.store.city();

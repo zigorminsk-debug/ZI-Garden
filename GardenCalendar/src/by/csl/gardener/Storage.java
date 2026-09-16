@@ -29,6 +29,15 @@ public class Storage {
         this.p.edit().putStringSet("plants", new HashSet<>(set)).apply();
     }
 
+    /** Отмеченные пользователем болезни культуры за сезон (для профилактики в следующем). */
+    public Set<String> plantDiseases(String plantId) {
+        return new HashSet<>(this.p.getStringSet("dz_" + plantId, new HashSet<String>()));
+    }
+
+    public void setPlantDiseases(String plantId, Set<String> set) {
+        this.p.edit().putStringSet("dz_" + plantId, new HashSet<>(set)).apply();
+    }
+
     private Set<String> defaultPlants() {
         HashSet hashSet = new HashSet();
         hashSet.add("apple");

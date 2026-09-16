@@ -21,6 +21,38 @@ public final class Notifications {
     public static final String EXTRA_TITLE = "task_title";
     private static final int MAX_ALARMS = 20;
     private static final int SCHEDULE_DAYS = 14;
+    /** Тихие часы: уведомления показываются только с 8:00 до 21:00. */
+    public static final int QUIET_FROM = 21;
+    public static final int QUIET_TO = 8;
+
+    public static boolean isQuietNow() {
+        int h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        return h >= QUIET_FROM || h < QUIET_TO;
+    }
+
+    /** Сдвигает момент срабатывания в разрешённое окно 8:00–21:00. */
+    public static long clampQuiet(long atMs) {
+        int h;
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(atMs);
+        h = c.get(Calendar.HOUR_OF_DAY);
+        if (h >= QUIET_FROM) {
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            c.set(Calendar.HOUR_OF_DAY, QUIET_TO);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            return c.getTimeInMillis();
+        }
+        if (h < QUIET_TO) {
+            c.set(Calendar.HOUR_OF_DAY, QUIET_TO);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            return c.getTimeInMillis();
+        }
+        return atMs;
+    }
 
     private Notifications() {
     }
@@ -80,6 +112,7 @@ public final class Notifications {
             if (atMs <= now) {
                 atMs = now + 60000L; // уже прошло — напомнить через минуту
             }
+            atMs = clampQuiet(atMs); // тихие часы 21:00–8:00 — переносим на утро
             if (atMs > horizon.getTimeInMillis() + 86400000L) continue;
             setAlarm(context, alarmManager, d, due, atMs);
             count++;

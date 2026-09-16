@@ -84,7 +84,27 @@ public class Weather {
         return "https://api.open-meteo.com/v1/forecast?latitude=" + d + "&longitude=" + d2 + "&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,relative_humidity_2m_max,soil_moisture_0_to_7cm_max&hourly=temperature_2m,precipitation,precipitation_probability,soil_temperature_6cm&forecast_days=10&timezone=auto";
     }
 
+    /** Загрузка прогноза с одной повторной попыткой при сбое сети. */
     public static Weather fetch(double d, double d2, String str) throws Exception {
+        Exception first = null;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            try {
+                return fetchOnce(d, d2, str);
+            } catch (Exception e) {
+                first = e;
+                if (attempt == 0) {
+                    try {
+                        Thread.sleep(1500L);
+                    } catch (InterruptedException unused) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+        throw first;
+    }
+
+    private static Weather fetchOnce(double d, double d2, String str) throws Exception {
         String str2;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(buildUrl(d, d2)).openConnection();
         httpURLConnection.setConnectTimeout(15000);
