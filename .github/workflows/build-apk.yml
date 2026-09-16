@@ -52,18 +52,14 @@ jobs:
       - name: Build & sign APK
         run: |
           set +e
-          bash GardenCalendar/build.sh 2>&1 | tee /tmp/build-apk.log
-          code=${PIPESTATUS[0]}
+          bash -x GardenCalendar/build.sh > /tmp/build-apk.log 2>&1
+          code=$?
+          tail -30 /tmp/build-apk.log
           if [ "$code" -ne 0 ]; then
-            echo "=== build.sh завершился с кодом $code; последние строки лога: ==="
-            tail -60 /tmp/build-apk.log
-            # публикуем хвост лога как аннотации — видно на странице ревизии/коммита
-            tail -40 /tmp/build-apk.log | while IFS= read -r l; do
-              safe="${l//%/%%}"; safe="${safe//$'\r'/}"
-              printf '::error title=build.sh(exit %s)::%s\n' "$code" "$safe"
-            done
-            exit "$code"
+            B64=$(tail -c 12000 /tmp/build-apk.log | base64 -w0)
+            echo "::error::B64LOG_EXIT_${code}:${B64}"
           fi
+          exit "$code"
 
       - name: APK info
         run: |
