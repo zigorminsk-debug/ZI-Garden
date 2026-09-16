@@ -120,7 +120,7 @@ public class LogicTest {
             else noPhotoList.append(dz.image).append(' ');
         }
         // Храповик: каждая партия фото уменьшает долг; расти снова он не должен.
-        int photoDebtMax = 99;
+        int photoDebtMax = 89;
         check("фото есть у болезней (долг фото ≤ " + photoDebtMax + ")",
             dzAll.size() - photos <= photoDebtMax,
             "есть " + photos + "/" + dzAll.size() + ", ждут фото: " + noPhotoList);
