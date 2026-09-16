@@ -48,6 +48,20 @@ public final class TaskDialog {
             layoutParams.topMargin = Ui.dp(context, 6.0f);
             button.setLayoutParams(layoutParams);
             linearLayout.addView(button);
+
+            Button diseaseBtn = new Button(context);
+            diseaseBtn.setText("🦠 Болезни: определить по фото и вылечить");
+            diseaseBtn.setTextSize(13.0f);
+            diseaseBtn.setAllCaps(false);
+            diseaseBtn.setOnClickListener(new View.OnClickListener() {
+                public final void onClick(View view) {
+                    DiseaseActivity.show(activity, str);
+                }
+            });
+            LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(-1, -2);
+            dlp.topMargin = Ui.dp(context, 6.0f);
+            diseaseBtn.setLayoutParams(dlp);
+            linearLayout.addView(diseaseBtn);
         }
         Plant dlgPlant = Plant.byId(task.plantId);
         TextView dlgTitle = Ui.text(context, (dlgPlant != null && dlgPlant.iconRes != 0 ? dlgPlant.name : (dlgPlant != null ? dlgPlant.icon + " " + dlgPlant.name : "")) + " — " + Operation.icon(task.op) + " " + task.title, 17.0f, -14670049, true);
@@ -142,6 +156,12 @@ public final class TaskDialog {
         });
         AlertDialog create = positiveButton.setNegativeButton("Закрыть", (DialogInterface.OnClickListener) null).create();
         create.show();
+        int maxH = (int) (context.getResources().getDisplayMetrics().heightPixels * 0.68d);
+        android.view.ViewGroup.LayoutParams svLp = scrollView.getLayoutParams();
+        if (svLp != null) {
+            svLp.height = Math.min(svLp.height > 0 ? svLp.height : maxH, maxH);
+            scrollView.setLayoutParams(svLp);
+        }
         Button button2 = create.getButton(-1);
         if (button2 != null) {
             button2.setTypeface(null, 1);

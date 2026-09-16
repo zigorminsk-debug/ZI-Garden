@@ -54,7 +54,19 @@ public final class CropInfoSheet {
         }
         ScrollView scrollView = new ScrollView(activity);
         scrollView.addView(linearLayout);
-        new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).show();
+        final int maxH = (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.7d);
+        final ScrollView fScroll = scrollView;
+        android.app.AlertDialog dlg = new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).setNeutralButton("🦠 Болезни и лечение", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                DiseaseActivity.show(activity, str);
+            }
+        }).create();
+        dlg.show();
+        android.view.ViewGroup.LayoutParams lp = fScroll.getLayoutParams();
+        if (lp != null) {
+            lp.height = Math.min(lp.height > 0 ? lp.height : maxH, maxH);
+            fScroll.setLayoutParams(lp);
+        }
     }
 
     static void lambda$show$0(Set set, String[] strArr, Activity activity, Storage storage, String str, CompoundButton compoundButton, boolean z) {

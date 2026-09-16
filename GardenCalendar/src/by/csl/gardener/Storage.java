@@ -56,6 +56,14 @@ public class Storage {
         this.p.edit().putInt("plant_size", i).apply();
     }
 
+    public String diseaseUpdateUrl() {
+        return this.p.getString("disease_update_url", "https://csl.by/garden/diseases.json");
+    }
+
+    public void setDiseaseUpdateUrl(String str) {
+        this.p.edit().putString("disease_update_url", str).apply();
+    }
+
     public String city() {
         return this.p.getString("city", "Минск");
     }

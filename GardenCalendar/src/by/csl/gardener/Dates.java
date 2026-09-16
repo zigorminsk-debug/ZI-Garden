@@ -35,7 +35,11 @@ public final class Dates {
     }
 
     public static int diffDays(Calendar calendar, Calendar calendar2) {
-        return (int) ((at(calendar2.get(1), calendar2.get(2) + 1, calendar2.get(5)).getTimeInMillis() - at(calendar.get(1), calendar.get(2) + 1, calendar.get(5)).getTimeInMillis()) / 86400000);
+        // Math.round, а не усечение: на переводе часов (Украина, EET→EEST) сутки длиной 23/25 ч
+        // усечение деления на 86400000 давало сдвиг на день
+        long ms = at(calendar2.get(1), calendar2.get(2) + 1, calendar2.get(5)).getTimeInMillis()
+                - at(calendar.get(1), calendar.get(2) + 1, calendar.get(5)).getTimeInMillis();
+        return (int) Math.round(ms / 86400000.0d);
     }
 
     public static String fmt(int i, int i2, int i3) {

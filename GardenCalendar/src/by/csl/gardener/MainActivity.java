@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        RemoteDiseases.refreshAsync(this);
         setContentView(R.layout.activity_main);
         this.store = new Storage(this);
         Notifications.ensureChannel(this);

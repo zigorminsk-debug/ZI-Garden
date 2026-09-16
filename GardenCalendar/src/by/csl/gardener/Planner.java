@@ -367,7 +367,8 @@ public class Planner {
         ShopItem shopItem;
         Calendar calendar = Dates.today();
         Calendar plusDays = Dates.plusDays(calendar, i);
-        List<Task> tasks = tasks(21);
+        // окно планирования = окну списка покупок (иначе позиции за пределами 21 дня терялись бы)
+        List<Task> tasks = tasks(Math.max(i, DEFAULT_WINDOW));
         HashSet hashSet = new HashSet();
         Iterator<Task> it = tasks.iterator();
         while (it.hasNext()) {
