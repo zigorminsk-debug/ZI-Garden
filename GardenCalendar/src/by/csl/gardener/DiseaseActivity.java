@@ -14,6 +14,11 @@ import java.util.List;
 
 /** Справочник болезней конкретной культуры: фото, симптомы, лечение, профилактика по сезонам. */
 public class DiseaseActivity extends Activity {
+    @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
 
     private String plantId;
     private LinearLayout root;

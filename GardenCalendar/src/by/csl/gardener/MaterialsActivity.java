@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class MaterialsActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private int daysAhead = 30;
     private LinearLayout list;
     private Storage store;

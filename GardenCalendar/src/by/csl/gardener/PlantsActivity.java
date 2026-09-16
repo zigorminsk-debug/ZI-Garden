@@ -19,6 +19,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class PlantsActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private final List<CheckBox> boxes = new ArrayList();
     private final Map<String, CheckBox> byId = new HashMap();
     private final Map<String, LinearLayout> dzBoxes = new HashMap();

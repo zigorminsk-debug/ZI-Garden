@@ -8,6 +8,11 @@ import android.view.View;
 import android.widget.TextView;
 
 public class AboutActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_about);

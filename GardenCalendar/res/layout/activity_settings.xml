@@ -108,6 +108,61 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:text="🔠 Размер шрифта"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/font_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/font_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Мелкий"
+                android:textSize="13sp" />
+
+            <RadioButton
+                android:id="@+id/font_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Обычный" />
+
+            <RadioButton
+                android:id="@+id/font_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Крупный"
+                android:textSize="17sp" />
+
+            <RadioButton
+                android:id="@+id/font_xlarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Огромный"
+                android:textSize="20sp" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/font_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Образец: такие подписи будут во всех разделах приложения — задачи, календарь, справочники. Размер применяется сразу."
+            android:textColor="@color/text_sub"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="🔔 Напоминания"
             android:textColor="@color/green_700"
             android:textSize="16sp"

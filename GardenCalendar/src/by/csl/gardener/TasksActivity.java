@@ -8,6 +8,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 public class TasksActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private LinearLayout container;
     private boolean onlyPending = true;
     private Storage store;

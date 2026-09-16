@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class CalendarActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private LinearLayout list;
     private Storage store;
 

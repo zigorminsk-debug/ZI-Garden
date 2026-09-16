@@ -602,6 +602,30 @@ public class LogicTest {
         }
         check("списки сортов расширены (≥5 у каждой культуры)", thin == 0, "тонких: " + thin);
 
+        System.out.println("\n=== 16. Размер шрифта ===");
+        check("4 ступени масштаба шрифта с подписями",
+            Fonts.SCALES.length == 4 && Fonts.LABELS.length == 4,
+            "масштабов: " + Fonts.SCALES.length + ", подписей: " + Fonts.LABELS.length);
+        boolean monoFont = Fonts.SCALES[0] < Fonts.SCALES[1]
+            && Fonts.SCALES[1] < Fonts.SCALES[2] && Fonts.SCALES[2] < Fonts.SCALES[3];
+        check("ступени возрастают, обычный = 100%", monoFont && Fonts.SCALES[1] == 1.0f,
+            java.util.Arrays.toString(Fonts.SCALES));
+        Context ctxFont = new Context();
+        check("размер шрифта по умолчанию — обычный", new Storage(ctxFont).fontSize() == 1, "");
+        new Storage(ctxFont).setFontSize(3);
+        check("размер шрифта сохраняется в настройках", new Storage(ctxFont).fontSize() == 3, "");
+        check("масштаб «огромный» = ×1.4", Fonts.scale(ctxFont) == 1.4f, String.valueOf(Fonts.scale(ctxFont)));
+        new Storage(ctxFont).setFontSize(9);
+        check("некорректное значение в настройках → обычный шрифт", Fonts.scale(ctxFont) == 1.0f, "");
+        new Storage(ctxFont).setFontSize(3);
+        Context scaledFont = Fonts.applyFont(ctxFont);
+        check("масштаб шрифта применяется к контексту (attachBaseContext)",
+            scaledFont.getResources().getConfiguration().fontScale == 1.4f,
+            String.valueOf(scaledFont.getResources().getConfiguration().fontScale));
+        new Storage(ctxFont).setFontSize(1);
+        check("обычный шрифт — контекст без обёртки", Fonts.applyFont(ctxFont) == ctxFont, "");
+        check("настройки общие для обёрнутого контекста", new Storage(scaledFont).fontSize() == 1, "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

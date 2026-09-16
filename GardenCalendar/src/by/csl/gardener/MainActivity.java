@@ -20,6 +20,11 @@ import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private static final int REQ_NOTIFY = 1001;
     private Calendar lastDay;
     private boolean loading;

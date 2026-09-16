@@ -65,6 +65,15 @@ public class Storage {
         this.p.edit().putInt("plant_size", i).apply();
     }
 
+    /** Размер шрифта интерфейса: 0 — мелкий, 1 — обычный, 2 — крупный, 3 — очень крупный. */
+    public int fontSize() {
+        return this.p.getInt("font_size", 1);
+    }
+
+    public void setFontSize(int i) {
+        this.p.edit().putInt("font_size", i).apply();
+    }
+
     public String diseaseUpdateUrl() {
         return this.p.getString("disease_update_url", "https://csl.by/garden/diseases.json");
     }

@@ -25,6 +25,11 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class SettingsActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context context) {
+        super.attachBaseContext(Ui.applyFont(context));
+    }
+
     private static final String[] CITIES = {"Минск", "Брест", "Гомель", "Гродно", "Витебск", "Могилёв", "Бобруйск", "Барановичи", "Борисов", "Пинск", "Орша", "Мозырь", "Солигорск", "Новополоцк", "Лида", "Молодечно", "Полоцк", "Светлогорск", "Жлобин", "Речица", "Слуцк", "Сморгонь", "Волковыск", "Осиповичи"};
     private static final double[][] COORDS;
     private Storage store;
@@ -84,6 +89,15 @@ public class SettingsActivity extends Activity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             public final void onCheckedChanged(RadioGroup radioGroup2, int i2) {
                 SettingsActivity.this.m17lambda$onCreate$2$bycslgardenerSettingsActivity(radioGroup2, i2);
+            }
+        });
+        RadioGroup fontGroup = (RadioGroup) findViewById(R.id.font_group);
+        int fontSize = this.store.fontSize();
+        fontGroup.check(fontSize == 0 ? R.id.font_small : fontSize == 2 ? R.id.font_large : fontSize == 3 ? R.id.font_xlarge : R.id.font_normal);
+        fontGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public final void onCheckedChanged(RadioGroup radioGroup2, int i2) {
+                SettingsActivity.this.store.setFontSize(i2 == R.id.font_small ? 0 : i2 == R.id.font_large ? 2 : i2 == R.id.font_xlarge ? 3 : 1);
+                SettingsActivity.this.recreate();
             }
         });
         CheckBox checkBox = (CheckBox) findViewById(R.id.notify_enabled);

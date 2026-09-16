@@ -17,6 +17,11 @@ public final class Ui {
     private Ui() {
     }
 
+    /** Размер шрифта из настроек применён к контексту активности (логика — в Fonts). */
+    public static Context applyFont(Context context) {
+        return Fonts.applyFont(context);
+    }
+
     public static int dp(Context context, float f) {
         return (int) TypedValue.applyDimension(1, f, context.getResources().getDisplayMetrics());
     }
