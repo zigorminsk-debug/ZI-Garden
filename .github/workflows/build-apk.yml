@@ -49,6 +49,21 @@ jobs:
       - name: JVM logic tests (LogicTest)
         run: bash GardenCalendar/test.sh
 
+      - name: Версия сборки (автономер)
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            # Релиз по тегу vX.Y → name X.Y, code X*10000+Y*1000 (выше CI-диапазона)
+            V="${GITHUB_REF_NAME#v}"
+            MAJ="${V%%.*}"; REST="${V#*.}"; MIN="${REST%%.*}"
+            echo "APP_VERSION_CODE=$(( MAJ * 10000 + MIN * 1000 ))" >> "$GITHUB_ENV"
+            echo "APP_VERSION_NAME=$V" >> "$GITHUB_ENV"
+          else
+            # CI-сборка: растёт с каждым запуском, диапазон 17xxx (ниже релизных)
+            echo "APP_VERSION_CODE=$(( 17000 + GITHUB_RUN_NUMBER ))" >> "$GITHUB_ENV"
+            echo "APP_VERSION_NAME=2.5-ci$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          fi
+
       - name: Build & sign APK
         run: bash GardenCalendar/build.sh
 
@@ -63,7 +78,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ZI-Garden-csl.by-v2.5-apk
+          name: ZI-Garden-${{ env.APP_VERSION_NAME }}-apk
           path: GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk
           if-no-files-found: error
           retention-days: 90

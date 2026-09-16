@@ -28,6 +28,12 @@ mkdir -p "$GEN" "$OBJ" "$OUT/apk" "$OUT/dex"
 echo "[1/8] aapt2 compile"
 aapt2 compile --dir "$ROOT/res" -o "$OUT/res.zip"
 
+# Версию можно переопределить извне (CI подставляет автономер);
+# при локальной сборке остаются значения по умолчанию.
+APP_VERSION_CODE="${APP_VERSION_CODE:-17}"
+APP_VERSION_NAME="${APP_VERSION_NAME:-2.5}"
+echo "Версия APK: $APP_VERSION_NAME (code $APP_VERSION_CODE)"
+
 echo "[2/8] aapt2 link"
 aapt2 link -o "$OUT/app.unsigned.apk" \
   -I "$PLATFORM/android.jar" \
@@ -35,7 +41,7 @@ aapt2 link -o "$OUT/app.unsigned.apk" \
   --java "$GEN" \
   --auto-add-overlay \
   --min-sdk-version 24 --target-sdk-version 34 \
-  --version-code 17 --version-name "2.5" \
+  --version-code "$APP_VERSION_CODE" --version-name "$APP_VERSION_NAME" \
   "$OUT/res.zip"
 
 echo "[3/8] javac"
