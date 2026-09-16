@@ -115,10 +115,15 @@ public class LogicTest {
         check("профилактика весна+осень у каждой болезни", noPrev == 0, "пустых: " + noPrev);
         int photos = 0;
         StringBuilder noPhotoList = new StringBuilder();
-        for (Plant pl : Plant.all()) {
-            if (new java.io.File("res/drawable-nodpi/dz_" + pl.id + ".jpg").exists()) photos++; else noPhotoList.append(pl.id).append(" ");
+        for (Disease dz : dzAll) {
+            if (dz.image != null && new java.io.File("res/drawable-nodpi/" + dz.image + ".jpg").exists()) photos++;
+            else noPhotoList.append(dz.image).append(' ');
         }
-        check("фото симптомов в библиотеке (≥10 культур)", photos >= 10, "есть " + photos + ", ждут фото: " + noPhotoList);
+        // Храповик: каждая партия фото уменьшает долг; расти снова он не должен.
+        int photoDebtMax = 119;
+        check("фото есть у болезней (долг фото ≤ " + photoDebtMax + ")",
+            dzAll.size() - photos <= photoDebtMax,
+            "есть " + photos + "/" + dzAll.size() + ", ждут фото: " + noPhotoList);
         String dzJson = DiseaseDb.toJson(dzAll, 1);
         List<Disease> dzBack = DiseaseDb.fromJson(dzJson);
         check("JSON справочника сериализуется и читается (файл обновлений)", dzBack.size() == dzAll.size(), dzBack.size() + " из " + dzAll.size());

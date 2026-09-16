@@ -1,0 +1,175 @@
+apple_scab	apple	Парша яблони	Гриб — Venturia inaequalis
+apple_mildew	apple	Мучнистая роса	Гриб — Podosphaera leucotricha
+apple_monilia	apple	Плодовая гниль (монилиоз)	Гриб — Monilinia fructigena
+apple_canker	apple	Чёрный рак	Гриб — Sphaeropsis malorum
+pear_scab	pear	Парша груши	Гриб — Venturia pirina
+pear_rust	pear	Ржавчина груши	Гриб — Gymnosporangium sabinae
+pear_monilia	pear	Плодовая гниль (монилиоз)	Гриб — Monilinia fructigena
+pear_cytospora	pear	Цитоспороз (инфекционное усыхание)	Гриб — Cytospora
+quince_monilia	quince	Монилиоз айвы	Гриб — Monilinia
+quince_leafspot	quince	Бурая пятнистость листьев (филлостиктоз)	Гриб — Phyllosticta
+quince_fruitrot	quince	Плодовая гниль (горькая)	Гриб — Penicillium/Glomerella
+rowan_rust	rowan	Ржавчина рябины	Гриб — Gymnosporangium
+rowan_leafspot	rowan	Пятнистости листьев (септориоз)	Гриб — Septoria
+rowan_monilia	rowan	Плодовая гниль рябины	Гриб — Monilinia
+walnut_anthracnose	walnut	Антракноз (марссониоз)	Гриб — Marssonina juglandis
+walnut_bacteriosis	walnut	Бактериоз (бактериальный ожог)	Бактерия — Xanthomonas arboricola
+walnut_dieback	walnut	Усыхание ветвей (цитоспороз)	Гриб — Cytospora
+sweet_cherry_monilia	sweet_cherry	Монилиальный ожог (серая гниль косточковых)	Гриб — Monilinia cinerea
+sweet_cherry_coccomyces	sweet_cherry	Коккомикоз	Гриб — Blumeriella jaapii
+sweet_cherry_clastero	sweet_cherry	Клястероспориоз (дырчатая пятнистость)	Гриб — Clasterosporium carpophilum
+sweet_cherry_fruitrot	sweet_cherry	Плодовая гниль черешни	Гриб — Monilinia fructigena
+cherry_coccomyces	cherry	Коккомикоз вишни	Гриб — Blumeriella jaapii
+cherry_monilia	cherry	Монилиальный ожог	Гриб — Monilinia cinerea
+cherry_clastero	cherry	Клястероспориоз (дырчатая пятнистость)	Гриб — Clasterosporium carpophilum
+cherry_anthracnose	cherry	Антракноз вишни	Гриб — Colletotrichum
+apricot_monilia	apricot	Монилиальный ожог абрикоса	Гриб — Monilinia cinerea
+apricot_clastero	apricot	Клястероспориоз	Гриб — Clasterosporium carpophilum
+apricot_verticillium	apricot	Вертициллёзное увядание	Гриб — Verticillium dahliae
+apricot_fruitrot	apricot	Плодовая гниль	Гриб — Monilinia fructigena
+peach_curl	peach	Курчавость листьев	Гриб — Taphrina deformans
+peach_monilia	peach	Монилиоз персика	Гриб — Monilinia cinerea
+peach_clastero	peach	Клястероспориоз	Гриб — Clasterosporium carpophilum
+peach_mildew	peach	Мучнистая роса персика	Гриб — Sphaerotheca pannosa
+cherry_plum_clastero	cherry_plum	Клястероспориоз	Гриб — Clasterosporium carpophilum
+cherry_plum_monilia	cherry_plum	Монилиальный ожог	Гриб — Monilinia cinerea
+cherry_plum_fruitrot	cherry_plum	Плодовая гниль	Гриб — Monilinia fructigena
+plum_clastero	plum	Клястероспориоз сливы	Гриб — Clasterosporium carpophilum
+plum_monilia	plum	Монилиоз сливы	Гриб — Monilinia fructigena/cinerea
+plum_pockets	plum	«Кармашки» слив	Гриб — Taphrina pruni
+plum_rust	plum	Ржавчина сливы	Гриб — Tranzschelia pruni-spinosae
+grape_mildew	grape	Милдью (ложная мучнистая роса)	Гриб — Plasmopara viticola
+grape_oidium	grape	Оидиум (настоящая мучнистая роса)	Гриб — Erysiphe necator
+grape_grayrot	grape	Серая гниль	Гриб — Botrytis cinerea
+grape_anthracnose	grape	Антракноз винограда	Гриб — Gloeosporium
+rosehip_rust	rosehip	Ржавчина шиповника	Гриб — Phragmidium
+rosehip_mildew	rosehip	Мучнистая роса	Гриб — Sphaerotheca
+rosehip_blackspot	rosehip	Чёрная пятнистость	Гриб — Diplocarpon/Marssonina
+strawberry_grayrot	strawberry	Серая гниль ягод	Гриб — Botrytis cinerea
+strawberry_mildew	strawberry	Мучнистая роса земляники	Гриб — Sphaerotheca macularis
+strawberry_leafspot	strawberry	Бурая и белая пятнистости	Грибы — Marssonina/Mycosphaerella
+strawberry_verticillium	strawberry	Вертициллёзное увядание	Гриб — Verticillium dahliae
+raspberry_didymella	raspberry	Пурпуровая пятнистость (дидимелла)	Гриб — Didymella applanata
+raspberry_anthracnose	raspberry	Антракноз малины	Гриб — Elsinoe veneta
+raspberry_grayrot	raspberry	Серая гниль ягод	Гриб — Botrytis cinerea
+raspberry_mosaic	raspberry	Мозаика (вирус)	Вирус малинной мозаики
+blackberry_anthracnose	blackberry	Антракноз ежевики	Гриб — Elsinoe veneta
+blackberry_grayrot	blackberry	Серая гниль ягод	Гриб — Botrytis cinerea
+blackberry_rust	blackberry	Ржавчина ежевики	Гриб — Phragmidium
+currant_black_anthracnose	currant_black	Антракноз смородины	Гриб — Colletotrichum
+currant_black_septoria	currant_black	Септориоз (белая пятнистость)	Гриб — Septoria ribis
+currant_black_goblet	currant_black	Бокальчатая ржавчина	Гриб — Puccinia ribesii
+currant_black_reversion	currant_black	Махровость (реверсия)	Вирус/микоплазма, переносчик — почковый клещ
+currant_red_anthracnose	currant_red	Антракноз	Гриб — Colletotrichum
+currant_red_septoria	currant_red	Белая пятнистость (септориоз)	Гриб — Septoria
+currant_red_goblet	currant_red	Бокальчатая ржавчина	Гриб — Puccinia ribesii
+gooseberry_mildew	gooseberry	Американская мучнистая роса (сферотека)	Гриб — Sphaerotheca mors-uvae
+gooseberry_anthracnose	gooseberry	Антракноз и септориоз	Грибы — Colletotrichum, Septoria
+gooseberry_goblet	gooseberry	Бокальчатая ржавчина	Гриб — Puccinia ribesii
+blueberry_grayrot	blueberry	Серая гниль ягод	Гриб — Botrytis cinerea
+blueberry_mummy	blueberry	Монилиоз (мумификация ягод)	Гриб — Monilinia vaccinii-corymbosi
+blueberry_stemcanker	blueberry	Рак стебля (ботриосферия)	Гриб — Botryosphaeria
+blueberry_chlorosis	blueberry	Хлороз (неинфекционный)	Дефицит железа из-за высокого pH
+honeysuckle_leafspot	honeysuckle	Пятнистости листьев (церкоспороз, рамуляриоз)	Грибы — Cercospora, Ramularia
+honeysuckle_mildew	honeysuckle	Мучнистая роса жимолости	Гриб — Erysiphaceae
+honeysuckle_dieback	honeysuckle	Усыхание ветвей (туберкуляриоз)	Гриб — Tubercularia
+sea_buckthorn_fusarium	sea_buckthorn	Фузариозное увядание (вертициллёз)	Гриб — Fusarium/Verticillium
+sea_buckthorn_endomycosis	sea_buckthorn	Эндомикоз плодов	Гриб — Endomyces
+sea_buckthorn_blackscab	sea_buckthorn	Чёрный парша/некроз коры	Грибы — Cytospora/Fusicoccum
+irga_monilia	irga	Монилиоз ирги	Гриб — Monilinia
+irga_septoria	irga	Септориоз (белая пятнистость)	Гриб — Septoria
+irga_dieback	irga	Усыхание побегов (цитоспороз)	Гриб — Cytospora
+chokeberry_monilia	chokeberry	Монилиоз аронии	Гриб — Monilinia
+chokeberry_septoria	chokeberry	Пятнистости листьев	Грибы — Septoria, Phyllosticta
+chokeberry_dieback	chokeberry	Усыхание ветвей	Грибы — Cytospora и др.
+actinidia_leafspot	actinidia	Пятнистости листьев (филлостиктоз, рамуляриоз)	Грибы — Phyllosticta, Ramularia
+actinidia_grayrot	actinidia	Серая гниль плодов	Гриб — Botrytis cinerea
+actinidia_dieback	actinidia	Усыхание побегов	Грибы — фузариум и др.
+clematis_wilt	clematis	Вилт (увядание)	Грибы — Fusarium, Phomopsis
+clematis_mildew	clematis	Мучнистая роса клематиса	Гриб — Erysiphe
+clematis_grayrot	clematis	Серая гниль	Гриб — Botrytis cinerea
+clematis_rust	clematis	Ржавчина клематиса	Гриб — Aecidium clematidis
+rose_blackspot	rose	Чёрная пятнистость	Гриб — Diplocarpon rosae
+rose_mildew	rose	Мучнистая роса роз	Гриб — Sphaerotheca pannosa
+rose_rust	rose	Ржавчина роз	Гриб — Phragmidium
+rose_grayrot	rose	Серая гниль бутонов (ботритис)	Гриб — Botrytis cinerea
+rose_infectious_burn	rose	Инфекционный ожог (рак стеблей)	Гриб — Coniothyrium wernsdorffiae
+conifer_schutte	conifer	Шютте (бурое и снежное)	Грибы — Herpotrichia, Lophodermium
+conifer_rust	conifer	Ржавчина хвои (пузырчатая, столбчатая)	Грибы — Cronartium, Endocronartium
+conifer_fusarium	conifer	Фузариоз (трахеомикоз)	Гриб — Fusarium
+conifer_necrosis	conifer	Некроз коры (песталоциоз, цитоспороз)	Грибы — Pestalotia, Cytospora
+hydrangea_grayrot	hydrangea	Серая гниль	Гриб — Botrytis cinerea
+hydrangea_mildew	hydrangea	Мучнистая роса гортензии	Гриб — Erysiphe polygoni
+hydrangea_leafspot	hydrangea	Пятнистости (аскохитоз, септориоз)	Грибы — Ascochyta, Septoria
+hydrangea_chlorosis	hydrangea	Хлороз гортензии	Дефицит железа при высоком pH
+lawn_snowmold	lawn	Снежная плесень (фузариоз)	Грибы — Fusarium, Microdochium
+lawn_mildew	lawn	Мучнистая роса газона	Гриб — Blumeria graminis
+lawn_rust	lawn	Ржавчина газона	Грибы — Puccinia
+lawn_redthread	lawn	Красная нитевидность	Гриб — Laetisaria fuciformis
+tomato_lateblight	tomato	Фитофтороз	Оомицет — Phytophthora infestans
+tomato_cladosporium	tomato	Кладоспориоз (бурая пятнистость листьев)	Гриб — Cladosporium fulvum
+tomato_blossomrot	tomato	Вершинная гниль плодов	Неинфекционное — дефицит кальция
+tomato_fusarium	tomato	Фузариозное увядание	Гриб — Fusarium oxysporum
+tomato_alternaria	tomato	Альтернариоз (сухая пятнистость)	Гриб — Alternaria solani
+tomato_mosaic	tomato	Вирус мозаики (ВТМ)	Вирус — Tobacco mosaic virus
+cucumber_downy	cucumber	Пероноспороз (ложная мучнистая роса)	Оомицет — Pseudoperonospora cubensis
+cucumber_mildew	cucumber	Мучнистая роса огурца	Гриб — Erysiphe cichoracearum
+cucumber_rootrot	cucumber	Корневые гнили (фузариоз, питиум)	Грибы — Fusarium, Pythium
+cucumber_anthracnose	cucumber	Антракноз (медянка)	Гриб — Colletotrichum orbiculare
+cucumber_cladosporium	cucumber	Оливковая (кладоспориозная) пятнистость плодов	Гриб — Cladosporium cucumerinum
+pepper_blossomrot	pepper	Вершинная гниль плодов	Неинфекционное — дефицит кальция
+pepper_bacterial	pepper	Чёрная бактериальная пятнистость	Бактерия — Xanthomonas
+pepper_phytophthora	pepper	Фитофтороз перца	Оомицет — Phytophthora infestans
+pepper_fusarium	pepper	Фузариозное увядание	Гриб — Fusarium
+eggplant_phytophthora	eggplant	Фитофтороз баклажана	Оомицет — Phytophthora infestans
+eggplant_verticillium	eggplant	Вертициллёзное увядание	Гриб — Verticillium dahliae
+eggplant_grayrot	eggplant	Серая гниль плодов	Гриб — Botrytis cinerea
+eggplant_blackbacterial	eggplant	Чёрная бактериальная пятнистость	Бактерия — Xanthomonas
+cabbage_kila	cabbage	Кила капусты	Слизевик — Plasmodiophora brassicae
+cabbage_slimybacteriosis	cabbage	Слизистый бактериоз	Бактерии — Erwinia/Pectobacterium
+cabbage_blackleg	cabbage	Чёрная ножка рассады	Грибы — Pythium, Rhizoctonia
+cabbage_downy	cabbage	Пероноспороз капусты	Оомицет — Hyaloperonospora
+cabbage_grayrot	cabbage	Серая гниль при хранении	Гриб — Botrytis cinerea
+carrot_alternaria	carrot	Альтернариоз (чёрная гниль)	Гриб — Alternaria radicina
+carrot_phomosis	carrot	Фомоз (сухая гниль)	Гриб — Phoma rostrupii
+carrot_cercospora	carrot	Церкоспороз листьев	Гриб — Cercospora carotae
+carrot_bacterial	carrot	Мокрая бактериальная гниль при хранении	Бактерии — Erwinia
+beet_cercospora	beet	Церкоспороз	Гриб — Cercospora beticola
+beet_phomosis	beet	Фомоз (зональная пятнистость)	Гриб — Phoma betae
+beet_blackleg	beet	Корнеед всходов (чёрная ножка)	Грибы — Pythium, Aphanomyces
+beet_mildew	beet	Мучнистая роса свёклы	Гриб — Erysiphe betae
+radish_kila	radish	Кила	Слизевик — Plasmodiophora brassicae
+radish_blackleg	radish	Чёрная ножка	Грибы — Pythium и др.
+radish_bacteriosis	radish	Слизистый бактериоз корнеплода	Бактерии — Pectobacterium
+onion_downy	onion	Пероноспороз (ложная мучнистая роса)	Оомицет — Peronospora destructor
+onion_neckrot	onion	Шейковая гниль	Гриб — Botrytis allii
+onion_fusarium	onion	Фузариозная гниль донца	Гриб — Fusarium
+onion_rust	onion	Ржавчина лука	Гриб — Puccinia allii
+garlic_rust	garlic	Ржавчина чеснока	Гриб — Puccinia allii
+garlic_fusarium	garlic	Фузариоз (гниль донца)	Гриб — Fusarium
+garlic_downy	garlic	Пероноспороз чеснока	Оомицет — Peronospora destructor
+garlic_bacterial	garlic	Бактериальная гниль зубков	Бактерии — Pectobacterium и др.
+potato_lateblight	potato	Фитофтороз картофеля	Оомицет — Phytophthora infestans
+potato_alternaria	potato	Альтернариоз (сухая пятнистость)	Гриб — Alternaria solani
+potato_rhizoctonia	potato	Ризоктониоз (чёрная парша)	Гриб — Rhizoctonia solani
+potato_scab	potato	Парша обыкновенная	Гриб — Streptomyces
+potato_blackleg	potato	Чёрная ножка	Бактерии — Pectobacterium
+zucchini_mildew	zucchini	Мучнистая роса	Гриб — Erysiphe cichoracearum
+zucchini_anthracnose	zucchini	Антракноз	Гриб — Colletotrichum
+zucchini_grayrot	zucchini	Серая гниль плодов	Гриб — Botrytis cinerea
+zucchini_downy	zucchini	Пероноспороз	Оомицет — Pseudoperonospora
+pumpkin_mildew	pumpkin	Мучнистая роса тыквы	Гриб — Erysiphe cichoracearum
+pumpkin_anthracnose	pumpkin	Антракноз	Гриб — Colletotrichum
+pumpkin_whiterot	pumpkin	Белая гниль (склеротиния)	Гриб — Sclerotinia sclerotiorum
+pumpkin_downy	pumpkin	Пероноспороз	Оомицет — Pseudoperonospora
+pea_ascochyta	pea	Аскохитоз	Гриб — Ascochyta pisi
+pea_rust	pea	Ржавчина гороха	Гриб — Uromyces pisi
+pea_mildew	pea	Мучнистая роса гороха	Гриб — Erysiphe pisi
+pea_fusarium	pea	Фузариозное увядание	Гриб — Fusarium
+greens_blackleg	greens	Чёрная ножка всходов	Грибы — Pythium, Rhizoctonia
+greens_downy	greens	Пероноспороз (ложная мучнистая роса)	Оомицеты — Peronospora и др.
+greens_grayrot	greens	Серая гниль	Гриб — Botrytis cinerea
+greens_rust	greens	Ржавчина зелени	Грибы — Puccinia и др.
+greenhouse_cladosporium	greenhouse	Кладоспориоз тепличных культур	Гриб — Cladosporium
+greenhouse_rootrot	greenhouse	Корневые гнили тепличных растений	Грибы — Pythium, Fusarium
+greenhouse_grayrot	greenhouse	Серая гниль в теплице	Гриб — Botrytis cinerea
