@@ -81,15 +81,24 @@ public class Weather {
     }
 
     public static String buildUrl(double d, double d2) {
-        return "https://api.open-meteo.com/v1/forecast?latitude=" + d + "&longitude=" + d2 + "&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,relative_humidity_2m_max,soil_moisture_0_to_7cm_max&hourly=temperature_2m,precipitation,precipitation_probability,soil_temperature_6cm&forecast_days=10&timezone=auto";
+        // Влажность воздуха и влага почвы у Open-Meteo — только почасовые величины
+        // (daily-параметры relative_humidity_2m_max и soil_moisture_0_to_7cm_max
+        // API отклоняет с HTTP 400). Суточные значения считаем из почасового ряда.
+        return "https://api.open-meteo.com/v1/forecast?latitude=" + d + "&longitude=" + d2 + "&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&hourly=temperature_2m,precipitation,precipitation_probability,relative_humidity_2m,soil_temperature_6cm,soil_moisture_0_to_7cm&forecast_days=10&timezone=auto";
     }
 
-    /** Загрузка прогноза с одной повторной попыткой при сбое сети. */
+    /** Минимальный URL без почасовых величин — запасной вариант при HTTP 400. */
+    public static String buildUrlMinimal(double d, double d2) {
+        return "https://api.open-meteo.com/v1/forecast?latitude=" + d + "&longitude=" + d2 + "&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&forecast_days=10&timezone=auto";
+    }
+
+    /** Загрузка прогноза: полный URL (2 попытки), при отказе — минимальный URL без почасовых данных. */
     public static Weather fetch(double d, double d2, String str) throws Exception {
         Exception first = null;
-        for (int attempt = 0; attempt < 2; attempt++) {
+        String[] urls = {buildUrl(d, d2), buildUrl(d, d2), buildUrlMinimal(d, d2)};
+        for (int attempt = 0; attempt < urls.length; attempt++) {
             try {
-                return fetchOnce(d, d2, str);
+                return fetchOnce(urls[attempt], d, d2, str);
             } catch (Exception e) {
                 first = e;
                 if (attempt == 0) {
@@ -104,9 +113,9 @@ public class Weather {
         throw first;
     }
 
-    private static Weather fetchOnce(double d, double d2, String str) throws Exception {
+    private static Weather fetchOnce(String url, double d, double d2, String str) throws Exception {
         String str2;
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(buildUrl(d, d2)).openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setConnectTimeout(15000);
         httpURLConnection.setReadTimeout(20000);
         httpURLConnection.setRequestProperty("User-Agent", "GardenCalendar/1.1 (csl.by)");
@@ -169,8 +178,6 @@ public class Weather {
         JSONArray optJSONArray = jSONObject3.optJSONArray("precipitation_probability_max");
         JSONArray optJSONArray2 = jSONObject3.optJSONArray("wind_speed_10m_max");
         JSONArray optJSONArray3 = jSONObject3.optJSONArray("weather_code");
-        JSONArray arrHum = jSONObject3.optJSONArray("relative_humidity_2m_max");
-        JSONArray arrSoil = jSONObject3.optJSONArray("soil_moisture_0_to_7cm_max");
         char c = 0;
         int i = 0;
         while (i < jSONArray.length()) {
@@ -185,8 +192,6 @@ public class Weather {
             day.precipProb = optJSONArray == null ? 0.0d : optJSONArray.optDouble(i);
             day.windMax = optJSONArray2 != null ? optJSONArray2.optDouble(i) : 0.0d;
             day.code = optJSONArray3 == null ? -1 : optJSONArray3.optInt(i);
-            day.humidity = arrHum == null ? Double.NaN : arrHum.optDouble(i, Double.NaN);
-            day.soilMoist = arrSoil == null ? Double.NaN : arrSoil.optDouble(i, Double.NaN);
             weather.days.add(day);
             i++;
             c = 0;
@@ -204,9 +209,12 @@ public class Weather {
         JSONArray optJSONArray2 = jSONObject.optJSONArray("precipitation");
         JSONArray optJSONArray3 = jSONObject.optJSONArray("precipitation_probability");
         JSONArray optJSONArray4 = jSONObject.optJSONArray("soil_temperature_6cm");
+        JSONArray arrHum = jSONObject.optJSONArray("relative_humidity_2m");
+        JSONArray arrSoil = jSONObject.optJSONArray("soil_moisture_0_to_7cm");
         if (optJSONArray == null) {
             return;
         }
+        int[] soilCount = new int[weather.days.size()];
         for (int i2 = 0; i2 < optJSONArray.length(); i2++) {
             String[] split = optJSONArray.getString(i2).split("T");
             int[] ymd = ymd(split[0]);
@@ -220,6 +228,20 @@ public class Weather {
                 if (optJSONArray4 != null && Double.isNaN(dayFor.soilT)) {
                     dayFor.soilT = optJSONArray4.optDouble(i2);
                 }
+                if (arrHum != null && !arrHum.isNull(i2)) {
+                    double h = arrHum.optDouble(i2, Double.NaN);
+                    if (!Double.isNaN(h) && (Double.isNaN(dayFor.humidity) || h > dayFor.humidity)) {
+                        dayFor.humidity = h; // суточный максимум влажности воздуха
+                    }
+                }
+                if (arrSoil != null && !arrSoil.isNull(i2)) {
+                    double sm = arrSoil.optDouble(i2, Double.NaN);
+                    if (!Double.isNaN(sm)) {
+                        int di = weather.days.indexOf(dayFor);
+                        dayFor.soilMoist = soilCount[di] == 0 ? sm : dayFor.soilMoist + sm;
+                        soilCount[di]++;
+                    }
+                }
                 if (i >= 8 && i < 20) {
                     if (optJSONArray2 != null) {
                         dayFor.workPrecipMm += Math.max(0.0d, optJSONArray2.optDouble(i2));
@@ -228,6 +250,12 @@ public class Weather {
                         dayFor.workPrecipProb = Math.max(dayFor.workPrecipProb, optJSONArray3.optDouble(i2));
                     }
                 }
+            }
+        }
+        // влага почвы — среднее за сутки из почасовых значений
+        for (int di = 0; di < weather.days.size(); di++) {
+            if (soilCount[di] > 1) {
+                weather.days.get(di).soilMoist /= soilCount[di];
             }
         }
     }

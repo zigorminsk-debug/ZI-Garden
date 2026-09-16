@@ -171,6 +171,28 @@ public class LogicTest {
                     + System.currentTimeMillis() + ",\"currentTemp\":18.0,\"currentCode\":1,\"days\":[]}");
         }
 
+        System.out.println("\n=== 2a. Погода: разбор ответа Open-Meteo (офлайн-фикстура) ===");
+        String fx = "{\"current\":{\"temperature_2m\":15.4,\"weather_code\":3}"
+            + ",\"daily\":{\"time\":[\"2026-09-16\"],\"temperature_2m_max\":[21.0],\"temperature_2m_min\":[11.0]"
+            + ",\"precipitation_sum\":[1.2],\"precipitation_probability_max\":[60],\"wind_speed_10m_max\":[12.0],\"weather_code\":[61]}"
+            + ",\"hourly\":{\"time\":[\"2026-09-16T08:00\",\"2026-09-16T12:00\",\"2026-09-16T20:00\"]"
+            + ",\"precipitation\":[0.5,0.5,1.0],\"precipitation_probability\":[50,60,90]"
+            + ",\"relative_humidity_2m\":[70,85,95],\"soil_temperature_6cm\":[14.0,16.5,15.0],\"soil_moisture_0_to_7cm\":[0.30,0.36,0.33]}}";
+        try {
+            Weather wf = Weather.parse(fx, 53.9, 27.56, "Тест");
+            Weather.Day df = wf.days.get(0);
+            check("влажность воздуха — суточный максимум из почасовых", Double.compare(df.humidity, 95.0) == 0, String.valueOf(df.humidity));
+            check("влага почвы — суточная средняя из почасовых", Math.abs(df.soilMoist - 0.33) < 0.001, String.valueOf(df.soilMoist));
+            check("осадки в рабочие часы 8–20", Math.abs(df.workPrecipMm - 1.0) < 0.001 && Double.compare(df.workPrecipProb, 60.0) == 0,
+                    df.workPrecipMm + " мм / " + df.workPrecipProb + "%");
+            check("URL без daily-параметров влажности (Open-Meteo их отклоняет HTTP 400)",
+                    !Weather.buildUrl(53.9, 27.56).contains("relative_humidity_2m_max")
+                            && !Weather.buildUrl(53.9, 27.56).contains("soil_moisture_0_to_7cm_max"), "");
+            check("минимальный запасной URL задан", Weather.buildUrlMinimal(53.9, 27.56).contains("daily=weather_code"), "");
+        } catch (Exception e) {
+            check("разбор ответа Open-Meteo (фикстура)", false, String.valueOf(e));
+        }
+
         System.out.println("\n=== 2b. Метео-логика полива (синтетический прогноз) ===");
         Weather wSyn = new Weather();
         wSyn.fetchedAt = System.currentTimeMillis();
