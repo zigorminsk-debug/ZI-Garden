@@ -6,9 +6,17 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 SDK="${ANDROID_HOME:-/home/user/android-sdk}"
 PLATFORM="$SDK/platforms/android-34"
 BT="$SDK/build-tools/34.0.0"
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-[ -x "$JAVA_HOME/bin/javac" ] || JAVA_HOME="$(ls -d /home/user/tools/jdk-17* 2>/dev/null | head -1)"
-[ -x "$JAVA_HOME/bin/javac" ] || JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+# JAVA_HOME: уважаем уже заданный (например, actions/setup-java в CI),
+# иначе ищем типовые установки; fallback'и не должны валить скрипт при set -euo pipefail
+export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
+if [ ! -x "$JAVA_HOME/bin/javac" ]; then
+  JAVA_HOME="$( (ls -d /usr/lib/jvm/java-21-openjdk-amd64 /home/user/tools/jdk-17* /home/user/ZI-Garden/tools/jdk-17* 2>/dev/null || true) | head -1 )"
+fi
+if [ ! -x "$JAVA_HOME/bin/javac" ]; then
+  JAVAC_BIN="$(command -v javac || true)"
+  [ -n "$JAVAC_BIN" ] && JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$JAVAC_BIN")")")"
+fi
+[ -x "$JAVA_HOME/bin/javac" ] || { echo "ОШИБКА: не найден javac — установите JDK 17+"; exit 1; }
 export PATH="$JAVA_HOME/bin:$BT:$PATH"
 
 OUT="$ROOT/out"
@@ -17,10 +25,10 @@ OBJ="$OUT/classes"
 rm -rf "$OUT"
 mkdir -p "$GEN" "$OBJ" "$OUT/apk" "$OUT/dex"
 
-echo "[1/7] aapt2 compile"
+echo "[1/8] aapt2 compile"
 aapt2 compile --dir "$ROOT/res" -o "$OUT/res.zip"
 
-echo "[2/7] aapt2 link"
+echo "[2/8] aapt2 link"
 aapt2 link -o "$OUT/app.unsigned.apk" \
   -I "$PLATFORM/android.jar" \
   --manifest "$ROOT/AndroidManifest.xml" \
@@ -30,7 +38,7 @@ aapt2 link -o "$OUT/app.unsigned.apk" \
   --version-code 17 --version-name "2.5" \
   "$OUT/res.zip"
 
-echo "[3/7] javac"
+echo "[3/8] javac"
 find "$ROOT/src" "$GEN" -name '*.java' > "$OUT/sources.txt"
 javac --release 8 -nowarn -encoding UTF-8 \
   -sourcepath "$ROOT/src:$GEN" \

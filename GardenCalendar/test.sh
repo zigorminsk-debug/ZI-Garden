@@ -4,9 +4,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 # тест ищет res/drawable-nodpi по относительному пути — всегда работаем из каталога проекта
 cd "$ROOT"
-export JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}
-[ -x "$JAVA_HOME/bin/javac" ] || JAVA_HOME="$(ls -d /usr/lib/jvm/java-21-openjdk-amd64 /home/user/tools/jdk-17* /home/user/ZI-Garden/tools/jdk-17* 2>/dev/null | head -1)"
-[ -x "$JAVA_HOME/bin/javac" ] || JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
+if [ ! -x "$JAVA_HOME/bin/javac" ]; then
+  JAVA_HOME="$( (ls -d /usr/lib/jvm/java-21-openjdk-amd64 /home/user/tools/jdk-17* /home/user/ZI-Garden/tools/jdk-17* 2>/dev/null || true) | head -1 )"
+fi
+if [ ! -x "$JAVA_HOME/bin/javac" ]; then
+  JAVAC_BIN="$(command -v javac || true)"
+  [ -n "$JAVAC_BIN" ] && JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$JAVAC_BIN")")")"
+fi
+[ -x "$JAVA_HOME/bin/javac" ] || { echo "ОШИБКА: не найден javac — установите JDK 17+"; exit 1; }
 export PATH="$JAVA_HOME/bin:$PATH"
 OUT="$ROOT/out-test"
 rm -rf "$OUT" && mkdir -p "$OUT"
