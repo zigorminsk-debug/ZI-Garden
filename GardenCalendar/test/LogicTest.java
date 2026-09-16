@@ -120,7 +120,7 @@ public class LogicTest {
             else noPhotoList.append(dz.image).append(' ');
         }
         // Храповик: каждая партия фото уменьшает долг; расти снова он не должен.
-        int photoDebtMax = 69;
+        int photoDebtMax = 59;
         check("фото есть у болезней (долг фото ≤ " + photoDebtMax + ")",
             dzAll.size() - photos <= photoDebtMax,
             "есть " + photos + "/" + dzAll.size() + ", ждут фото: " + noPhotoList);
@@ -145,6 +145,28 @@ public class LogicTest {
         Set<String> dzMarks = stPrev.plantDiseases("apple");
         check("отметки болезней хранятся изолированно от списка культур",
                 dzMarks.isEmpty() && stPrev.plants().contains("apple"), "");
+
+        // Рекомендации сортов в посадочных работах (регион по GPS)
+        Storage stVar = new Storage(new Context());
+        stVar.setPlants(new HashSet<>(java.util.Arrays.asList("apple")));
+        stVar.setLocation("Лесной", 54.0, 27.68);
+        boolean sortBlockBy = false;
+        String sortText = "";
+        for (Task tv : new Planner(stVar, null).tasks(400)) {
+            if (Operation.PLANT.equals(tv.op) && tv.text.contains("Сорта, хорошо зарекомендовавшие")) {
+                sortBlockBy = true;
+                sortText = tv.text;
+                break;
+            }
+        }
+        check("посадочная работа содержит сорта региона (Беларусь)", sortBlockBy && sortText.contains("Алеся"), "");
+        check("сорт несёт срок созревания и описание", sortText.contains("летний") || sortText.contains("зима"), "");
+        List<Varieties.V> vsCrimea = Varieties.forPlant("peach", "crimea");
+        boolean southern = false;
+        for (Varieties.V v : vsCrimea) {
+            if (v.name.equals("Краснощёкий")) southern = true;
+        }
+        check("региональный фильтр сортов (Крым → южные сорта)", southern && !Varieties.forPlant("peach", "by").equals(vsCrimea), "");
         String dzJson = DiseaseDb.toJson(dzAll, 1);
         List<Disease> dzBack = DiseaseDb.fromJson(dzJson);
         check("JSON справочника сериализуется и читается (файл обновлений)", dzBack.size() == dzAll.size(), dzBack.size() + " из " + dzAll.size());

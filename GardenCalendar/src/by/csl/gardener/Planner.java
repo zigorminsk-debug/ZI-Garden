@@ -123,6 +123,12 @@ public class Planner {
         task.op = rule2.op;
         task.title = rule2.title + groupSuffix(str);
         task.text = rule2.text;
+        if (Operation.PLANT.equals(task.op)) {
+            String sortBlock = Varieties.blockFor(plant, this.region);
+            if (sortBlock.length() > 0) {
+                task.text += sortBlock;
+            }
+        }
         task.year = i;
         task.month = i2;
         task.day = i3;
