@@ -34,8 +34,16 @@ jobs:
 
       - name: Android SDK (platform 34, build-tools 34.0.0)
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
+          ls "$ANDROID_HOME/platforms" 2>/dev/null || true
+          ls "$ANDROID_HOME/build-tools" 2>/dev/null || true
+          if [ ! -f "$ANDROID_HOME/platforms/android-34/android.jar" ] || [ ! -x "$ANDROID_HOME/build-tools/34.0.0/aapt2" ]; then
+            SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+            [ -x "$SDKM" ] || SDKM=sdkmanager
+            yes | "$SDKM" --sdk_root="$ANDROID_HOME" --licenses > /dev/null 2>&1 || true
+            "$SDKM" --sdk_root="$ANDROID_HOME" --install "platforms;android-34" "build-tools;34.0.0"
+          else
+            echo "android-34 и build-tools 34.0.0 уже есть в образе — пропускаю установку"
+          fi
           echo "ANDROID_HOME=$ANDROID_HOME"
 
       - name: JVM logic tests (LogicTest)
