@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#1565C0</color>
+    <color name="bg">#F4F6F2</color>
+    <color name="green_50">#E8F5E9</color>
+    <color name="green_700">#388E3C</color>
+    <color name="green_900">#1B5E20</color>
+    <color name="ok_bg">#E8F5E9</color>
+    <color name="ok_stroke">#81C784</color>
+    <color name="text_main">#20271F</color>
+    <color name="text_sub">#5C6660</color>
+    <color name="warn_bg">#FFF3E0</color>
+    <color name="warn_stroke">#FFB74D</color>
+    <color name="white">#FFFFFF</color>
+</resources>

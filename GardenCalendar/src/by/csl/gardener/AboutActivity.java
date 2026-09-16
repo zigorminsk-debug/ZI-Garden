@@ -1,0 +1,41 @@
+package by.csl.gardener;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+public class AboutActivity extends Activity {
+    protected void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+        setContentView(R.layout.activity_about);
+        ((TextView) findViewById(R.id.phone)).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                AboutActivity.this.m0lambda$onCreate$0$bycslgardenerAboutActivity(view);
+            }
+        });
+        ((TextView) findViewById(R.id.site)).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                AboutActivity.this.m1lambda$onCreate$1$bycslgardenerAboutActivity(view);
+            }
+        });
+    }
+
+    void m0lambda$onCreate$0$bycslgardenerAboutActivity(View view) {
+        try {
+            startActivity(new Intent("android.intent.action.DIAL", Uri.parse("tel:+375293371412")));
+        } catch (Exception unused) {
+            Ui.toast(this, "+375 29 337-14-12");
+        }
+    }
+
+    void m1lambda$onCreate$1$bycslgardenerAboutActivity(View view) {
+        try {
+            startActivity(new Intent("android.intent.action.VIEW", Uri.parse("https://csl.by")));
+        } catch (Exception unused) {
+            Ui.toast(this, "csl.by");
+        }
+    }
+}

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 Участок (город / координаты)"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/lat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Широта"
+                android:inputType="numberDecimal|numberSigned" />
+
+            <EditText
+                android:id="@+id/lon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:hint="Долгота"
+                android:inputType="numberDecimal|numberSigned" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_gps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📡 Определить моё местоположение по GPS"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/save_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сохранить участок"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:id="@+id/region_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/card_bg"
+            android:lineSpacingExtra="3dp"
+            android:padding="10dp"
+            android:textColor="@color/text_main"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🌳 Возраст ваших растений (влияет на дозы)"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/size_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/size_young"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Молодые (до 5 лет)" />
+
+            <RadioButton
+                android:id="@+id/size_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Плодоносящие (5–15 лет)" />
+
+            <RadioButton
+                android:id="@+id/size_old"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Взрослые, крупные (старше 15 лет)" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🔔 Напоминания"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/notify_enabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Присылать напоминания о работах" />
+
+        <Button
+            android:id="@+id/notify_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Напоминать:"
+            android:textColor="@color/text_sub"
+            android:textSize="13sp" />
+
+        <Spinner
+            android:id="@+id/lead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/test_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Проверить уведомление"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:id="@+id/notify_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_sub"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🧹 Данные"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/reset_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сбросить отметки «выполнено» за этот год"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/clear_bought"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Очистить список покупок"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</ScrollView>
