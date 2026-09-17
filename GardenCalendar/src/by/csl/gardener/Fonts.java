@@ -6,9 +6,9 @@ import android.content.res.Configuration;
 /** Размер шрифта интерфейса: ступени масштаба и их применение к контексту активности. */
 public final class Fonts {
 
-    /** Ступени масштаба шрифта: мелкий / обычный / крупный / очень крупный. */
-    public static final float[] SCALES = {0.85f, 1.0f, 1.2f, 1.4f};
-    public static final String[] LABELS = {"Мелкий", "Обычный", "Крупный", "Очень крупный"};
+    /** Ступени масштаба шрифта: мелкий / обычный / крупный / очень крупный / огромный / гигантский. */
+    public static final float[] SCALES = {0.85f, 1.0f, 1.2f, 1.4f, 1.6f, 1.85f};
+    public static final String[] LABELS = {"Мелкий", "Обычный", "Крупный", "Очень крупный", "Огромный", "Гигантский"};
 
     private Fonts() {
     }

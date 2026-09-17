@@ -603,18 +603,23 @@ public class LogicTest {
         check("списки сортов расширены (≥5 у каждой культуры)", thin == 0, "тонких: " + thin);
 
         System.out.println("\n=== 16. Размер шрифта ===");
-        check("4 ступени масштаба шрифта с подписями",
-            Fonts.SCALES.length == 4 && Fonts.LABELS.length == 4,
+        check("6 ступеней масштаба шрифта с подписями",
+            Fonts.SCALES.length == 6 && Fonts.LABELS.length == 6,
             "масштабов: " + Fonts.SCALES.length + ", подписей: " + Fonts.LABELS.length);
         boolean monoFont = Fonts.SCALES[0] < Fonts.SCALES[1]
-            && Fonts.SCALES[1] < Fonts.SCALES[2] && Fonts.SCALES[2] < Fonts.SCALES[3];
+            && Fonts.SCALES[1] < Fonts.SCALES[2] && Fonts.SCALES[2] < Fonts.SCALES[3]
+            && Fonts.SCALES[3] < Fonts.SCALES[4] && Fonts.SCALES[4] < Fonts.SCALES[5];
         check("ступени возрастают, обычный = 100%", monoFont && Fonts.SCALES[1] == 1.0f,
             java.util.Arrays.toString(Fonts.SCALES));
+        check("две новые ступени крупнее ×1.4", Fonts.SCALES[4] == 1.6f && Fonts.SCALES[5] == 1.85f,
+            "×" + Fonts.SCALES[4] + " и ×" + Fonts.SCALES[5]);
         Context ctxFont = new Context();
         check("размер шрифта по умолчанию — обычный", new Storage(ctxFont).fontSize() == 1, "");
         new Storage(ctxFont).setFontSize(3);
         check("размер шрифта сохраняется в настройках", new Storage(ctxFont).fontSize() == 3, "");
-        check("масштаб «огромный» = ×1.4", Fonts.scale(ctxFont) == 1.4f, String.valueOf(Fonts.scale(ctxFont)));
+        check("масштаб «очень крупный» = ×1.4", Fonts.scale(ctxFont) == 1.4f, String.valueOf(Fonts.scale(ctxFont)));
+        new Storage(ctxFont).setFontSize(5);
+        check("масштаб «гигантский» = ×1.85", Fonts.scale(ctxFont) == 1.85f, String.valueOf(Fonts.scale(ctxFont)));
         new Storage(ctxFont).setFontSize(9);
         check("некорректное значение в настройках → обычный шрифт", Fonts.scale(ctxFont) == 1.0f, "");
         new Storage(ctxFont).setFontSize(3);

@@ -145,6 +145,20 @@
                 android:layout_height="wrap_content"
                 android:text="Очень крупный"
                 android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/font_xxlarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Огромный"
+                android:textSize="23sp" />
+
+            <RadioButton
+                android:id="@+id/font_xxxlarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Гигантский"
+                android:textSize="26sp" />
         </RadioGroup>
 
         <TextView

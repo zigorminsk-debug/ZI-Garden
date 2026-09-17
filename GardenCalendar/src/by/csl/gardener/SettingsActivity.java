@@ -93,10 +93,10 @@ public class SettingsActivity extends Activity {
         });
         RadioGroup fontGroup = (RadioGroup) findViewById(R.id.font_group);
         int fontSize = this.store.fontSize();
-        fontGroup.check(fontSize == 0 ? R.id.font_small : fontSize == 2 ? R.id.font_large : fontSize == 3 ? R.id.font_xlarge : R.id.font_normal);
+        fontGroup.check(fontSize == 0 ? R.id.font_small : fontSize == 2 ? R.id.font_large : fontSize == 3 ? R.id.font_xlarge : fontSize == 4 ? R.id.font_xxlarge : fontSize == 5 ? R.id.font_xxxlarge : R.id.font_normal);
         fontGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             public final void onCheckedChanged(RadioGroup radioGroup2, int i2) {
-                SettingsActivity.this.store.setFontSize(i2 == R.id.font_small ? 0 : i2 == R.id.font_large ? 2 : i2 == R.id.font_xlarge ? 3 : 1);
+                SettingsActivity.this.store.setFontSize(i2 == R.id.font_small ? 0 : i2 == R.id.font_large ? 2 : i2 == R.id.font_xlarge ? 3 : i2 == R.id.font_xxlarge ? 4 : i2 == R.id.font_xxxlarge ? 5 : 1);
                 SettingsActivity.this.recreate();
             }
         });
