@@ -87,6 +87,7 @@ public class CalendarActivity extends Activity {
         Calendar calendar2 = Dates.today();
         int i = 0;
         int i2 = 0;
+        renderHints(calendar2);
         for (int i3 = 21; i < i3; i3 = 21) {
             Calendar plusDays = Dates.plusDays(calendar2, i);
             boolean z = true;
@@ -146,6 +147,50 @@ public class CalendarActivity extends Activity {
         if (i2 == 0) {
             this.list.addView(Ui.text(this, "Работ на ближайшие 3 недели не найдено. Проверьте, отмечены ли растения.", 14.0f, getResources().getColor(R.color.text_sub), false));
         }
+    }
+
+    /** Карточка «⚠️ Активно в этом месяце» — сезонные болезни и вредители культур пользователя. */
+    private void renderHints(Calendar calendar) {
+        final int month = calendar.get(2);
+        List<Disease> hints = SeasonHints.forMonth(month, this.store.plants(), DiseaseDb.all(this));
+        if (hints.isEmpty()) {
+            return;
+        }
+        LinearLayout card = Ui.card(this);
+        card.addView(Ui.text(this, "⚠️ Активно в этом месяце", 15.0f, getResources().getColor(R.color.green_900), true));
+        int min = Math.min(hints.size(), 6);
+        for (int i = 0; i < min; i++) {
+            final Disease disease = hints.get(i);
+            Plant byId = Plant.byId(disease.plantId);
+            String seasonText = SeasonHints.seasonText(disease, month);
+            if (seasonText.length() > 140) {
+                seasonText = seasonText.substring(0, 137) + "…";
+            }
+            TextView text = Ui.text(this, (byId == null || byId.iconRes != 0 ? "" : byId.icon + " ")
+                    + (byId == null ? "" : byId.name + " — ") + disease.name + ". " + seasonText,
+                    13.0f, getResources().getColor(R.color.text_main), false);
+            if (byId != null && byId.iconRes != 0) {
+                text.setCompoundDrawablesWithIntrinsicBounds(byId.iconRes, 0, 0, 0);
+                text.setCompoundDrawablePadding(Ui.dp(this, 6.0f));
+            }
+            text.setOnClickListener(new android.view.View.OnClickListener() {
+                public final void onClick(android.view.View view) {
+                    DiseaseActivity.show(CalendarActivity.this, disease.plantId);
+                }
+            });
+            card.addView(text);
+        }
+        if (hints.size() > min) {
+            TextView more = Ui.text(this, "Ещё " + (hints.size() - min) + " — смотрите в справочнике культур",
+                    12.0f, getResources().getColor(R.color.text_sub), false);
+            more.setOnClickListener(new android.view.View.OnClickListener() {
+                public final void onClick(android.view.View view) {
+                    CalendarActivity.this.startActivity(new android.content.Intent(CalendarActivity.this, (Class<?>) PlantsActivity.class));
+                }
+            });
+            card.addView(more);
+        }
+        this.list.addView(card);
     }
 
     void m2lambda$render$0$bycslgardenerCalendarActivity() {

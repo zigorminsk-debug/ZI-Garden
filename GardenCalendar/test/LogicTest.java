@@ -646,6 +646,49 @@ public class LogicTest {
         check("список размеров шрифта вертикальный (влезает при любом масштабе)",
                 fg >= 0 && fontBlock.contains("android:orientation=\"vertical\""), "");
 
+        System.out.println("\n=== 17. Сезонные подсказки календаря ===");
+        Set<String> dzIds = new HashSet<>();
+        for (Disease dz : dzAll) dzIds.add(dz.id);
+        Set<String> plantIds = new HashSet<>();
+        for (Plant pl : Plant.all()) plantIds.add(pl.id);
+        int emptyActive = 0, badHint = 0, dupHint = 0;
+        for (int m = 0; m < 12; m++) {
+            List<Disease> monthHints = SeasonHints.forMonth(m, plantIds, dzAll);
+            if (m >= 2 && m <= 9 && monthHints.isEmpty()) emptyActive++;
+            if ((m < 2 || m > 9) && !monthHints.isEmpty()) emptyActive++;
+            Set<String> seen = new HashSet<>();
+            for (Disease dz : monthHints) {
+                if (!dzIds.contains(dz.id) || !plantIds.contains(dz.plantId)) badHint++;
+                if (!seen.add(dz.id)) dupHint++;
+            }
+        }
+        check("подсказки есть с марта по октябрь, зимой скрыты", emptyActive == 0, "нарушений: " + emptyActive);
+        check("все подсказки ведут на существующие записи и культуры", badHint == 0, "битых: " + badHint);
+        check("в месяце нет повторных подсказок", dupHint == 0, "дублей: " + dupHint);
+        // фильтрация по культурам пользователя
+        Set<String> onlyApple = new HashSet<>(java.util.Arrays.asList("apple"));
+        List<Disease> appleJune = SeasonHints.forMonth(5, onlyApple, dzAll);
+        boolean allApple = !appleJune.isEmpty();
+        for (Disease dz : appleJune) {
+            if (!"apple".equals(dz.plantId)) allApple = false;
+        }
+        check("подсказки фильтруются по культурам пользователя", allApple,
+            "июнь, только яблоня: " + appleJune.size() + " шт.");
+        check("у пользователя без яблони плодожорка не подсвечивается",
+            SeasonHints.forMonth(5, new HashSet<>(java.util.Arrays.asList("cabbage")), dzAll).size()
+                < SeasonHints.forMonth(5, plantIds, dzAll).size(), "");
+        // сезонный текст соответствует месяцу
+        Disease scabDz = null;
+        for (Disease dz : dzAll) {
+            if (dz.id.equals("apple_scab")) scabDz = dz;
+        }
+        boolean seasons = scabDz != null
+            && SeasonHints.seasonText(scabDz, 4).equals(scabDz.spring)
+            && SeasonHints.seasonText(scabDz, 6).equals(scabDz.summer)
+            && SeasonHints.seasonText(scabDz, 9).equals(scabDz.autumn)
+            && SeasonHints.seasonText(scabDz, 0).equals(scabDz.spring);
+        check("сезонный текст подсказки соответствует месяцу", seasons, "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
