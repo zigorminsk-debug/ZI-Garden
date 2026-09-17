@@ -634,6 +634,12 @@ public class LogicTest {
         check("на главном экране есть видимая кнопка настроек", layoutMain.contains("@+id/btn_settings"), "");
         check("кнопка настроек открывает SettingsActivity",
                 srcMain.contains("R.id.btn_settings") && srcMain.contains("SettingsActivity.class"), "");
+        String layoutSettings = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_settings.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        int fg = layoutSettings.indexOf("@+id/font_group");
+        String fontBlock = fg < 0 ? "" : layoutSettings.substring(fg, Math.min(fg + 400, layoutSettings.length()));
+        check("список размеров шрифта вертикальный (влезает при любом масштабе)",
+                fg >= 0 && fontBlock.contains("android:orientation=\"vertical\""), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

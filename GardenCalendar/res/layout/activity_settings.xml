@@ -117,36 +117,33 @@
             android:id="@+id/font_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <RadioButton
                 android:id="@+id/font_small"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:text="Мелкий"
                 android:textSize="13sp" />
 
             <RadioButton
                 android:id="@+id/font_normal"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:text="Обычный" />
 
             <RadioButton
                 android:id="@+id/font_large"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:text="Крупный"
                 android:textSize="17sp" />
 
             <RadioButton
                 android:id="@+id/font_xlarge"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Огромный"
+                android:text="Очень крупный"
                 android:textSize="20sp" />
         </RadioGroup>
 
