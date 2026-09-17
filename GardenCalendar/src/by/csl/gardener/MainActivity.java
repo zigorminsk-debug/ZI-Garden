@@ -337,6 +337,7 @@ public class MainActivity extends Activity {
             linearLayout.addView(Ui.text(this, "На ближайшие 7 дней работ нет. Добавьте растения или расширьте окно в «Календаре».", 14.0f, getResources().getColor(R.color.text_sub), false));
         }
             TasksWidgetProvider.refresh(this);
+            Widgets.refreshAll(this);
     }
 
     private String headerFor(Calendar calendar, Calendar calendar2) {

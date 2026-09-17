@@ -7,6 +7,6 @@ import android.content.Intent;
 public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Notifications.scheduleAll(context);
-        TasksWidgetProvider.refresh(context);
+        Widgets.refreshAll(context);
     }
 }

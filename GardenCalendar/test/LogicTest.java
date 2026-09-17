@@ -798,6 +798,83 @@ public class LogicTest {
         check("Geo: на Android 5 разрешение геолокации считается выданным",
                 srcGeo.contains("SDK_INT < 23") && srcGeo.contains("return true;"), "");
 
+        System.out.println("\n=== 20. Виджеты рабочего стола ===");
+        check("виджеты: месяцы в предложном падеже — 12 шт.", WidgetTexts.MONTHS_GEN.length == 12, "");
+        check("виджет погоды: без данных — вежливая подсказка",
+                WidgetTexts.weatherNow(null).contains("Нет данных")
+                && WidgetTexts.weatherAdvice(null, 2026, 9, 17).contains("Обновите"), "");
+        // погодные ветки совета
+        Weather wf = new Weather();
+        Weather.Day frost = new Weather.Day();
+        frost.year = 2026; frost.month = 5; frost.day = 3; frost.tMin = -2; frost.tMax = 9;
+        frost.code = 0; frost.windMax = 5; frost.precipMm = 0; frost.precipProb = 0;
+        wf.days.add(frost);
+        check("совет виджета: заморозок — укрыть",
+                WidgetTexts.weatherAdvice(wf, 2026, 5, 3).contains("замороз"), "");
+        Weather wr = new Weather();
+        Weather.Day rain = new Weather.Day();
+        rain.year = 2026; rain.month = 6; rain.day = 10; rain.tMin = 12; rain.tMax = 18;
+        rain.code = 61; rain.windMax = 5; rain.precipMm = 5; rain.precipProb = 80;
+        wr.days.add(rain);
+        check("совет виджета: дождь — полив не нужен",
+                WidgetTexts.weatherAdvice(wr, 2026, 6, 10).contains("полив не нужен"), "");
+        Weather wd = new Weather();
+        for (int i = 0; i < 3; i++) {
+            Weather.Day dry = new Weather.Day();
+            dry.year = 2026; dry.month = 7; dry.day = 20 + i; dry.tMin = 15; dry.tMax = 26;
+            dry.code = 1; dry.windMax = 3; dry.precipMm = 0; dry.precipProb = 0;
+            wd.days.add(dry);
+        }
+        check("совет виджета: засуха 3 дня — полейте",
+                WidgetTexts.weatherAdvice(wd, 2026, 7, 20).contains("полейте"), "");
+        Weather wn = new Weather();
+        Weather.Day nice = new Weather.Day();
+        nice.year = 2026; nice.month = 9; nice.day = 17; nice.tMin = 7; nice.tMax = 18;
+        nice.code = 2; nice.windMax = 4; nice.precipMm = 0.5; nice.precipProb = 30;
+        wn.days.add(nice);
+        wn.currentCode = 2; wn.currentTemp = 14; wn.cityName = "Полоцк";
+        check("совет виджета: нормальная погода — можно работать",
+                WidgetTexts.weatherAdvice(wn, 2026, 9, 17).contains("благоприятна"), "");
+        check("виджет погоды: строка «Сегодня» и город в заголовке",
+                WidgetTexts.weatherToday(wn, 2026, 9, 17).contains("Сегодня")
+                && WidgetTexts.weatherTitle(wn).contains("Полоцк"), "");
+        check("виджет сезона: июньские подсказки с культурами",
+                WidgetTexts.seasonLines(5, plantIds, dzAll, 3).size() == 4
+                && WidgetTexts.seasonLines(5, plantIds, dzAll, 3).get(0).contains("—"), "");
+        check("виджет сезона: январь — тихая подпись",
+                WidgetTexts.seasonLines(0, plantIds, dzAll, 3).isEmpty()
+                && WidgetTexts.seasonQuiet(0, plantIds).contains("Спокойный"), "");
+        check("виджет сезона: без культур — приглашение отметить",
+                WidgetTexts.seasonQuiet(5, new HashSet<String>()).contains("Мои растения"), "");
+        check("памятка: детерминирована и зависит от дня",
+                WidgetTexts.tipOfDay(61).equals(WidgetTexts.tipOfDay(61))
+                && !WidgetTexts.tipOfDay(61).equals(WidgetTexts.tipOfDay(62))
+                && WidgetTexts.tipOfDay(1).equals(WidgetTexts.tipOfDay(1 + WidgetTexts.TIPS.length)), "");
+        boolean tipsOk = WidgetTexts.TIPS.length >= 30;
+        for (String tip : WidgetTexts.TIPS) {
+            if (tip == null || tip.length() < 15 || tip.contains("null")) tipsOk = false;
+        }
+        check("памятки: ≥30 осмысленных советов без пустых", tipsOk,
+                "советов: " + WidgetTexts.TIPS.length);
+        for (String cls : new String[]{"WeatherWidgetProvider", "SeasonWidgetProvider", "TipWidgetProvider"}) {
+            check("виджет: провайдер " + cls + " есть и зарегистрирован",
+                    new java.io.File("src/by/csl/gardener/" + cls + ".java").exists()
+                    && manifest.contains("." + cls + "\""), cls);
+        }
+        for (String lay : new String[]{"widget_weather", "widget_season", "widget_tip"}) {
+            check("виджет: layout и appwidget-info " + lay,
+                    new java.io.File("res/layout/" + lay + ".xml").exists()
+                    && new java.io.File("res/xml/" + lay + "_info.xml").exists(), lay);
+        }
+        check("виджеты: единое обновление Widgets.refreshAll вызывается приложением",
+                new java.io.File("src/by/csl/gardener/Widgets.java").exists()
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("Widgets.refreshAll")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/BootReceiver.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("Widgets.refreshAll"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

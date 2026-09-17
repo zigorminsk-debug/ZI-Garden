@@ -68,5 +68,41 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+        <!-- Виджет «Погода для сада» -->
+        <receiver
+            android:name=".WeatherWidgetProvider"
+            android:exported="true"
+            android:label="ZI Garden — погода">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_weather_info" />
+        </receiver>
+        <!-- Виджет «Активно в этом месяце» -->
+        <receiver
+            android:name=".SeasonWidgetProvider"
+            android:exported="true"
+            android:label="ZI Garden — сезонные угрозы">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_season_info" />
+        </receiver>
+        <!-- Виджет «Садовая памятка дня» -->
+        <receiver
+            android:name=".TipWidgetProvider"
+            android:exported="true"
+            android:label="ZI Garden — памятка дня">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_tip_info" />
+        </receiver>
     </application>
 </manifest>
