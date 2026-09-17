@@ -143,13 +143,29 @@
             android:textColor="@color/text_sub"
             android:textSize="12sp" />
 
-        <Button
-            android:id="@+id/btn_about"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="4dp"
-            android:text="@string/about"
-            android:textAllCaps="false" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_settings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="⚙️ Настройки"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_about"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="@string/about"
+                android:textAllCaps="false" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

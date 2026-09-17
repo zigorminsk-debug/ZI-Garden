@@ -63,6 +63,11 @@ public class MainActivity extends Activity {
                 MainActivity.this.m9lambda$onCreate$4$bycslgardenerMainActivity(view);
             }
         });
+        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) SettingsActivity.class));
+            }
+        });
         findViewById(R.id.btn_gps).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 MainActivity.this.m10lambda$onCreate$5$bycslgardenerMainActivity(view);

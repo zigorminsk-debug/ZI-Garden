@@ -626,6 +626,15 @@ public class LogicTest {
         check("обычный шрифт — контекст без обёртки", Fonts.applyFont(ctxFont) == ctxFont, "");
         check("настройки общие для обёрнутого контекста", new Storage(scaledFont).fontSize() == 1, "");
 
+        // Настройки должны быть доступны с главного экрана (меню без тулбара недоступно на современных телефонах)
+        String layoutMain = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcMain = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("на главном экране есть видимая кнопка настроек", layoutMain.contains("@+id/btn_settings"), "");
+        check("кнопка настроек открывает SettingsActivity",
+                srcMain.contains("R.id.btn_settings") && srcMain.contains("SettingsActivity.class"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
