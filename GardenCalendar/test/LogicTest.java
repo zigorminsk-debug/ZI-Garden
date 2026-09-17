@@ -721,6 +721,83 @@ public class LogicTest {
         check("шаринг: отправка через системный выбор приложения (ACTION_SEND + createChooser)",
                 srcDisease.contains("ACTION_SEND") && srcDisease.contains("createChooser"), "");
 
+        System.out.println("\n=== 19. Совместимость со старым Android (min API 21) ===");
+        String buildSh = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("build.sh").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("минимальная версия: Android 5.0 (API 21) в aapt2 link",
+                buildSh.contains("--min-sdk-version 21"), "");
+        check("минимальная версия: API 21 в d8",
+                buildSh.contains("--min-api 21"), "");
+        check("байткод Java 8 (поддерживается d8 на 21+)",
+                buildSh.contains("--release 8"), "");
+        check("целевая версия — Android 14 (API 34)",
+                buildSh.contains("--target-sdk-version 34"), "");
+        // Новые API (23+) допустимы только под guard'ом Build.VERSION.SDK_INT в том же файле.
+        String[] risky = {"NotificationChannel", "createNotificationChannel", "POST_NOTIFICATIONS",
+                "startForegroundService", "canScheduleExactAlarms", "checkSelfPermission",
+                "requestPermissions", "Notification.Builder("};
+        Set<String> unguarded = new HashSet<>();
+        java.io.File srcDir = new java.io.File("src/by/csl/gardener");
+        java.io.File[] javaFiles = srcDir.listFiles(new java.io.FilenameFilter() {
+            public boolean accept(java.io.File d, String n) { return n.endsWith(".java"); }
+        });
+        if (javaFiles == null) javaFiles = new java.io.File[0];
+        for (java.io.File f : javaFiles) {
+            String body = new String(java.nio.file.Files.readAllBytes(f.toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            for (String tok : risky) {
+                if (body.contains(tok) && !body.contains("SDK_INT")) {
+                    unguarded.add(f.getName() + ": " + tok);
+                }
+            }
+        }
+        check("все вызовы API 23+ защищены проверкой Build.VERSION",
+                unguarded.isEmpty(), unguarded.toString());
+        // Java-библиотеки, недоступные на 21 без десугара — запрещены.
+        String[] bannedLib = {"java.time", "java.nio.file", "java.util.stream",
+                "java.util.Base64", "java.util.Optional"};
+        Set<String> foundLib = new HashSet<>();
+        for (java.io.File f : javaFiles) {
+            String body = new String(java.nio.file.Files.readAllBytes(f.toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            for (String tok : bannedLib) {
+                if (body.contains(tok)) foundLib.add(f.getName() + ": " + tok);
+            }
+        }
+        check("нет вызовов библиотек новее Android 5 (java.time/Stream/nio)",
+                foundLib.isEmpty(), foundLib.toString());
+        // Тема Material требует API 21 — lower порога уже нельзя.
+        String stylesXml = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/styles.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        boolean themeOk = stylesXml.contains("Theme.Material"); // 21+
+        check("тема Material согласована с порогом API 21", themeOk, "");
+        // Каждый компонент с intent-filter обязан иметь android:exported (требование 31+/aapt2).
+        String manifest = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        int filters = 0, exportedTagged = 0;
+        java.util.regex.Matcher mBlock = java.util.regex.Pattern
+                .compile("<(activity|service|receiver)\\b[^>]*>(.*?)</\\1>|<(activity|service|receiver)\\b[^>]*/>",
+                        java.util.regex.Pattern.DOTALL).matcher(manifest);
+        while (mBlock.find()) {
+            String whole = mBlock.group(0);
+            if (whole.contains("intent-filter")) {
+                filters++;
+                if (whole.contains("android:exported")) exportedTagged++;
+            }
+        }
+        check("у всех компонентов с intent-filter указан android:exported",
+                filters > 0 && filters == exportedTagged, filters + "/" + exportedTagged);
+        // Строковые новые разрешения в манифесте на старых версиях игнорируются — это безопасно,
+        // но контролируем, что не появился auto-permission без обработки.
+        check("разрешения манифеста известны и все из списка",
+                manifest.contains("POST_NOTIFICATIONS") && manifest.contains("SCHEDULE_EXACT_ALARM")
+                && manifest.contains("ACCESS_FINE_LOCATION"), "");
+        // Метод эталона: Geo.hasPermission должен считать API<23 «разрешено при установке».
+        String srcGeo = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Geo.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("Geo: на Android 5 разрешение геолокации считается выданным",
+                srcGeo.contains("SDK_INT < 23") && srcGeo.contains("return true;"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

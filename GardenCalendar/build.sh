@@ -40,7 +40,7 @@ aapt2 link -o "$OUT/app.unsigned.apk" \
   --manifest "$ROOT/AndroidManifest.xml" \
   --java "$GEN" \
   --auto-add-overlay \
-  --min-sdk-version 24 --target-sdk-version 34 \
+  --min-sdk-version 21 --target-sdk-version 34 \
   --version-code "$APP_VERSION_CODE" --version-name "$APP_VERSION_NAME" \
   "$OUT/res.zip"
 
@@ -56,7 +56,7 @@ python3 "$ROOT/tools/strip_method_params.py" $(find "$OBJ" -name '*.class')
 
 echo "[5/8] d8 -> classes.dex"
 find "$OBJ" -name '*.class' > "$OUT/cls.txt"
-d8 --release --lib "$PLATFORM/android.jar" --min-api 24 \
+d8 --release --lib "$PLATFORM/android.jar" --min-api 21 \
   --output "$OUT/dex" $(cat "$OUT/cls.txt")
 
 echo "[6/8] zip classes.dex + zipalign"

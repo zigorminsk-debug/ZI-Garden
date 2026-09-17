@@ -27,6 +27,11 @@ public final class Geo {
     }
 
     public static boolean hasPermission(Activity activity) {
+        // До Android 6 (API 23) разрешения выдаются при установке — проверять нечего;
+        // checkSelfPermission сам появился только в API 23, на 21–22 вызов упал бы.
+        if (android.os.Build.VERSION.SDK_INT < 23) {
+            return true;
+        }
         return activity.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED
                 || activity.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -34,6 +39,10 @@ public final class Geo {
     }
 
     public static void requestPermission(Activity activity) {
+        // Запрос разрешений во время работы — только с Android 6 (API 23).
+        if (android.os.Build.VERSION.SDK_INT < 23) {
+            return;
+        }
         activity.requestPermissions(new String[]{
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_GPS);

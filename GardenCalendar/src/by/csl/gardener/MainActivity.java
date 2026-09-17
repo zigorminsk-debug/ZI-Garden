@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 33 && !Notifications.permissionGranted(this)) {
             requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, REQ_NOTIFY);
         }
-        if (this.store.locationSource().equals("default") && checkSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == 0) {
+        if (this.store.locationSource().equals("default") && Geo.hasPermission(this)) {
             trySilentGps();
         }
         String stringExtra = getIntent() == null ? null : getIntent().getStringExtra(Notifications.EXTRA_TASK);
