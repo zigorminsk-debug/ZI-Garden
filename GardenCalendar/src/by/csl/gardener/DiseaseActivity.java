@@ -127,11 +127,34 @@ public class DiseaseActivity extends Activity {
                 }
             }
 
+            final Disease shareDz = dz;
+            final Plant sharePlant = plant;
+            Button share = new Button(this);
+            share.setText("📤 Поделиться советом");
+            share.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    DiseaseActivity.this.shareAdvice(sharePlant, shareDz);
+                }
+            });
+            LinearLayout.LayoutParams shareLp = new LinearLayout.LayoutParams(-1, -2);
+            shareLp.setMargins(0, Ui.dp(this, 8.0f), 0, 0);
+            card.addView(share, shareLp);
+
             this.root.addView(card);
         }
 
         TextView sign = Ui.text(this, "© Zakharevich Igor · +375 29 337-14-12 · csl.by", 12.0f, cSub, false);
         sign.setPadding(0, Ui.dp(this, 12.0f), 0, 0);
         this.root.addView(sign);
+    }
+
+    /** Отправить совет по болезни/вредителю в любой мессенджер через стандартный системный выбор. */
+    private void shareAdvice(Plant plant, Disease dz) {
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_SUBJECT,
+                "Совет садоводу: " + (plant != null ? plant.name + " — " : "") + dz.name);
+        send.putExtra(Intent.EXTRA_TEXT, ShareText.diseaseAdvice(plant, dz));
+        startActivity(Intent.createChooser(send, "Поделиться советом через…"));
     }
 }

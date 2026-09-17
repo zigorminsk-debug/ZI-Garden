@@ -689,6 +689,38 @@ public class LogicTest {
             && SeasonHints.seasonText(scabDz, 0).equals(scabDz.spring);
         check("сезонный текст подсказки соответствует месяцу", seasons, "");
 
+        System.out.println("\n=== 18. Поделиться советом ===");
+        Plant appleForShare = Plant.byId("apple");
+        Disease scabForShare = null, pestForShare = null;
+        for (Disease dz : dzAll) {
+            if (dz.id.equals("apple_scab")) scabForShare = dz;
+            if (dz.id.equals("apple_codling_moth")) pestForShare = dz;
+        }
+        String shareScab = ShareText.diseaseAdvice(appleForShare, scabForShare);
+        check("шаринг: болезнь — название и культура в тексте",
+                shareScab.contains(scabForShare.name) && shareScab.contains("Яблоня"), "");
+        check("шаринг: болезнь — есть распознавание, лечение, профилактика и препараты",
+                shareScab.contains("Как распознать") && shareScab.contains("Лечение по шагам")
+                && shareScab.contains("Профилактика") && shareScab.contains("Препараты"), "");
+        check("шаринг: болезнь — сезонные блоки с пометками",
+                shareScab.contains("Весна") && (shareScab.contains("Лето") || shareScab.contains("Осень")), "");
+        check("шаринг: болезнь — подпись приложения и разумная длина",
+                shareScab.contains("ZI Garden") && shareScab.length() > 200 && shareScab.length() < 4000,
+                "длина: " + shareScab.length());
+        String sharePest = ShareText.diseaseAdvice(appleForShare, pestForShare);
+        check("шаринг: вредитель — текст без «null» и с шагами",
+                !sharePest.contains("null") && sharePest.contains(pestForShare.name)
+                && sharePest.contains("1. "), "");
+        String shareNoPlant = ShareText.diseaseAdvice(null, scabForShare);
+        check("шаринг: без культуры текст всё равно собирается",
+                shareNoPlant.contains(scabForShare.name) && !shareNoPlant.contains("null"), "");
+        String srcDisease = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DiseaseActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("шаринг: кнопка «Поделиться советом» есть на экране болезней",
+                srcDisease.contains("📤 Поделиться советом"), "");
+        check("шаринг: отправка через системный выбор приложения (ACTION_SEND + createChooser)",
+                srcDisease.contains("ACTION_SEND") && srcDisease.contains("createChooser"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
