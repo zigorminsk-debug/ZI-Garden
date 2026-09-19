@@ -7,14 +7,16 @@ import org.json.JSONObject;
 final class UpdateInfo {
     final String tag;         // "v2.6"
     final String name;        // заголовок релиза
-    final String apkUrl;      // browser_download_url первого .apk
+    final String apkUrl;      // первая ссылка на .apk (главная)
+    final java.util.List<String> apkUrls; // все ссылки на .apk (главная + зеркала)
     final String notes;       // текст релиза (body)
     final long versionCode;   // та же формула, что в CI: MAJ*10000 + MIN*1000
 
-    private UpdateInfo(String tag, String name, String apkUrl, String notes, long versionCode) {
+    private UpdateInfo(String tag, String name, java.util.List<String> apkUrls, String notes, long versionCode) {
         this.tag = tag;
         this.name = name;
-        this.apkUrl = apkUrl;
+        this.apkUrls = apkUrls;
+        this.apkUrl = apkUrls.isEmpty() ? null : apkUrls.get(0);
         this.notes = notes;
         this.versionCode = versionCode;
     }
@@ -52,20 +54,19 @@ final class UpdateInfo {
             String name = obj.optString("name", tag);
             String notes = obj.optString("body", "");
             JSONArray assets = obj.optJSONArray("assets");
-            String apk = null;
+            java.util.List<String> apks = new java.util.ArrayList<>();
             if (assets != null) {
                 for (int i = 0; i < assets.length(); i++) {
                     JSONObject a = assets.optJSONObject(i);
                     if (a == null) continue;
                     String url = a.optString("browser_download_url", "");
-                    if (url.endsWith(".apk")) {
-                        apk = url;
-                        break;
+                    if (url.endsWith(".apk") && !apks.contains(url)) {
+                        apks.add(url);
                     }
                 }
             }
-            if (apk == null) return null;
-            return new UpdateInfo(tag, name, apk, notes, code);
+            if (apks.isEmpty()) return null;
+            return new UpdateInfo(tag, name, apks, notes, code);
         } catch (Exception e) {
             return null;
         }
@@ -93,7 +94,7 @@ final class UpdateInfo {
                     .compile("(/[^\\s\"']*/releases/download/[^\\s\"']+\\.apk)").matcher(html);
             if (!mApk.find()) return null;
             String url = "https://github.com" + mApk.group(1);
-            return new UpdateInfo(tag, tag, url, "", code);
+            return new UpdateInfo(tag, tag, java.util.Collections.singletonList(url), "", code);
         } catch (Exception e) {
             return null;
         }

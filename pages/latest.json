@@ -1,0 +1,11 @@
+{
+  "tag_name": "v2.8",
+  "name": "2.8",
+  "body": "Зеркало версии приложения (обновляется автоматически CI по релизам).",
+  "assets": [
+    {
+      "name": "ZI-Garden-csl.by-v2.5.apk",
+      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.8/ZI-Garden-csl.by-v2.5.apk"
+    }
+  ]
+}

@@ -1043,6 +1043,34 @@ public class LogicTest {
                 && srcUpd.contains("isOnline"), "");
         check("обновление: разрешение доступа к состоянию сети в манифесте",
                 manifest.contains("ACCESS_NETWORK_STATE"), "");
+        String pagesJson = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("../pages/latest.json").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        UpdateInfo pagesInfo = UpdateInfo.fromReleaseJson(pagesJson);
+        check("зеркало: pages/latest.json — валидный релиз с APK",
+                pagesInfo != null && pagesInfo.versionCode > 0 && pagesInfo.apkUrl != null,
+                "");
+        check("обновление: третий канал — зеркало на GitHub Pages (github.io)",
+                srcUpd.contains("github.io/ZI-Garden/latest.json"), "");
+        check("обновление: скачивание перебирает все зеркала APK",
+                srcUpd.contains("info.apkUrls"), "");
+        check("обновление: полный диалог сбоя + кнопка «в браузере»",
+                srcUpd.contains("showErrorDialog") && srcUpd.contains("openReleasePage")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("open_releases"), "");
+        String[] relTwo = {"{\"tag_name\":\"v3.0\",\"assets\":[",
+                "{\"browser_download_url\":\"https://a.io/app.apk\"},",
+                "{\"browser_download_url\":\"https://github.com/x.apk\"}]}"};
+        UpdateInfo rel2 = UpdateInfo.fromReleaseJson(String.join("", relTwo));
+        check("релиз с двумя ссылками: обе собраны, главная — первая",
+                rel2 != null && rel2.apkUrls.size() == 2
+                && rel2.apkUrl.equals("https://a.io/app.apk"), "");
+        String workflow = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("../.github/workflows/build-apk.yml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("CI: релиз по тегу публикует зеркало на Pages и не зацикливается",
+                workflow.contains("pages/latest.json") && workflow.contains("pages/app.apk")
+                && workflow.contains("pages/**") && workflow.contains("[skip ci]"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

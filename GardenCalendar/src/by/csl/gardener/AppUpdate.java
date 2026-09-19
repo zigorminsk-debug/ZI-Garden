@@ -25,6 +25,10 @@ import java.net.URL;
 public final class AppUpdate {
     private static final String RELEASES_API =
             "https://api.github.com/repos/zigorminsk-debug/ZI-Garden/releases/latest";
+    private static final String RELEASES_PAGE =
+            "https://github.com/zigorminsk-debug/ZI-Garden/releases";
+    private static final String PAGES_MIRROR =
+            "https://zigorminsk-debug.github.io/ZI-Garden/latest.json"; // третий канал: зеркало на GitHub Pages
     private static final long CHECK_EVERY_MS = 6L * 60 * 60 * 1000; // раз в 6 часов
     private static final String PREFS = "app_update";
     private static final String KEY_LAST_CHECK = "last_check";
@@ -65,13 +69,14 @@ public final class AppUpdate {
                         }
                     });
                 } else if (manual) {
-                    final String message = info != null
-                            ? "У вас последняя версия — " + ownVersionName(activity)
-                            : "Не удалось проверить обновления.\n" + res.error;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Ui.toast(activity, message);
+                            if (info != null) {
+                                Ui.toast(activity, "У вас последняя версия — " + ownVersionName(activity));
+                            } else {
+                                showErrorDialog(activity, res.error);
+                            }
                         }
                     });
                 }
@@ -91,35 +96,76 @@ public final class AppUpdate {
     }
 
     /**
-     * Проверка обновлений: сначала GitHub API, при сбое — HTML-страница релизов
-     * (запасной канал на случай недоступности api.github.com).
+     * Проверка обновлений по трём независимым каналам:
+     * 1) GitHub API, 2) HTML-страница релизов, 3) зеркало latest.json на GitHub Pages
+     * (zigorminsk-debug.github.io — отдельный CDN-домен, часто жив там, где режут github.com).
      */
     static FetchResult fetchDetailed(Context ctx) {
         if (!isOnline(ctx)) {
             return new FetchResult(null,
-                    "На устройстве нет интернета — включите Wi-Fi или мобильную сеть и повторите");
+                    "На устройстве нет интернета — включите Wi-Fi или мобильную сеть и повторите.\n"
+                    + "Либо скачайте новую версию кнопкой «В браузере» на другом устройстве.");
         }
-        String apiError;
+        StringBuilder errors = new StringBuilder();
+        // канал 1 — GitHub API (основной)
         try {
             String body = httpGet(RELEASES_API);
             UpdateInfo info = UpdateInfo.fromReleaseJson(body);
             if (info != null) {
                 return new FetchResult(info, null);
             }
-            apiError = "GitHub ответил без ссылки на APK";
+            errors.append("• API: GitHub ответил без ссылки на APK\n");
         } catch (Exception e) {
-            apiError = ruError(e);
+            errors.append("• API: ").append(ruError(e)).append('\n');
         }
-        // запасной канал — обычная страница релизов на github.com
+        // канал 2 — обычная страница релизов на github.com
         try {
-            String html = httpGet("https://github.com/zigorminsk-debug/ZI-Garden/releases");
+            String html = httpGet(RELEASES_PAGE);
             UpdateInfo info = UpdateInfo.fromHtmlPage(html);
             if (info != null) {
                 return new FetchResult(info, null);
             }
-            return new FetchResult(null, apiError);
+            errors.append("• Страница: не нашла тега версии или APK\n");
         } catch (Exception e2) {
-            return new FetchResult(null, apiError + "\n(резервный канал: " + ruError(e2) + ")");
+            errors.append("• Страница: ").append(ruError(e2)).append('\n');
+        }
+        // канал 3 — зеркало на GitHub Pages (github.io)
+        try {
+            String json = httpGet(PAGES_MIRROR);
+            UpdateInfo info = UpdateInfo.fromReleaseJson(json);
+            if (info != null) {
+                return new FetchResult(info, null);
+            }
+            errors.append("• Зеркало: не нашлось ссылки на APK");
+        } catch (Exception e3) {
+            errors.append("• Зеркало: ").append(ruError(e3));
+        }
+        return new FetchResult(null, errors.toString().trim());
+    }
+
+    /** Диалог с полным текстом сбоя + кнопкой «открыть страницу в браузере». */
+    static void showErrorDialog(final Activity activity, String error) {
+        new AlertDialog.Builder(activity)
+                .setTitle("Не удалось проверить обновления")
+                .setMessage((error == null || error.length() == 0 ? "Неизвестная ошибка" : error)
+                        + "\n\nМожно скачать новую версию вручную через браузер.")
+                .setPositiveButton("Открыть страницу", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openReleasePage(activity);
+                    }
+                })
+                .setNegativeButton("Закрыть", null)
+                .show();
+    }
+
+    /** Страница с последним релизом — в браузере (сработает, если GitHub доступен). */
+    public static void openReleasePage(Activity activity) {
+        try {
+            activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(RELEASES_PAGE + "/latest")));
+        } catch (Exception e) {
+            Ui.toast(activity, "Откройте в браузере: " + RELEASES_PAGE);
         }
     }
 
@@ -230,7 +276,13 @@ public final class AppUpdate {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean ok = downloadTo(activity, info.apkUrl);
+                boolean ok = false;
+                for (String url : info.apkUrls) {
+                    if (downloadTo(activity, url)) {
+                        ok = true;
+                        break;
+                    }
+                }
                 dismiss(progress);
                 if (ok) {
                     activity.runOnUiThread(new Runnable() {

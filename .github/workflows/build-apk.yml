@@ -8,10 +8,12 @@ on:
     paths-ignore:
       - '**.md'
       - 'uploads/**'
+      - 'pages/**'
   pull_request:
     paths-ignore:
       - '**.md'
       - 'uploads/**'
+      - 'pages/**'
   workflow_dispatch: {}
 
 permissions:
@@ -90,3 +92,37 @@ jobs:
         with:
           files: GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk
           generate_release_notes: true
+
+      - name: Publish update mirror to GitHub Pages (on version tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          APK_URL="https://github.com/zigorminsk-debug/ZI-Garden/releases/download/${TAG}/ZI-Garden-csl.by-v2.5.apk"
+          PAGES_URL="https://zigorminsk-debug.github.io/ZI-Garden/app.apk"
+          mkdir -p pages
+          cp GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk pages/app.apk
+          TAG="$TAG" APK_URL="$APK_URL" PAGES_URL="$PAGES_URL" python3 - <<'PY'
+          import json, os
+          data = {
+              "tag_name": os.environ["TAG"],
+              "name": os.environ["TAG"].lstrip("v"),
+              "body": "Автообновление приложения ZI Garden.",
+              "assets": [
+                  {"name": "app.apk", "browser_download_url": os.environ["PAGES_URL"]},
+                  {"name": "ZI-Garden-csl.by.apk", "browser_download_url": os.environ["APK_URL"]},
+              ],
+          }
+          open("pages/latest.json", "w", encoding="utf-8").write(
+              json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+          PY
+          git config user.name 'ZI Garden CI'
+          git config user.email 'ci@github.local'
+          git add pages/latest.json pages/app.apk
+          git commit -m "[skip ci] зеркало обновления ${TAG} на GitHub Pages" || echo 'нет изменений — пропуск'
+          for i in 1 2 3; do
+            if git push origin HEAD:refs/heads/arena/01a0aa7c-zi-garden; then
+              echo 'зеркало опубликовано'; break
+            else
+              git fetch origin arena/01a0aa7c-zi-garden && git rebase origin/arena/01a0aa7c-zi-garden
+            fi
+          done
