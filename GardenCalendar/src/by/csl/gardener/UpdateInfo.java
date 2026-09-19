@@ -75,4 +75,27 @@ final class UpdateInfo {
     static boolean isNewer(long remoteCode, long ownCode) {
         return remoteCode > 0 && remoteCode > ownCode;
     }
+
+    /**
+     * Запасной канал: парсинг HTML-страницы /releases (когда api.github.com недоступен,
+     * а github.com — доступен). Берём первый тег vX.Y и первую прямую ссылку на .apk.
+     */
+    static UpdateInfo fromHtmlPage(String html) {
+        try {
+            if (html == null) return null;
+            java.util.regex.Matcher mTag = java.util.regex.Pattern
+                    .compile("/releases/tag/v([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)").matcher(html);
+            if (!mTag.find()) return null;
+            String tag = "v" + mTag.group(1);
+            long code = versionCodeFromTag(tag);
+            if (code <= 0) return null;
+            java.util.regex.Matcher mApk = java.util.regex.Pattern
+                    .compile("(/[^\\s\"']*/releases/download/[^\\s\"']+\\.apk)").matcher(html);
+            if (!mApk.find()) return null;
+            String url = "https://github.com" + mApk.group(1);
+            return new UpdateInfo(tag, tag, url, "", code);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

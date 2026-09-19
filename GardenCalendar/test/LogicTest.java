@@ -1021,6 +1021,29 @@ public class LogicTest {
                         new java.io.File("src/by/csl/gardener/NotifyTapReceiver.java").toPath()),
                         java.nio.charset.StandardCharsets.UTF_8).contains("addJournal"), "");
 
+        System.out.println("\n=== 23. Диагностика самообновления ===");
+        String html = "<html><body><a href=\"/zigorminsk-debug/ZI-Garden/releases/tag/v2.9\">v2.9</a>"
+                + "<a href=\"/zigorminsk-debug/ZI-Garden/releases/download/v2.9/ZI-Garden-csl.apk\">apk</a></body></html>";
+        UpdateInfo htmlInfo = UpdateInfo.fromHtmlPage(html);
+        check("резервный канал: тег и код из HTML-страницы релизов",
+                htmlInfo != null && htmlInfo.tag.equals("v2.9") && htmlInfo.versionCode == 29000, "");
+        check("резервный канал: прямая ссылка на APK абсолютная",
+                htmlInfo != null && htmlInfo.apkUrl.startsWith("https://github.com/")
+                && htmlInfo.apkUrl.endsWith(".apk"), "");
+        check("резервный канал: страница без тега/APK → null",
+                UpdateInfo.fromHtmlPage("<a href=\"/foo\">no</a>") == null
+                && UpdateInfo.fromHtmlPage("<a href=\"/x/releases/tag/v1.2\">t</a>") == null, "");
+        check("ошибки по-русски: DNS / таймаут / SSL / 403",
+                NetErrors.ru(new java.net.UnknownHostException()).contains("интернет")
+                && NetErrors.ru(new java.net.SocketTimeoutException()).contains("таймаут")
+                && NetErrors.ru(new javax.net.ssl.SSLException("x")).contains("защищённое")
+                && NetErrors.ru(new java.io.IOException("HTTP 403")).contains("403"), "");
+        check("обновление: запасной канал и предпроверка сети подключены",
+                srcUpd.contains("github.com/zigorminsk-debug/ZI-Garden/releases")
+                && srcUpd.contains("isOnline"), "");
+        check("обновление: разрешение доступа к состоянию сети в манифесте",
+                manifest.contains("ACCESS_NETWORK_STATE"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

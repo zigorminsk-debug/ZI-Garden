@@ -53,9 +53,10 @@ public final class AppUpdate {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                UpdateInfo info = fetchLatest();
+                FetchResult res = fetchDetailed(activity);
                 saveLastCheck(activity);
                 final long own = ownVersionCode(activity);
+                final UpdateInfo info = res.info;
                 if (info != null && UpdateInfo.isNewer(info.versionCode, own)) {
                     activity.runOnUiThread(new Runnable() {
                         @Override
@@ -64,12 +65,13 @@ public final class AppUpdate {
                         }
                     });
                 } else if (manual) {
+                    final String message = info != null
+                            ? "У вас последняя версия — " + ownVersionName(activity)
+                            : "Не удалось проверить обновления.\n" + res.error;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Ui.toast(activity, info == null
-                                    ? "Не удалось проверить обновления (нет интернета?)"
-                                    : "У вас последняя версия — " + ownVersionName(activity));
+                            Ui.toast(activity, message);
                         }
                     });
                 }
@@ -77,31 +79,95 @@ public final class AppUpdate {
         }, "update-check").start();
     }
 
-    /** Загрузка JSON последнего релиза. В фоне. */
-    static UpdateInfo fetchLatest() {
+    /** Результат проверки: либо описание релиза, либо понятная пользователю причина сбоя. */
+    static final class FetchResult {
+        final UpdateInfo info;
+        final String error;
+
+        FetchResult(UpdateInfo info, String error) {
+            this.info = info;
+            this.error = error;
+        }
+    }
+
+    /**
+     * Проверка обновлений: сначала GitHub API, при сбое — HTML-страница релизов
+     * (запасной канал на случай недоступности api.github.com).
+     */
+    static FetchResult fetchDetailed(Context ctx) {
+        if (!isOnline(ctx)) {
+            return new FetchResult(null,
+                    "На устройстве нет интернета — включите Wi-Fi или мобильную сеть и повторите");
+        }
+        String apiError;
+        try {
+            String body = httpGet(RELEASES_API);
+            UpdateInfo info = UpdateInfo.fromReleaseJson(body);
+            if (info != null) {
+                return new FetchResult(info, null);
+            }
+            apiError = "GitHub ответил без ссылки на APK";
+        } catch (Exception e) {
+            apiError = ruError(e);
+        }
+        // запасной канал — обычная страница релизов на github.com
+        try {
+            String html = httpGet("https://github.com/zigorminsk-debug/ZI-Garden/releases");
+            UpdateInfo info = UpdateInfo.fromHtmlPage(html);
+            if (info != null) {
+                return new FetchResult(info, null);
+            }
+            return new FetchResult(null, apiError);
+        } catch (Exception e2) {
+            return new FetchResult(null, apiError + "\n(резервный канал: " + ruError(e2) + ")");
+        }
+    }
+
+    /** GET с таймаутами и User-Agent; не-200 → IOException. В фоне. */
+    private static String httpGet(String url) throws java.io.IOException {
         HttpURLConnection conn = null;
         try {
-            conn = (HttpURLConnection) new URL(RELEASES_API).openConnection();
+            conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setConnectTimeout(8000);
-            conn.setReadTimeout(10000);
+            conn.setReadTimeout(12000);
             conn.setRequestProperty("User-Agent", "ZI-Garden-App");
-            conn.setRequestProperty("Accept", "application/vnd.github+json");
-            if (conn.getResponseCode() != 200) {
-                return null;
+            conn.setRequestProperty("Accept", "application/vnd.github+json, text/html");
+            int code = conn.getResponseCode();
+            if (code != 200) {
+                throw new java.io.IOException("HTTP " + code);
             }
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
             StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+            char[] buf = new char[8192];
+            int n;
+            while ((n = br.read(buf)) > 0) {
+                sb.append(buf, 0, n);
+                if (sb.length() > 1500000) {
+                    break; // страницу релизов целиком не нужна
+                }
             }
             br.close();
-            return UpdateInfo.fromReleaseJson(sb.toString());
-        } catch (Exception e) {
-            return null;
+            return sb.toString();
         } finally {
             if (conn != null) conn.disconnect();
         }
+    }
+
+    /** Есть ли сейчас вообще сеть (до обращения к GitHub). */
+    static boolean isOnline(Context ctx) {
+        try {
+            android.net.ConnectivityManager cm =
+                    (android.net.ConnectivityManager) ctx.getSystemService("connectivity");
+            android.net.NetworkInfo ni = cm == null ? null : cm.getActiveNetworkInfo();
+            return ni != null && ni.isConnected();
+        } catch (Exception e) {
+            return true; // не смогли узнать — считаем, что сеть есть, и пробуем
+        }
+    }
+
+    /** Причина сбоя сети по-русски. */
+    static String ruError(Exception e) {
+        return NetErrors.ru(e);
     }
 
     /** Код версии установленного приложения (17000+N для CI, 2x0000 для релизов). */
