@@ -1123,6 +1123,30 @@ public class LogicTest {
                 && srcSet.contains("Backup.decode") && srcSet.contains("importAll")
                 && srcSet.contains("confirmBackupRestore"), "");
 
+        // ───────────────────────── 25. ЛУННЫЙ КАЛЕНДАРЬ ─────────────────────────
+        check("луна: опорное новолуние 06.01.2000 → возраст почти ноль (обёрнутый)",
+                Moon.age(2000, 1, 6) > 28.9 && Moon.age(2000, 1, 6) < Moon.SYNODIC, "");
+        check("луна: новолуние 15.09.2023 распознано",
+                Moon.age(2023, 9, 15) < 1.5 && Moon.phaseIndex(2023, 9, 15) == 0, "");
+        check("луна: полнолуние 29.09.2023 распознано",
+                Moon.phaseIndex(2023, 9, 29) == 4, "");
+        check("луна: возраст растёт день ото дня и корректно заворачивается в месяце",
+                Moon.age(2023, 9, 16) > Moon.age(2023, 9, 15)
+                && Moon.age(2023, 9, 14) > 27.0 && Moon.age(2023, 9, 14) < Moon.SYNODIC, "");
+        check("луна: 8 фаз с эмодзи, названиями и советами",
+                Moon.EMOJI.length == 8 && Moon.NAMES.length == 8
+                && Moon.advice(0).length() > 10 && Moon.advice(4).length() > 10
+                && Moon.emoji(2023, 9, 29).equals("🌕"), "");
+        Calendar moonDay = Calendar.getInstance();
+        moonDay.set(2023, 8, 29, 10, 0, 0);
+        check("луна: строка-подсказка на день содержит фазу и совет",
+                Moon.guide(moonDay).contains("🌕") && Moon.guide(moonDay).contains("урожай"), "");
+        String srcCal = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/CalendarActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("луна: календарь показывает фазы в днях и совет на неделю",
+                srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

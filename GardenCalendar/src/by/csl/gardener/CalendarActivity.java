@@ -75,6 +75,9 @@ public class CalendarActivity extends Activity {
                 text3.setGravity(17);
                 linearLayout2.addView(text3);
             }
+            TextView moon = Ui.text(this, Moon.emoji(i2, i3, i4), 11.0f, -10721696, false);
+            moon.setGravity(17);
+            linearLayout2.addView(moon);
             linearLayout.addView(linearLayout2);
             i++;
         }
@@ -105,6 +108,11 @@ public class CalendarActivity extends Activity {
             }
         });
         this.list.addView(sharePlan);
+
+        // 🌙 Лунный календарь: фаза и совет дня (ориентир по традиции, не замена погоде)
+        TextView moonGuide = Ui.text(this, Moon.guide(calendar2), 13.0f, -10721696, false);
+        moonGuide.setPadding(0, 0, 0, Ui.dp(this, 4.0f));
+        this.list.addView(moonGuide);
         for (int i3 = 21; i < i3; i3 = 21) {
             Calendar plusDays = Dates.plusDays(calendar2, i);
             boolean z = true;
