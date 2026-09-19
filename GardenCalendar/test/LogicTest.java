@@ -1049,8 +1049,12 @@ public class LogicTest {
         check("зеркало: pages/latest.json — валидный релиз с APK",
                 pagesInfo != null && pagesInfo.versionCode > 0 && pagesInfo.apkUrl != null,
                 "");
-        check("обновление: третий канал — зеркало на GitHub Pages (github.io)",
+        check("обновление: третий канал — raw-зеркало (raw.githubusercontent.com)",
+                srcUpd.contains("raw.githubusercontent.com/zigorminsk-debug/ZI-Garden"), "");
+        check("обновление: четвёртый канал — зеркало на GitHub Pages (github.io)",
                 srcUpd.contains("github.io/ZI-Garden/latest.json"), "");
+        check("обновление: без сведений о статусе сети просто пробуем",
+                srcUpd.contains("cm == null) {\n                return true;"), "");
         check("обновление: скачивание перебирает все зеркала APK",
                 srcUpd.contains("info.apkUrls"), "");
         check("обновление: полный диалог сбоя + кнопка «в браузере»",

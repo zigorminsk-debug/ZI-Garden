@@ -28,7 +28,9 @@ public final class AppUpdate {
     private static final String RELEASES_PAGE =
             "https://github.com/zigorminsk-debug/ZI-Garden/releases";
     private static final String PAGES_MIRROR =
-            "https://zigorminsk-debug.github.io/ZI-Garden/latest.json"; // третий канал: зеркало на GitHub Pages
+            "https://zigorminsk-debug.github.io/ZI-Garden/latest.json"; // зеркало на GitHub Pages (включается в настройках)
+    private static final String RAW_MIRROR =
+            "https://raw.githubusercontent.com/zigorminsk-debug/ZI-Garden/arena/01a0aa7c-zi-garden/pages/latest.json"; // raw-CDN, работает без настройки
     private static final long CHECK_EVERY_MS = 6L * 60 * 60 * 1000; // раз в 6 часов
     private static final String PREFS = "app_update";
     private static final String KEY_LAST_CHECK = "last_check";
@@ -96,9 +98,9 @@ public final class AppUpdate {
     }
 
     /**
-     * Проверка обновлений по трём независимым каналам:
-     * 1) GitHub API, 2) HTML-страница релизов, 3) зеркало latest.json на GitHub Pages
-     * (zigorminsk-debug.github.io — отдельный CDN-домен, часто жив там, где режут github.com).
+     * Проверка обновлений по четырём независимым каналам:
+     * 1) GitHub API, 2) HTML-страница релизов, 3) raw-зеркало (raw.githubusercontent.com),
+     * 4) зеркало latest.json на GitHub Pages (github.io — отдельный CDN, включается в настройках).
      */
     static FetchResult fetchDetailed(Context ctx) {
         if (!isOnline(ctx)) {
@@ -129,16 +131,27 @@ public final class AppUpdate {
         } catch (Exception e2) {
             errors.append("• Страница: ").append(ruError(e2)).append('\n');
         }
-        // канал 3 — зеркало на GitHub Pages (github.io)
+        // канал 3 — raw-зеркало (raw.githubusercontent.com — отдельный CDN, без настройки)
+        try {
+            String json = httpGet(RAW_MIRROR);
+            UpdateInfo info = UpdateInfo.fromReleaseJson(json);
+            if (info != null) {
+                return new FetchResult(info, null);
+            }
+            errors.append("• Зеркало(raw): не нашлось ссылки на APK\n");
+        } catch (Exception e3) {
+            errors.append("• Зеркало(raw): ").append(ruError(e3)).append('\n');
+        }
+        // канал 4 — зеркало на GitHub Pages (github.io), если включено владельцем
         try {
             String json = httpGet(PAGES_MIRROR);
             UpdateInfo info = UpdateInfo.fromReleaseJson(json);
             if (info != null) {
                 return new FetchResult(info, null);
             }
-            errors.append("• Зеркало: не нашлось ссылки на APK");
-        } catch (Exception e3) {
-            errors.append("• Зеркало: ").append(ruError(e3));
+            errors.append("• Зеркало(github.io): не нашлось ссылки на APK");
+        } catch (Exception e4) {
+            errors.append("• Зеркало(github.io): ").append(ruError(e4));
         }
         return new FetchResult(null, errors.toString().trim());
     }
@@ -204,7 +217,10 @@ public final class AppUpdate {
         try {
             android.net.ConnectivityManager cm =
                     (android.net.ConnectivityManager) ctx.getSystemService("connectivity");
-            android.net.NetworkInfo ni = cm == null ? null : cm.getActiveNetworkInfo();
+            if (cm == null) {
+                return true; // не смогли узнать — считаем, что сеть есть, и пробуем
+            }
+            android.net.NetworkInfo ni = cm.getActiveNetworkInfo();
             return ni != null && ni.isConnected();
         } catch (Exception e) {
             return true; // не смогли узнать — считаем, что сеть есть, и пробуем

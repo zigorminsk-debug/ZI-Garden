@@ -10,6 +10,10 @@
     {
       "name": "ZI-Garden-csl.by.apk",
       "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.9/ZI-Garden-csl.by-v2.5.apk"
+    },
+    {
+      "name": "app-raw.apk",
+      "browser_download_url": "https://raw.githubusercontent.com/zigorminsk-debug/ZI-Garden/arena/01a0aa7c-zi-garden/pages/app.apk"
     }
   ]
 }

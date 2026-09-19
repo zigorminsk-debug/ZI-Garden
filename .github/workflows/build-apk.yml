@@ -101,7 +101,8 @@ jobs:
           PAGES_URL="https://zigorminsk-debug.github.io/ZI-Garden/app.apk"
           mkdir -p pages
           cp GardenCalendar/out/ZI-Garden-csl.by-v2.5.apk pages/app.apk
-          TAG="$TAG" APK_URL="$APK_URL" PAGES_URL="$PAGES_URL" python3 - <<'PY'
+          RAW_URL="https://raw.githubusercontent.com/zigorminsk-debug/ZI-Garden/arena/01a0aa7c-zi-garden/pages/app.apk"
+          TAG="$TAG" APK_URL="$APK_URL" PAGES_URL="$PAGES_URL" RAW_URL="$RAW_URL" python3 - <<'PY'
           import json, os
           data = {
               "tag_name": os.environ["TAG"],
@@ -110,6 +111,7 @@ jobs:
               "assets": [
                   {"name": "app.apk", "browser_download_url": os.environ["PAGES_URL"]},
                   {"name": "ZI-Garden-csl.by.apk", "browser_download_url": os.environ["APK_URL"]},
+                  {"name": "app-raw.apk", "browser_download_url": os.environ["RAW_URL"]},
               ],
           }
           open("pages/latest.json", "w", encoding="utf-8").write(
