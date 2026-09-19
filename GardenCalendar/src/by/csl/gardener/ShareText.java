@@ -59,4 +59,34 @@ final class ShareText {
         sb.append("\n— из справочника приложения ZI Garden");
         return sb.toString();
     }
+
+    /** План работ на неделю текстом — для отправки семье в мессенджер (без выполненных). */
+    static String weekPlan(java.util.List<Task> tasks, String fromLabel) {
+        StringBuilder sb = new StringBuilder("🗓️ План работ на неделю");
+        if (fromLabel != null && fromLabel.length() > 0) {
+            sb.append(" (от ").append(fromLabel).append(')');
+        }
+        int shown = 0;
+        int pending = 0;
+        if (tasks != null) {
+            for (Task t : tasks) {
+                if (t == null || t.done) continue;
+                pending++;
+                if (sb.length() < 1400) {
+                    sb.append('\n').append("• ").append(Dates.fmt(t.year, t.month, t.day))
+                            .append(" (").append(Dates.weekday(t.year, t.month, t.day)).append(") ")
+                            .append(Operation.icon(t.op)).append(' ')
+                            .append(t.plantName).append(" — ").append(t.title);
+                    shown++;
+                }
+            }
+        }
+        if (shown == 0) {
+            sb.append("\nРабот на ближайшую неделю не запланировано 🌿");
+        } else if (pending > shown) {
+            sb.append("\n…ещё ").append(pending - shown).append(" — смотрите в приложении");
+        }
+        sb.append("\n\n— из приложения ZI Garden");
+        return sb.toString();
+    }
 }

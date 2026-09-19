@@ -147,8 +147,9 @@ public class MainActivity extends Activity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "Обновить погоду");
-        menu.add(0, 2, 1, R.string.settings);
-        menu.add(0, 3, 2, R.string.about);
+        menu.add(0, 4, 1, "📒 Журнал");
+        menu.add(0, 2, 2, R.string.settings);
+        menu.add(0, 3, 3, R.string.about);
         return true;
     }
 
@@ -156,6 +157,10 @@ public class MainActivity extends Activity {
         int itemId = menuItem.getItemId();
         if (itemId == 1) {
             loadWeather(false);
+            return true;
+        }
+        if (itemId == 4) {
+            startActivity(new Intent(this, (Class<?>) JournalActivity.class));
             return true;
         }
         if (itemId == 2) {

@@ -115,6 +115,10 @@ public final class Ui {
 
     static void lambda$taskCard$0(Context context, Task task, Runnable runnable, CompoundButton compoundButton, boolean z) {
         new Storage(context).setDone(task.id, task.year, z);
+        if (z) {
+            // Журнал сада: фиксируем выполненную работу (надо сроки ожидания после обработок следить)
+            new Storage(context).addJournal(task.op, task.plantName, task.title, WaitDays.matsCsv(task));
+        }
         task.done = z;
         if (runnable != null) {
             runnable.run();
@@ -188,5 +192,22 @@ public final class Ui {
 
     public static void toast(Context context, String str) {
         Toast.makeText(context, str, 1).show();
+    }
+
+    /** Полноэкранный просмотр фото (тап — закрыть). Используется для снимков симптомов болезней. */
+    public static void zoomPhoto(android.app.Activity activity, int resId) {
+        final android.app.Dialog dialog = new android.app.Dialog(activity,
+                android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        android.widget.ImageView image = new android.widget.ImageView(activity);
+        image.setImageResource(resId);
+        image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        image.setBackgroundColor(android.graphics.Color.BLACK);
+        image.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.setContentView(image);
+        dialog.show();
     }
 }

@@ -12,6 +12,9 @@ public class NotifyTapReceiver extends BroadcastReceiver {
             return;
         }
         new Storage(context).setDone(stringExtra, intExtra, true);
+        new Storage(context).addJournal("",
+                intent.getStringExtra(Notifications.EXTRA_PLANT),
+                intent.getStringExtra(Notifications.EXTRA_TITLE), "");
         Notifications.scheduleAll(context);
     }
 }

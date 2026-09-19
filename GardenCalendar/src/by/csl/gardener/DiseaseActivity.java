@@ -22,6 +22,7 @@ public class DiseaseActivity extends Activity {
 
     private String plantId;
     private LinearLayout root;
+    private String filter = "";
 
     public static void show(Context ctx, String plantId) {
         Intent intent = new Intent(ctx, DiseaseActivity.class);
@@ -41,7 +42,26 @@ public class DiseaseActivity extends Activity {
         this.root.setOrientation(LinearLayout.VERTICAL);
         this.root.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f));
         scroll.addView(this.root);
-        setContentView(scroll);
+
+        // Поиск по справочнику: название болезни, симптом («паутина», «пятна») или препарат
+        android.widget.EditText search = new android.widget.EditText(this);
+        search.setHint("🔎 Поиск: название, симптом, препарат…");
+        search.setSingleLine(true);
+        search.setPadding(Ui.dp(this, 12.0f), 0, Ui.dp(this, 12.0f), 0);
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void afterTextChanged(android.text.Editable s) {
+                DiseaseActivity.this.filter = s == null ? "" : s.toString();
+                DiseaseActivity.this.render();
+            }
+        });
+
+        LinearLayout wrap = new LinearLayout(this);
+        wrap.setOrientation(LinearLayout.VERTICAL);
+        wrap.addView(search, new LinearLayout.LayoutParams(-1, -2));
+        wrap.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1.0f));
+        setContentView(wrap);
         render();
     }
 
@@ -61,9 +81,17 @@ public class DiseaseActivity extends Activity {
         });
         this.root.addView(refresh);
 
-        List<Disease> list = DiseaseDb.forPlant(this, this.plantId);
+        List<Disease> all = DiseaseDb.forPlant(this, this.plantId);
+        List<Disease> list = new java.util.ArrayList<>();
+        for (Disease dz : all) {
+            if (Search.matches(dz, this.filter)) {
+                list.add(dz);
+            }
+        }
         int updated = RemoteDiseases.cachedCount(this);
-        TextView header = Ui.text(this, "Найдено болезней: " + list.size()
+        TextView header = Ui.text(this, (this.filter.trim().length() > 0
+                ? "Найдено по запросу «" + this.filter.trim() + "»: " + list.size() + " из " + all.size() + ". "
+                : "Найдено болезней: " + list.size())
                 + (updated > 0 ? " (есть обновление с сервера: " + updated + " записей)" : " (встроенный справочник)")
                 + ". Сравните симптомы с растением — по фото и описанию определите болезнь, затем действуйте по шагам.",
                 13.0f, cSub, false);
@@ -77,8 +105,14 @@ public class DiseaseActivity extends Activity {
                 ImageView img = new ImageView(this);
                 img.setImageResource(dz.imageRes());
                 img.setAdjustViewBounds(true);
+                final int photoRes = dz.imageRes();
+                img.setOnClickListener(new View.OnClickListener() {
+                    public final void onClick(View view) {
+                        Ui.zoomPhoto(DiseaseActivity.this, photoRes);
+                    }
+                });
                 card.addView(img, new LinearLayout.LayoutParams(-1, -2));
-                TextView cap = Ui.text(this, "На фото: типичные симптомы — «" + dz.name + "». Сравните со своим растением.", 12.0f, cSub, false);
+                TextView cap = Ui.text(this, "На фото: типичные симптомы — «" + dz.name + "». Нажмите — открыть на весь экран.", 12.0f, cSub, false);
                 cap.setPadding(0, Ui.dp(this, 2.0f), 0, Ui.dp(this, 6.0f));
                 card.addView(cap);
             }

@@ -84,10 +84,27 @@ public class CalendarActivity extends Activity {
         Calendar calendar;
         this.list.removeAllViews();
         List<Task> tasks = new Planner(this.store, weather).tasks(21);
-        Calendar calendar2 = Dates.today();
+        final Calendar calendar2 = Dates.today();
         int i = 0;
         int i2 = 0;
         renderHints(calendar2);
+
+        // 📤 Отправить план на неделю в мессенджер (семье, помощникам)
+        final Weather shareWeather = weather;
+        android.widget.Button sharePlan = new android.widget.Button(this);
+        sharePlan.setText("📤 Отправить план на неделю");
+        sharePlan.setOnClickListener(new android.view.View.OnClickListener() {
+            public final void onClick(android.view.View view) {
+                android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                send.setType("text/plain");
+                send.putExtra(android.content.Intent.EXTRA_SUBJECT, "План работ в саду на неделю");
+                send.putExtra(android.content.Intent.EXTRA_TEXT, ShareText.weekPlan(
+                        new Planner(CalendarActivity.this.store, shareWeather).tasks(7),
+                        Dates.fmt(calendar2.get(1), calendar2.get(2) + 1, calendar2.get(5))));
+                CalendarActivity.this.startActivity(android.content.Intent.createChooser(send, "Отправить план через…"));
+            }
+        });
+        this.list.addView(sharePlan);
         for (int i3 = 21; i < i3; i3 = 21) {
             Calendar plusDays = Dates.plusDays(calendar2, i);
             boolean z = true;

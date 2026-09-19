@@ -42,6 +42,7 @@
         <activity android:name=".MaterialsActivity" android:exported="false" android:label="@string/materials" />
         <activity android:name=".SettingsActivity" android:exported="false" android:label="@string/settings" />
         <activity android:name=".AboutActivity" android:exported="false" android:label="@string/about" />
+        <activity android:name=".JournalActivity" android:exported="false" android:label="Журнал сада" />
 
         <service android:name=".RescheduleService" android:exported="false" />
 

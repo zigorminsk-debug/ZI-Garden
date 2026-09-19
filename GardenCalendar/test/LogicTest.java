@@ -926,6 +926,101 @@ public class LogicTest {
                         new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()),
                         java.nio.charset.StandardCharsets.UTF_8).contains("AppUpdate.checkNow"), "");
 
+        System.out.println("\n=== 22. План на неделю, поиск, журнал сада ===");
+        // План работ на неделю (шаринг)
+        java.util.List<Task> wk = new java.util.ArrayList<>();
+        Task tA = new Task(); tA.year = 2026; tA.month = 9; tA.day = 21; tA.op = "spray";
+        tA.plantName = "Яблоня"; tA.title = "Обработка от парши"; tA.done = false;
+        Task tB = new Task(); tB.year = 2026; tB.month = 9; tB.day = 23; tB.op = "water";
+        tB.plantName = "Виноград"; tB.title = "Полив"; tB.done = true; // не попадёт в план
+        wk.add(tA); wk.add(tB);
+        String plan = ShareText.weekPlan(wk, "19.09");
+        check("план недели: задача есть, выполненная пропущена",
+                plan.contains("Обработка от парши") && !plan.contains("Полив")
+                && plan.contains("ZI Garden"), "");
+        check("план недели: пустой список — дружелюбный текст",
+                ShareText.weekPlan(new java.util.ArrayList<Task>(), "").contains("не запланировано"), "");
+        java.util.List<Task> many = new java.util.ArrayList<>();
+        for (int i = 0; i < 40; i++) {
+            Task t = new Task(); t.year = 2026; t.month = 9; t.day = 20 + (i % 7); t.op = "monitor";
+            t.plantName = "Культура"; t.title = "Осмотр номер " + i + " с длинным длинным описанием работы";
+            many.add(t);
+        }
+        check("план недели: длинный список ужимается с «ещё N»",
+                ShareText.weekPlan(many, "").contains("ещё"), "");
+        check("план недели: кнопка есть в календаре",
+                new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/CalendarActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("Отправить план на неделю"), "");
+        // Поиск по справочнику
+        Disease scabForSearch = null;
+        for (Disease dz : dzAll) {
+            if (dz.id.equals("apple_scab")) scabForSearch = dz;
+        }
+        check("поиск: находит по названию (регистр не важен)",
+                Search.matches(scabForSearch, "ПАРША") && Search.matches(scabForSearch, "парша"), "");
+        check("поиск: несколько слов — все должны встретиться",
+                Search.matches(scabForSearch, "парша яблон")
+                && !Search.matches(scabForSearch, "парша банановый экватор"), "");
+        check("поиск: пустой запрос показывает всё", Search.matches(scabForSearch, "   "), "");
+        check("поиск: экран болезней содержит строку фильтра",
+                srcDisease.contains("Search.matches") && srcDisease.contains("EditText"), "");
+        check("фото болезни открывается на весь экран",
+                srcDisease.contains("zoomPhoto"), "");
+        // Журнал сада + сроки ожидания
+        check("сроки ожидания: известные препараты",
+                WaitDays.forName("Актара ВДГ") == 21 && WaitDays.forName("Фитоверм КЭ") == 2
+                && WaitDays.forName("Поливочный шланг") == 0, "");
+        long nowMs = System.currentTimeMillis();
+        check("статус ожидания: свежая обработка → «ещё N дн.»",
+                WaitDays.statusLine("spray", "Актара", nowMs, nowMs).contains("ещё 21 дн"), "");
+        check("статус ожидания: срок вышел → разрешение сборов",
+                WaitDays.statusLine("spray", "Актара", nowMs - 22L * 86400000L, nowMs)
+                .contains("вышел"), "");
+        check("статус ожидания: только для обработок",
+                WaitDays.statusLine("feed_root", "Актара", nowMs, nowMs).length() == 0, "");
+        Task tMats = new Task();
+        Task.Item i1 = new Task.Item(); i1.name = "Актара ВДГ"; i1.alternative = false;
+        Task.Item i2 = new Task.Item(); i2.name = "Фитоверм КЭ (альтернатива)"; i2.alternative = true;
+        tMats.items.add(i1); tMats.items.add(i2);
+        check("журнал: материалы записываются без альтернатив",
+                WaitDays.matsCsv(tMats).equals("Актара ВДГ"), "");
+        String enc = Journal.encode("spray", "Яблоня", "Обработка, повторно", "Актара", 123456789L);
+        String[] dec = Journal.decode(enc);
+        check("журнал: кодирование/декодирование с запятыми",
+                dec != null && dec[Journal.F_PLANT].equals("Яблоня")
+                && dec[Journal.F_TITLE].equals("Обработка, повторно")
+                && Journal.when(dec) == 123456789L, "");
+        java.util.List<String> rawJ = new java.util.ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            rawJ.add(Journal.encode("water", "Виноград", "Полив " + i, "", 1000L + i));
+        }
+        java.util.List<String> newest = Journal.newest(rawJ, 3);
+        check("журнал: сортировка новые-сверху и лимит",
+                newest.size() == 3 && Journal.when(Journal.decode(newest.get(0))) == 1004L, "");
+        Storage stJ = new Storage(new Context());
+        stJ.addJournal("spray", "Томат", "Обработка от фитофторы", "Ридомил Голд");
+        stJ.addJournal("harvest", "Клубника", "Сбор урожая", "");
+        java.util.List<String> jourRows = stJ.journal(10);
+        check("журнал: запись сохраняется и читается",
+                jourRows.size() == 2
+                && Journal.decode(jourRows.get(0))[Journal.F_PLANT].equals("Клубника"), "");
+        check("журнал: экран и пункт меню зарегистрированы",
+                manifest.contains(".JournalActivity")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("JournalActivity.class"), "");
+        check("журнал: отметки «выполнено» пишутся из задач/диалога/уведомления",
+                new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/Ui.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("addJournal")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/TaskDialog.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("addJournal")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/NotifyTapReceiver.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("addJournal"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

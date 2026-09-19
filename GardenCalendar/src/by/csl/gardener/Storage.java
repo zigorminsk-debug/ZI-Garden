@@ -12,13 +12,17 @@ import org.json.JSONArray;
 
 public class Storage {
     private static final String DONE = "done_prefs";
+    private static final String JOURNAL = "journal_prefs";
+
     private static final String PREFS = "garden_prefs";
     private final SharedPreferences doneP;
+    private final SharedPreferences journalP;
     private final SharedPreferences p;
 
     public Storage(Context context) {
         this.p = context.getSharedPreferences(PREFS, 0);
         this.doneP = context.getSharedPreferences(DONE, 0);
+        this.journalP = context.getSharedPreferences(JOURNAL, 0);
     }
 
     public Set<String> plants() {
@@ -227,5 +231,37 @@ public class Storage {
             jSONArray.put(it.next());
         }
         this.p.edit().putString("bought", jSONArray.toString()).apply();
+    }
+
+    /** Журнал сада: ровно одна запись на выполненную работу (операция, культура, название, материалы). */
+    public void addJournal(String op, String plant, String title, String mats) {
+        android.content.SharedPreferences prefs = this.journalP;
+        android.content.SharedPreferences.Editor edit = prefs.edit();
+        java.util.List<String> all = new java.util.ArrayList<>();
+        for (java.util.Map.Entry<String, ?> e : prefs.getAll().entrySet()) {
+            Object v = e.getValue();
+            if (v instanceof String) all.add((String) v);
+        }
+        all.add(Journal.encode(op, plant, title, mats, System.currentTimeMillis()));
+        java.util.List<String> kept = Journal.newest(all, Journal.MAX_ENTRIES);
+        edit.clear();
+        for (String encoded : kept) {
+            String[] f = Journal.decode(encoded);
+            if (f != null) {
+                edit.putString("j#" + Journal.when(f), encoded);
+            }
+        }
+        edit.apply();
+    }
+
+    /** Журнал сада: закодированные записи, новые сверху. */
+    public java.util.List<String> journal(int max) {
+        android.content.SharedPreferences prefs = this.journalP;
+        java.util.List<String> all = new java.util.ArrayList<>();
+        for (java.util.Map.Entry<String, ?> e : prefs.getAll().entrySet()) {
+            Object v = e.getValue();
+            if (v instanceof String) all.add((String) v);
+        }
+        return Journal.newest(all, max);
     }
 }

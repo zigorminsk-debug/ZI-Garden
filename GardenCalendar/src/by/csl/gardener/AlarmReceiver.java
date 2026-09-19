@@ -35,6 +35,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent intent3 = new Intent(context, (Class<?>) NotifyTapReceiver.class);
         intent3.setAction("by.csl.gardener.MARK_DONE");
         intent3.putExtra(Notifications.EXTRA_TASK, stringExtra);
+        intent3.putExtra(Notifications.EXTRA_TITLE, stringExtra2);
+        intent3.putExtra(Notifications.EXTRA_PLANT, stringExtra3);
         intent3.putExtra("year", intent.getIntExtra("year", Dates.today().get(1)));
         PendingIntent broadcast = PendingIntent.getBroadcast(context, (stringExtra == null ? 0 : stringExtra.hashCode()) + 7, intent3, 201326592);
         if (Build.VERSION.SDK_INT >= 26) {

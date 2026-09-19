@@ -40,6 +40,7 @@ public class SharedPreferences {
     }
 
     public static class Editor {
+        private boolean cleared = false;
         private final SharedPreferences prefs;
         private final Map<String, Object> pending = new HashMap<>();
         private final Set<String> removed = new HashSet<>();
@@ -57,10 +58,12 @@ public class SharedPreferences {
         public Editor putBoolean(String key, boolean v) { pending.put(key, v); return this; }
 
         public Editor remove(String key) { removed.add(key); return this; }
+        public Editor clear() { cleared = true; return this; }
 
         public void apply() { commit(); }
 
         public boolean commit() {
+            if (cleared) { prefs.values.clear(); cleared = false; }
             for (String k : removed) prefs.values.remove(k);
             removed.clear();
             prefs.values.putAll(pending);

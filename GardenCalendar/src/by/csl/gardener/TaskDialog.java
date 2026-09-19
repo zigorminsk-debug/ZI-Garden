@@ -171,8 +171,12 @@ public final class TaskDialog {
     }
 
     static void lambda$show$1(Context context, Task task, Runnable runnable, DialogInterface dialogInterface, int i) {
-        new Storage(context).setDone(task.id, task.year, !task.done);
-        task.done = !task.done;
+        boolean nowDone = !task.done;
+        new Storage(context).setDone(task.id, task.year, nowDone);
+        if (nowDone) {
+            new Storage(context).addJournal(task.op, task.plantName, task.title, WaitDays.matsCsv(task));
+        }
+        task.done = nowDone;
         if (runnable != null) {
             runnable.run();
         }
