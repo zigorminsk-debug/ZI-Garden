@@ -16,6 +16,13 @@ public class AboutActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_about);
+        ((TextView) findViewById(R.id.version)).setText(
+                "Версия " + AppUpdate.ownVersionName(this) + " · обновления — с GitHub");
+        findViewById(R.id.check_update).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                AppUpdate.checkNow(AboutActivity.this);
+            }
+        });
         ((TextView) findViewById(R.id.phone)).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 AboutActivity.this.m0lambda$onCreate$0$bycslgardenerAboutActivity(view);

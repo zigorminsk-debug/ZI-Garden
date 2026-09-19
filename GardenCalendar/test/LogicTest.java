@@ -735,7 +735,8 @@ public class LogicTest {
         // Новые API (23+) допустимы только под guard'ом Build.VERSION.SDK_INT в том же файле.
         String[] risky = {"NotificationChannel", "createNotificationChannel", "POST_NOTIFICATIONS",
                 "startForegroundService", "canScheduleExactAlarms", "checkSelfPermission",
-                "requestPermissions", "Notification.Builder("};
+                "requestPermissions", "Notification.Builder(", "canRequestPackageInstalls",
+                "getLongVersionCode"};
         Set<String> unguarded = new HashSet<>();
         java.io.File srcDir = new java.io.File("src/by/csl/gardener");
         java.io.File[] javaFiles = srcDir.listFiles(new java.io.FilenameFilter() {
@@ -874,6 +875,56 @@ public class LogicTest {
                 && new String(java.nio.file.Files.readAllBytes(
                         new java.io.File("src/by/csl/gardener/BootReceiver.java").toPath()),
                         java.nio.charset.StandardCharsets.UTF_8).contains("Widgets.refreshAll"), "");
+
+        System.out.println("\n=== 21. Самообновление с GitHub ===");
+        check("тег v2.6 → код 26000 (как в CI)",
+                UpdateInfo.versionCodeFromTag("v2.6") == 26000
+                && UpdateInfo.versionCodeFromTag("v2.10") == 30000, "");
+        check("битые теги не дают кода", UpdateInfo.versionCodeFromTag("v2") < 0
+                && UpdateInfo.versionCodeFromTag("abc") < 0
+                && UpdateInfo.versionCodeFromTag(null) < 0, "");
+        String relJson = "{\"tag_name\":\"v2.7\",\"name\":\"2.7\",\"body\":\"Новое: виджеты\\nИсправления\","
+                + "\"assets\":[{\"name\":\"app.apk\",\"browser_download_url\":\"https://github.com/x/app.apk\"}]}";
+        UpdateInfo parsed = UpdateInfo.fromReleaseJson(relJson);
+        check("парсинг релиза: тег, код, ссылка на APK",
+                parsed != null && parsed.versionCode == 27000
+                && parsed.apkUrl.endsWith(".apk") && parsed.notes.contains("Новое"), "");
+        check("релиз без APK → null", UpdateInfo.fromReleaseJson(
+                "{\"tag_name\":\"v2.7\",\"assets\":[]}") == null, "");
+        check("битый JSON → null, без падения", UpdateInfo.fromReleaseJson("{oops") == null, "");
+        check("сравнение версий: релиз 2.7 новее CI-сборки 17036",
+                UpdateInfo.isNewer(27000, 17036)
+                && !UpdateInfo.isNewer(27000, 27000) && !UpdateInfo.isNewer(26000, 27000), "");
+        String srcManifest = manifest;
+        check("манифест: разрешение REQUEST_INSTALL_PACKAGES",
+                srcManifest.contains("REQUEST_INSTALL_PACKAGES"), "");
+        check("манифест: провайдер APK не экспортирован, выдачи по разрешению",
+                srcManifest.contains("by.csl.gardener.apk")
+                && srcManifest.contains("android:grantUriPermissions=\"true\""), "");
+        String srcApk = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ApkProvider.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("ApkProvider: корректный MIME и открытие только на чтение",
+                srcApk.contains("application/vnd.android.package-archive")
+                && srcApk.contains("MODE_READ_ONLY"), "");
+        String srcUpd = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AppUpdate.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("обновление: проверка по GitHub releases/latest с User-Agent",
+                srcUpd.contains("repos/zigorminsk-debug/ZI-Garden/releases/latest")
+                && srcUpd.contains("User-Agent"), "");
+        check("обновление: троттлинг проверки (6 часов)",
+                srcUpd.contains("CHECK_EVERY_MS"), "");
+        check("обновление: установка через системный установщик из content://",
+                srcUpd.contains("ACTION_INSTALL_PACKAGE")
+                && srcUpd.contains("FLAG_GRANT_READ_URI_PERMISSION"), "");
+        check("обновление: авто-проверка при запуске и ручная из «О приложении»",
+                new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("AppUpdate.autoCheck")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("AppUpdate.checkNow"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

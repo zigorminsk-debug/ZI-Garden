@@ -89,6 +89,7 @@ public class MainActivity extends Activity {
             getIntent().removeExtra(Notifications.EXTRA_TASK);
             this.pendingTaskId = stringExtra;
         }
+        AppUpdate.autoCheck(this);
     }
 
     void m5lambda$onCreate$0$bycslgardenerMainActivity(View view) {
