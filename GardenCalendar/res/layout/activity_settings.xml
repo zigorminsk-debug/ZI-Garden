@@ -241,5 +241,36 @@
             android:layout_height="wrap_content"
             android:text="Очистить список покупок"
             android:textAllCaps="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="💾 Резервная копия"
+            android:textColor="@color/green_700"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/backup_export"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Экспорт всех данных в файл"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/backup_import"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Импорт данных из файла"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Сохраните файл перед переустановкой приложения или сменой телефона — потом вернёте культуры, отметки «выполнено», журнал и настройки. Импорт полностью заменяет текущие данные."
+            android:textColor="@color/text_sub"
+            android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

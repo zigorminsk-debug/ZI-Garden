@@ -142,7 +142,154 @@ public class SettingsActivity extends Activity {
                 SettingsActivity.this.m24lambda$onCreate$9$bycslgardenerSettingsActivity(view);
             }
         });
+        findViewById(R.id.backup_export).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.onBackupExport();
+            }
+        });
+        findViewById(R.id.backup_import).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.onBackupImport();
+            }
+        });
         status(Notifications.scheduleAll(this));
+    }
+
+    private static final int REQ_BACKUP_SAVE = 46;
+    private static final int REQ_BACKUP_OPEN = 47;
+
+    /** Экспорт: системное окно «сохранить файл» (Storage Access Framework, без разрешений). */
+    void onBackupExport() {
+        android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory("android.intent.category.OPENABLE");
+        intent.setType("application/json");
+        String stamp = new java.text.SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(new java.util.Date());
+        intent.putExtra(android.content.Intent.EXTRA_TITLE, "zi-garden-backup-" + stamp + ".json");
+        try {
+            startActivityForResult(intent, REQ_BACKUP_SAVE);
+        } catch (Exception e) {
+            Ui.toast(this, "Не нашлось файлового менеджера — обновите устройство и повторите");
+        }
+    }
+
+    /** Импорт: сначала предупреждение о полной замене данных. */
+    void onBackupImport() {
+        new AlertDialog.Builder(this)
+                .setTitle("Импорт данных")
+                .setMessage("Импорт ПОЛНОСТЬЮ ЗАМЕНИТ текущие данные (культуры, отметки «выполнено», журнал, настройки) содержимым файла.\n\nСовет: сначала сделайте экспорт — это ваша страховка.")
+                .setPositiveButton("Выбрать файл", new DialogInterface.OnClickListener() {
+                    public final void onClick(DialogInterface dialogInterface, int i) {
+                        android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory("android.intent.category.OPENABLE");
+                        intent.setType("*/*");
+                        try {
+                            startActivityForResult(intent, REQ_BACKUP_OPEN);
+                        } catch (Exception e) {
+                            Ui.toast(SettingsActivity.this, "Не нашлось файлового менеджера — обновите устройство и повторите");
+                        }
+                    }
+                })
+                .setNegativeButton("Отмена", (DialogInterface.OnClickListener) null)
+                .show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) {
+            return;
+        }
+        android.net.Uri uri = data.getData();
+        if (requestCode == REQ_BACKUP_SAVE) {
+            doBackupWrite(uri);
+        } else if (requestCode == REQ_BACKUP_OPEN) {
+            doBackupRead(uri);
+        }
+    }
+
+    /** Пишет резервную копию (в фоне), затем сообщает итог. */
+    private void doBackupWrite(final android.net.Uri uri) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String message;
+                try {
+                    java.util.Map<String, ?>[] maps = SettingsActivity.this.store.exportAll();
+                    int count = maps[0].size() + maps[1].size() + maps[2].size();
+                    String json = Backup.encode(maps[0], maps[1], maps[2], AppUpdate.ownVersionCode(SettingsActivity.this));
+                    java.io.OutputStream out = SettingsActivity.this.getContentResolver().openOutputStream(uri, "wt");
+                    out.write(json.getBytes("UTF-8"));
+                    out.flush();
+                    out.close();
+                    message = "💾 Резервная копия сохранена: " + count + " записей. Храните файл в надёжном месте.";
+                } catch (Exception e) {
+                    message = "Не удалось сохранить копию: " + e.getMessage();
+                }
+                final String toast = message;
+                SettingsActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Ui.toast(SettingsActivity.this, toast);
+                    }
+                });
+            }
+        }, "backup-write").start();
+    }
+
+    /** Читает файл, декодирует и предлагает подтвердить восстановление. */
+    private void doBackupRead(final android.net.Uri uri) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    java.io.InputStream in = SettingsActivity.this.getContentResolver().openInputStream(uri);
+                    StringBuilder sb = new StringBuilder();
+                    java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(in, "UTF-8"));
+                    char[] buf = new char[8192];
+                    int n;
+                    while ((n = br.read(buf)) > 0 && sb.length() < 4194304) {
+                        sb.append(buf, 0, n);
+                    }
+                    br.close();
+                    final java.util.Map<String, Object>[] decoded = Backup.decode(sb.toString());
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SettingsActivity.this.confirmBackupRestore(decoded);
+                        }
+                    });
+                } catch (Exception e) {
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Ui.toast(SettingsActivity.this, "Не удалось прочитать файл — выбран не тот файл?");
+                        }
+                    });
+                }
+            }
+        }, "backup-read").start();
+    }
+
+    /** Диалог подтверждения и само восстановление. */
+    void confirmBackupRestore(final java.util.Map<String, Object>[] decoded) {
+        if (decoded == null) {
+            Ui.toast(this, "Это не файл резервной копии ZI Garden (или файл испорчен)");
+            return;
+        }
+        int count = decoded[0].size() + decoded[1].size() + decoded[2].size();
+        new AlertDialog.Builder(this)
+                .setTitle("Восстановить данные?")
+                .setMessage("В файле " + count + " записей. Текущие данные будут стёрты и заменены данными из файла — отменить это нельзя.")
+                .setPositiveButton("Восстановить", new DialogInterface.OnClickListener() {
+                    public final void onClick(DialogInterface dialogInterface, int i) {
+                        int n = SettingsActivity.this.store.importAll(decoded[0], decoded[1], decoded[2]);
+                        Ui.toast(SettingsActivity.this, "✅ Восстановлено " + n + " записей. Откройте нужный экран — данные уже на месте.");
+                        SettingsActivity.this.setResult(Activity.RESULT_OK);
+                        SettingsActivity.this.recreate();
+                    }
+                })
+                .setNegativeButton("Отмена", (DialogInterface.OnClickListener) null)
+                .show();
     }
 
     void m15lambda$onCreate$0$bycslgardenerSettingsActivity(Spinner spinner, View view) {

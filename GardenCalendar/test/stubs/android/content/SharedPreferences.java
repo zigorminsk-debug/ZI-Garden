@@ -26,6 +26,11 @@ public class SharedPreferences {
         return v == null ? def : (Integer) v;
     }
 
+    public long getLong(String key, long def) {
+        Object v = values.get(key);
+        return v == null ? def : (Long) v;
+    }
+
     public boolean getBoolean(String key, boolean def) {
         Object v = values.get(key);
         return v == null ? def : (Boolean) v;
@@ -54,6 +59,8 @@ public class SharedPreferences {
         public Editor putStringSet(String key, Set<String> v) { pending.put(key, v); return this; }
 
         public Editor putInt(String key, int v) { pending.put(key, v); return this; }
+
+        public Editor putLong(String key, long v) { pending.put(key, v); return this; }
 
         public Editor putBoolean(String key, boolean v) { pending.put(key, v); return this; }
 

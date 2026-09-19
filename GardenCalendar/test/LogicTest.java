@@ -1076,6 +1076,53 @@ public class LogicTest {
                 workflow.contains("pages/latest.json") && workflow.contains("pages/app.apk")
                 && workflow.contains("pages/**") && workflow.contains("[skip ci]"), "");
 
+        // ───────────────────────── 24. РЕЗЕРВНАЯ КОПИЯ ─────────────────────────
+        HashMap<String, Object> srcP = new HashMap<>();
+        srcP.put("city", "Полоцк");
+        srcP.put("font", 3);
+        srcP.put("notify", Boolean.TRUE);
+        srcP.put("weather_ts", 1700000000000L);
+        srcP.put("bought", new HashSet<>(java.util.Arrays.asList("Фитоспорин", "Агат-25")));
+        srcP.put("quote", "с «кавычками» и символами %");
+        HashMap<String, Object> emptyDone = new HashMap<>();
+        HashMap<String, Object> srcJ = new HashMap<>();
+        srcJ.put("j#1700000000000#ab", "{\"plant\":\"Яблоня\",\"name\":\"опрыскивание\"}");
+        String encodedBackup = Backup.encode(srcP, emptyDone, srcJ, 2010000);
+        Map<String, Object>[] decodedBackup = Backup.decode(encodedBackup);
+        check("резервная копия: типы и кириллица переживают экспорт-импорт",
+                decodedBackup != null
+                && "Полоцк".equals(decodedBackup[0].get("city"))
+                && Integer.valueOf(3).equals(decodedBackup[0].get("font"))
+                && Boolean.TRUE.equals(decodedBackup[0].get("notify"))
+                && Long.valueOf(1700000000000L).equals(decodedBackup[0].get("weather_ts"))
+                && ((Set<?>) decodedBackup[0].get("bought")).size() == 2
+                && ((String) decodedBackup[0].get("quote")).contains("«кавычками»")
+                && decodedBackup[2].size() == 1 && decodedBackup[1].isEmpty(), "");
+        check("резервная копия: чужой JSON и мусор отвергаются",
+                Backup.decode("{\"a\":1}") == null && Backup.decode("не json") == null, "");
+        Storage stBackup = new Storage(new Context());
+        stBackup.setLeadDays(2);
+        java.util.Map<String, ?>[] snapB = stBackup.exportAll();
+        String dumpB = Backup.encode(snapB[0], snapB[1], snapB[2], 2010000);
+        Map<String, Object>[] backB = Backup.decode(dumpB);
+        Storage stRestore = new Storage(new Context());
+        stRestore.setLeadDays(1); // отличается от копии — должен перезаписаться значением из копии
+        int restored = stRestore.importAll(backB[0], backB[1], backB[2]);
+        check("резервная копия: полный цикл через хранилище возвращает значения",
+                restored == snapB[0].size() + snapB[1].size() + snapB[2].size()
+                && stRestore.leadDays() == 2 && stRestore.city().equals(stBackup.city()), "");
+        String srcSet = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SettingsActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcLay = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_settings.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("резервная копия: кнопки и системный диалог файлов подключены",
+                srcLay.contains("backup_export") && srcLay.contains("backup_import")
+                && srcSet.contains("ACTION_CREATE_DOCUMENT") && srcSet.contains("ACTION_OPEN_DOCUMENT")
+                && srcSet.contains("Backup.decode") && srcSet.contains("importAll")
+                && srcSet.contains("confirmBackupRestore"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

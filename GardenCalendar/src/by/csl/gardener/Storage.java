@@ -143,6 +143,46 @@ public class Storage {
         this.p.edit().putString("vars_" + str, sb.toString()).apply();
     }
 
+    /** Три среза хранилища для резервной копии: [0]=настройки, [1]=отметки, [2]=журнал. */
+    @SuppressWarnings("unchecked")
+    public java.util.Map<String, ?>[] exportAll() {
+        return new java.util.Map[] { this.p.getAll(), this.doneP.getAll(), this.journalP.getAll() };
+    }
+
+    /**
+     * Полностью заменяет данные трёх хранилищ содержимым карт (каждая секция сначала очищается).
+     * Возвращает число записей, попавших в файл восстановления.
+     */
+    public int importAll(java.util.Map<String, Object> p, java.util.Map<String, Object> done,
+                         java.util.Map<String, Object> journal) {
+        return restoreSection(this.p, p) + restoreSection(this.doneP, done)
+                + restoreSection(this.journalP, journal);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static int restoreSection(SharedPreferences prefs, java.util.Map<String, Object> data) {
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.clear();
+        int n = 0;
+        for (java.util.Map.Entry<String, Object> e : data.entrySet()) {
+            Object v = e.getValue();
+            if (v instanceof Boolean) {
+                edit.putBoolean(e.getKey(), (Boolean) v);
+            } else if (v instanceof Integer) {
+                edit.putInt(e.getKey(), (Integer) v);
+            } else if (v instanceof Long) {
+                edit.putLong(e.getKey(), (Long) v);
+            } else if (v instanceof java.util.Set) {
+                edit.putStringSet(e.getKey(), (java.util.Set<String>) v);
+            } else if (v != null) {
+                edit.putString(e.getKey(), String.valueOf(v));
+            }
+            n++;
+        }
+        edit.commit();
+        return n;
+    }
+
     public static String groupsLabel(Set<String> set) {
         StringBuilder sb = new StringBuilder();
         for (String str : set) {
