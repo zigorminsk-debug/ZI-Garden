@@ -336,8 +336,8 @@ public class SettingsActivity extends Activity {
 
     /** Диалог создания семьи / присоединения: имя семьи + логин + пароль. */
     void showFamilyAccountDialog(final boolean create) {
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(this);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
         int pad = Ui.dp(this, 16.0f);
         box.setPadding(pad, Ui.dp(this, 8.0f), pad, 0);
         final EditText fFamily = new EditText(this);
