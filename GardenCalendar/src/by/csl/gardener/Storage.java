@@ -248,7 +248,8 @@ public class Storage {
         for (String encoded : kept) {
             String[] f = Journal.decode(encoded);
             if (f != null) {
-                edit.putString("j#" + Journal.when(f), encoded);
+                // ключ уникален даже при двух записях в одну миллисекунду
+                edit.putString("j#" + Journal.when(f) + "#" + Long.toHexString(System.nanoTime()), encoded);
             }
         }
         edit.apply();
