@@ -52,6 +52,9 @@ jobs:
       - name: JVM logic tests (LogicTest)
         run: bash GardenCalendar/test.sh
 
+      - name: Sync server tests (python)
+        run: cd sync-server && python3 -m unittest test_server -v
+
       - name: Версия сборки (автономер)
         shell: bash
         run: |

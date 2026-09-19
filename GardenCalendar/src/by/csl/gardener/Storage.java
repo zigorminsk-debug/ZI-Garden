@@ -149,6 +149,65 @@ public class Storage {
         return new java.util.Map[] { this.p.getAll(), this.doneP.getAll(), this.journalP.getAll() };
     }
 
+    public String familyEmail() {
+        return this.p.getString("family_email", "");
+    }
+
+    public void setFamilyEmail(String value) {
+        this.p.edit().putString("family_email", value).apply();
+    }
+
+    // ── Семейная синхронизация через сервер ──────────────────────────────
+
+    public String syncServer() {
+        String v = this.p.getString("sync_server", "");
+        return v.length() == 0 ? SyncClient.DEFAULT_SERVER : v;
+    }
+
+    public void setSyncServer(String value) {
+        this.p.edit().putString("sync_server", value.trim()).apply();
+    }
+
+    /** Есть ли активная учётная запись семьи. */
+    public boolean syncLinked() {
+        return this.p.getString("sync_token", "").length() > 0;
+    }
+
+    public String syncFamily() {
+        return this.p.getString("sync_family", "");
+    }
+
+    public String syncLogin() {
+        return this.p.getString("sync_login", "");
+    }
+
+    public String syncToken() {
+        return this.p.getString("sync_token", "");
+    }
+
+    public void setSyncAccount(String family, String login, String token) {
+        this.p.edit().putString("sync_family", family).putString("sync_login", login)
+                .putString("sync_token", token).apply();
+    }
+
+    public void clearSyncAccount() {
+        this.p.edit().putString("sync_family", "").putString("sync_login", "")
+                .putString("sync_token", "").apply();
+    }
+
+    /** Дата (мс) последнего известного серверного/применённого состояния. */
+    public long syncLastTs() {
+        try {
+            return Long.parseLong(this.p.getString("sync_last_ts", "0"));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public void setSyncLastTs(long ts) {
+        this.p.edit().putString("sync_last_ts", String.valueOf(ts)).apply();
+    }
+
     /**
      * Полностью заменяет данные трёх хранилищ содержимым карт (каждая секция сначала очищается).
      * Возвращает число записей, попавших в файл восстановления.

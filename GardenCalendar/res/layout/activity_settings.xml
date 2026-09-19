@@ -251,6 +251,88 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="👨‍👩‍👧 Семья (Gmail)"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/family_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Общий e-mail семьи (например, semya@gmail.com)"
+            android:inputType="textEmailAddress" />
+
+        <Button
+            android:id="@+id/family_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📨 Отправить данные семье по e-mail"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Как это работает: вы отправляете свою копию одним нажатием — на другом телефоне её импортируют: прямо текстом из письма или тапом по .json-вложению из Gmail (наше приложение зарегистрировано приёмником таких файлов). Кто последний отправил — тот и «главный»: у всех одинаковые культуры, отметки и журнал."
+            android:textColor="@color/text_sub"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="☁️ Онлайн — общий сад у всей семьи"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/sync_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Адрес сервера (обычно менять не нужно)"
+            android:inputType="textUri" />
+
+        <Button
+            android:id="@+id/sync_create"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="➕ Создать семью на сервере"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/sync_join"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔗 Присоединиться к семье (логин + пароль)"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/sync_now"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔄 Синхронизировать сейчас"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:id="@+id/sync_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_sub"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="🗂 На этом устройстве"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/backup_export"
             android:layout_width="match_parent"

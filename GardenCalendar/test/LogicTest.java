@@ -1117,11 +1117,76 @@ public class LogicTest {
         String srcLay = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("res/layout/activity_settings.xml").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
+        String srcBuiTmp = new String(java.nio.file.Files.readAllBytes(new java.io.File("src/by/csl/gardener/BackupUi.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
         check("резервная копия: кнопки и системный диалог файлов подключены",
                 srcLay.contains("backup_export") && srcLay.contains("backup_import")
                 && srcSet.contains("ACTION_CREATE_DOCUMENT") && srcSet.contains("ACTION_OPEN_DOCUMENT")
-                && srcSet.contains("Backup.decode") && srcSet.contains("importAll")
-                && srcSet.contains("confirmBackupRestore"), "");
+                && srcSet.contains("BackupUi.confirm") && srcBuiTmp.contains("importAll"), "");
+
+        // ───────────────────────── 26. СЕМЕЙНАЯ СИНХРОНИЗАЦИЯ (e-mail) ─────────────────────────
+        check("семья: адрес хранится в настройках",
+                srcLay.contains("family_email") && srcSet.contains("familyEmail") && srcSet.contains("setFamilyEmail"), "");
+        check("семья: отправка письма с полной копией и инструкцией",
+                srcSet.contains("onFamilyShare") && srcSet.contains("ACTION_SEND")
+                && srcSet.contains("EXTRA_EMAIL") && srcSet.contains("Backup.encode")
+                && srcSet.contains("скопируйте всё ниже линии"), "");
+        check("семья: импорт из текста письма (вставка)",
+                srcSet.contains("Вставить текст") && srcSet.contains("showPasteImportDialog"), "");
+        String manifest2 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcImp = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ImportBackupActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("семья: приложение зарегистрировано приёмником .json (Gmail-вложения)",
+                manifest2.contains("ImportBackupActivity") && manifest2.contains("application/json")
+                && manifest2.contains("android.intent.action.VIEW")
+                && srcImp.contains("BackupUi.confirm") && srcImp.contains("MainActivity.class"), "");
+
+        // ───────────────────────── 27. СЕРВЕРНАЯ СИНХРОНИЗАЦИЯ СЕМЬИ ─────────────────────────
+        Storage stSync = new Storage(new Context());
+        check("синхронизация: по умолчанию не привязана, после входа — семья/логин/токен",
+                !stSync.syncLinked() && stSync.syncServer().startsWith("https://"), "");
+        stSync.setSyncAccount("ивановы", "papa", "token123");
+        stSync.setSyncLastTs(1726760000000L);
+        check("синхронизация: учётка и метка времени сохраняются",
+                stSync.syncLinked() && "ивановы".equals(stSync.syncFamily())
+                && "papa".equals(stSync.syncLogin()) && "token123".equals(stSync.syncToken())
+                && stSync.syncLastTs() == 1726760000000L, "");
+        stSync.clearSyncAccount();
+        check("синхронизация: выход очищает учётку", !stSync.syncLinked(), "");
+        String srcSync = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SyncClient.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("синхронизация: клиент знает все маршруты сервера",
+                srcSync.contains("/api/family/create") && srcSync.contains("/api/family/join")
+                && srcSync.contains("/api/state/push") && srcSync.contains("/api/state/pull")
+                && srcSync.contains("/api/health") && srcSync.contains("NetErrors.ru"), "");
+        check("синхронизация: настройки — создание/вход/кнопка обмена",
+                srcSet.contains("showFamilyAccountDialog") && srcSet.contains("onSyncNow")
+                && srcSet.contains("doSyncPush") && srcLay.contains("sync_create")
+                && srcLay.contains("sync_join") && srcLay.contains("sync_now")
+                && srcLay.contains("sync_server"), "");
+        String srcMainSync = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("синхронизация: главный экран подсказывает об обновлениях от семьи",
+                srcMainSync.contains("checkFamilyUpdates") && srcMainSync.contains("SyncClient.pull"), "");
+        String serverPy = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("../sync-server/server.py").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("сервер: логин/пароль, PBKDF2, последний-новее-побеждает, health",
+                serverPy.contains("pbkdf2_hmac") && serverPy.contains("token_hex")
+                && serverPy.contains(">= ts") && serverPy.contains("/api/health")
+                && serverPy.contains("FAMILY_RE"), "");
+        check("сервер: автотест полного цикла семьи лежит рядом",
+                new java.io.File("../sync-server/test_server.py").isFile(), "");
+        check("копия: метка времени извлекается из файла",
+                Backup.timestamp(encodedBackup) > 0 && Backup.timestamp("мусор") == 0, "");
+        String srcBui = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/BackupUi.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("восстановление: общий диалог показывает дату копии и число записей",
+                srcBui.contains("Копия от") && srcBui.contains("записей") && srcBui.contains("importAll"), "");
 
         // ───────────────────────── 25. ЛУННЫЙ КАЛЕНДАРЬ ─────────────────────────
         check("луна: опорное новолуние 06.01.2000 → возраст почти ноль (обёрнутый)",

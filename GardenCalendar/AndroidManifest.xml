@@ -43,6 +43,23 @@
         <activity android:name=".SettingsActivity" android:exported="false" android:label="@string/settings" />
         <activity android:name=".AboutActivity" android:exported="false" android:label="@string/about" />
         <activity android:name=".JournalActivity" android:exported="false" android:label="Журнал сада" />
+        <!-- Принимает тап по .json-вложению из Gmail/проводника: предлагает восстановить данные. -->
+        <activity
+            android:name=".ImportBackupActivity"
+            android:exported="true"
+            android:label="ZI Garden — импорт данных"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:host="*" android:mimeType="application/json" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file" android:host="*" android:mimeType="application/json" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".RescheduleService" android:exported="false" />
 

@@ -110,4 +110,17 @@ final class Backup {
         }
         return map;
     }
+
+    /** Время создания копии (мс) из JSON-файла, 0 — если прочитать не вышло. */
+    static long timestamp(String json) {
+        try {
+            JSONObject root = new JSONObject(json);
+            if (!FORMAT.equals(root.optString("fmt"))) {
+                return 0;
+            }
+            return root.optLong("ts", 0);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 }

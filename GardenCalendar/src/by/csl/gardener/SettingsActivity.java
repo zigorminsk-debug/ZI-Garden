@@ -152,6 +152,29 @@ public class SettingsActivity extends Activity {
                 SettingsActivity.this.onBackupImport();
             }
         });
+        ((EditText) findViewById(R.id.family_email)).setText(this.store.familyEmail());
+        findViewById(R.id.family_send).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.onFamilyShare();
+            }
+        });
+        ((EditText) findViewById(R.id.sync_server)).setText(this.store.syncServer());
+        findViewById(R.id.sync_create).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.showFamilyAccountDialog(true);
+            }
+        });
+        findViewById(R.id.sync_join).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.showFamilyAccountDialog(false);
+            }
+        });
+        findViewById(R.id.sync_now).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.onSyncNow();
+            }
+        });
+        updateSyncStatus(null);
         status(Notifications.scheduleAll(this));
     }
 
@@ -172,12 +195,12 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    /** Импорт: сначала предупреждение о полной замене данных. */
+    /** Импорт: сначала предупреждение о полной замене данных, потом — откуда брать копию. */
     void onBackupImport() {
         new AlertDialog.Builder(this)
                 .setTitle("Импорт данных")
-                .setMessage("Импорт ПОЛНОСТЬЮ ЗАМЕНИТ текущие данные (культуры, отметки «выполнено», журнал, настройки) содержимым файла.\n\nСовет: сначала сделайте экспорт — это ваша страховка.")
-                .setPositiveButton("Выбрать файл", new DialogInterface.OnClickListener() {
+                .setMessage("Импорт ПОЛНОСТЬЮ ЗАМЕНИТ текущие данные (культуры, отметки «выполнено», журнал, настройки) содержимым копии.\n\nСовет: сначала сделайте экспорт — это ваша страховка.")
+                .setPositiveButton("Из файла", new DialogInterface.OnClickListener() {
                     public final void onClick(DialogInterface dialogInterface, int i) {
                         android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT);
                         intent.addCategory("android.intent.category.OPENABLE");
@@ -187,6 +210,34 @@ public class SettingsActivity extends Activity {
                         } catch (Exception e) {
                             Ui.toast(SettingsActivity.this, "Не нашлось файлового менеджера — обновите устройство и повторите");
                         }
+                    }
+                })
+                .setNeutralButton("Вставить текст", new DialogInterface.OnClickListener() {
+                    public final void onClick(DialogInterface dialogInterface, int i) {
+                        SettingsActivity.this.showPasteImportDialog();
+                    }
+                })
+                .setNegativeButton("Отмена", (DialogInterface.OnClickListener) null)
+                .show();
+    }
+
+    /** Импорт из текста: письмо семьи, мессенджер, заметка — просто вставить JSON. */
+    void showPasteImportDialog() {
+        final EditText input = new EditText(this);
+        input.setHint("Вставьте текст копии: от {\"fmt\" … до \"}\" в конце");
+        input.setMinLines(4);
+        new AlertDialog.Builder(this)
+                .setTitle("Вставить текст копии")
+                .setView(input)
+                .setPositiveButton("Проверить и восстановить", new DialogInterface.OnClickListener() {
+                    public final void onClick(DialogInterface dialogInterface, int i) {
+                        BackupUi.confirm(SettingsActivity.this, input.getText().toString(), new Runnable() {
+                            @Override
+                            public void run() {
+                                SettingsActivity.this.setResult(Activity.RESULT_OK);
+                                SettingsActivity.this.recreate();
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Отмена", (DialogInterface.OnClickListener) null)
@@ -251,11 +302,17 @@ public class SettingsActivity extends Activity {
                         sb.append(buf, 0, n);
                     }
                     br.close();
-                    final java.util.Map<String, Object>[] decoded = Backup.decode(sb.toString());
+                    final String json = sb.toString();
                     SettingsActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            SettingsActivity.this.confirmBackupRestore(decoded);
+                            BackupUi.confirm(SettingsActivity.this, json, new Runnable() {
+                                @Override
+                                public void run() {
+                                    SettingsActivity.this.setResult(Activity.RESULT_OK);
+                                    SettingsActivity.this.recreate();
+                                }
+                            });
                         }
                     });
                 } catch (Exception e) {
@@ -270,26 +327,234 @@ public class SettingsActivity extends Activity {
         }, "backup-read").start();
     }
 
-    /** Диалог подтверждения и само восстановление. */
-    void confirmBackupRestore(final java.util.Map<String, Object>[] decoded) {
-        if (decoded == null) {
-            Ui.toast(this, "Это не файл резервной копии ZI Garden (или файл испорчен)");
-            return;
-        }
-        int count = decoded[0].size() + decoded[1].size() + decoded[2].size();
+    /** Диалог подтверждения и само восстановление — см. BackupUi.confirm. */
+    void confirmBackupRestore(java.util.Map<String, Object>[] decoded) {
+        // оставлено для совместимости вызова; логика — в BackupUi
+    }
+
+    // ── Онлайн-синхронизация семьи (сервер) ─────────────────────────────
+
+    /** Диалог создания семьи / присоединения: имя семьи + логин + пароль. */
+    void showFamilyAccountDialog(final boolean create) {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = Ui.dp(this, 16.0f);
+        box.setPadding(pad, Ui.dp(this, 8.0f), pad, 0);
+        final EditText fFamily = new EditText(this);
+        fFamily.setHint("Имя семьи (например, Ивановы)");
+        box.addView(fFamily);
+        final EditText fLogin = new EditText(this);
+        fLogin.setHint("Ваш логин (латиница, 3–32)");
+        box.addView(fLogin);
+        final EditText fPass = new EditText(this);
+        fPass.setHint(create ? "Пароль семьи (сообщите его родным)" : "Пароль семьи");
+        fPass.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        box.addView(fPass);
         new AlertDialog.Builder(this)
-                .setTitle("Восстановить данные?")
-                .setMessage("В файле " + count + " записей. Текущие данные будут стёрты и заменены данными из файла — отменить это нельзя.")
-                .setPositiveButton("Восстановить", new DialogInterface.OnClickListener() {
+                .setTitle(create ? "Создать семью" : "Присоединиться к семье")
+                .setView(box)
+                .setPositiveButton(create ? "Создать" : "Войти", new DialogInterface.OnClickListener() {
                     public final void onClick(DialogInterface dialogInterface, int i) {
-                        int n = SettingsActivity.this.store.importAll(decoded[0], decoded[1], decoded[2]);
-                        Ui.toast(SettingsActivity.this, "✅ Восстановлено " + n + " записей. Откройте нужный экран — данные уже на месте.");
-                        SettingsActivity.this.setResult(Activity.RESULT_OK);
-                        SettingsActivity.this.recreate();
+                        SettingsActivity.this.doFamilyAccount(create,
+                                fFamily.getText().toString().trim(),
+                                fLogin.getText().toString().trim(),
+                                fPass.getText().toString());
                     }
                 })
                 .setNegativeButton("Отмена", (DialogInterface.OnClickListener) null)
                 .show();
+    }
+
+    void doFamilyAccount(final boolean create, final String family, final String login, final String password) {
+        final String server = ((EditText) findViewById(R.id.sync_server)).getText().toString().trim();
+        SettingsActivity.this.store.setSyncServer(server);
+        Ui.toast(this, create ? "Создаём семью…" : "Входим в семью…");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final org.json.JSONObject resp = create
+                            ? SyncClient.familyCreate(server, family, login, password)
+                            : SyncClient.familyJoin(server, family, login, password);
+                    final String fam = resp.optString("family");
+                    final String token = resp.optString("token");
+                    SettingsActivity.this.store.setSyncAccount(fam, login, token);
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateSyncStatus("✅ Готово");
+                            Ui.toast(SettingsActivity.this,
+                                    "Семья «" + fam + "»: вы вошли как " + login);
+                            new AlertDialog.Builder(SettingsActivity.this)
+                                    .setTitle("Отправить данные?")
+                                    .setMessage("Отправить ваши текущие данные семье сейчас? "
+                                            + "Родные заберут их кнопкой «Синхронизировать».")
+                                    .setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
+                                        public final void onClick(DialogInterface d, int i) {
+                                            SettingsActivity.this.doSyncPush();
+                                        }
+                                    })
+                                    .setNegativeButton("Позже", (DialogInterface.OnClickListener) null)
+                                    .show();
+                        }
+                    });
+                } catch (final SyncClient.ApiException e) {
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Ui.toast(SettingsActivity.this, "Не удалось: " + e.getMessage());
+                        }
+                    });
+                }
+            }
+        }, "family-create").start();
+    }
+
+    void updateSyncStatus(String note) {
+        TextView t = (TextView) findViewById(R.id.sync_status);
+        String base;
+        if (SettingsActivity.this.store.syncLinked()) {
+            base = "👨‍👩‍👧 Семья «" + SettingsActivity.this.store.syncFamily() + "» · вы — "
+                    + SettingsActivity.this.store.syncLogin();
+            if (SettingsActivity.this.store.syncLastTs() > 0) {
+                base += "\nпоследний обмен: " + new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US)
+                        .format(new java.util.Date(SettingsActivity.this.store.syncLastTs()));
+            }
+        } else {
+            base = "Пока не привязано: создайте семью или присоединитесь логином и паролем.";
+        }
+        t.setText(note == null ? base : note + "\n" + base);
+    }
+
+    /** Кнопка «Синхронизировать»: забрать новое от семьи или отправить своё. */
+    void onSyncNow() {
+        if (!SettingsActivity.this.store.syncLinked()) {
+            Ui.toast(this, "Сначала создайте семью или присоединитесь к ней");
+            return;
+        }
+        final String server = ((EditText) findViewById(R.id.sync_server)).getText().toString().trim();
+        SettingsActivity.this.store.setSyncServer(server);
+        Ui.toast(this, "🔄 Синхронизация…");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final org.json.JSONObject pulled = SyncClient.pull(server, SettingsActivity.this.store.syncToken());
+                    final long remoteTs = pulled.optLong("ts", 0);
+                    final String remoteJson = pulled.optString("json", "");
+                    final String by = pulled.optString("by", "");
+                    if (remoteTs > SettingsActivity.this.store.syncLastTs() && remoteJson.length() > 0) {
+                        SettingsActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Ui.toast(SettingsActivity.this,
+                                        "Семья прислала обновления" + (by.length() > 0 ? " (" + by + ")" : ""));
+                                BackupUi.confirm(SettingsActivity.this, remoteJson, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        SettingsActivity.this.store.setSyncLastTs(remoteTs);
+                                        updateSyncStatus("✅ Применено от семьи");
+                                        SettingsActivity.this.recreate();
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        SettingsActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                SettingsActivity.this.doSyncPush();
+                            }
+                        });
+                    }
+                } catch (final SyncClient.ApiException e) {
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Ui.toast(SettingsActivity.this, "Синхронизация: " + e.getMessage());
+                        }
+                    });
+                }
+            }
+        }, "family-sync").start();
+    }
+
+    /** Отправка своей копии семье. */
+    void doSyncPush() {
+        final String server = SettingsActivity.this.store.syncServer();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    java.util.Map<String, ?>[] maps = SettingsActivity.this.store.exportAll();
+                    String json = Backup.encode(maps[0], maps[1], maps[2],
+                            AppUpdate.ownVersionCode(SettingsActivity.this));
+                    final long ts = Backup.timestamp(json);
+                    final org.json.JSONObject resp =
+                            SyncClient.push(server, SettingsActivity.this.store.syncToken(), ts, json);
+                    final boolean applied = resp.optBoolean("applied", false);
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (applied) {
+                                SettingsActivity.this.store.setSyncLastTs(ts);
+                                updateSyncStatus("☁️ Отправлено ✓");
+                                Ui.toast(SettingsActivity.this, "Семья получила ваши данные");
+                            } else {
+                                Ui.toast(SettingsActivity.this,
+                                        "На сервере данные новее (от " + resp.optString("by", "?")
+                                        + ") — нажмите «Синхронизировать» ещё раз, чтобы забрать");
+                            }
+                        }
+                    });
+                } catch (final SyncClient.ApiException e) {
+                    SettingsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Ui.toast(SettingsActivity.this, "Отправка: " + e.getMessage());
+                        }
+                    });
+                }
+            }
+        }, "family-push").start();
+    }
+    void onFamilyShare() {
+        final String email = ((EditText) findViewById(R.id.family_email)).getText().toString().trim();
+        SettingsActivity.this.store.setFamilyEmail(email);
+        if (email.length() < 5 || !email.contains("@")) {
+            Ui.toast(this, "Укажите e-mail семьи (например, общий Gmail)");
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                java.util.Map<String, ?>[] maps = SettingsActivity.this.store.exportAll();
+                int count = maps[0].size() + maps[1].size() + maps[2].size();
+                String json = Backup.encode(maps[0], maps[1], maps[2], AppUpdate.ownVersionCode(SettingsActivity.this));
+                String today = new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US).format(new java.util.Date());
+                StringBuilder body = new StringBuilder();
+                body.append("Это данные приложения ZI Garden (культуры, отметки, журнал, настройки),\n");
+                body.append("отправлено ").append(today).append(", ").append(count).append(" записей.\n\n");
+                body.append("КАК ПРИМЕНИТЬ НА ВАШЕМ ТЕЛЕФОНЕ:\n");
+                body.append("1. Откройте ZI Garden → Настройки → 💾 Резервная копия → «Импорт данных из файла»\n");
+                body.append("2. Выберите «Вставить текст» и вставьте ВЕСЬ текст ниже линии (он начинается с {\"fmt\")\n");
+                body.append("3. Подтвердите «Восстановить» — и наш сад с огородом станет таким же, как у меня.\n\n");
+                body.append("----- скопируйте всё ниже линии -----\n");
+                body.append(json);
+                android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                send.setType("text/plain");
+                send.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email});
+                send.putExtra(android.content.Intent.EXTRA_SUBJECT, "ZI Garden · наш сад — данные (" + today + ")");
+                send.putExtra(android.content.Intent.EXTRA_TEXT, body.toString());
+                try {
+                    SettingsActivity.this.startActivity(
+                            android.content.Intent.createChooser(send, "Отправить через Gmail или другой почтой…"));
+                } catch (Exception e) {
+                    Ui.toast(SettingsActivity.this, "Не нашлось почтового приложения — отправьте файлом через «Экспорт»");
+                }
+            }
+        }, "family-share").start();
     }
 
     void m15lambda$onCreate$0$bycslgardenerSettingsActivity(Spinner spinner, View view) {

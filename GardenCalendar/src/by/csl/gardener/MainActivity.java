@@ -32,12 +32,45 @@ public class MainActivity extends Activity {
     private Storage store;
     private Weather weather;
 
+    /** Тихая подсказка от семьи: если на сервере данные новее наших — один раз сообщим. */
+    private void checkFamilyUpdates() {
+        final Storage storage = this.store == null ? new Storage(this) : this.store;
+        if (!storage.syncLinked()) {
+            return;
+        }
+        if (System.currentTimeMillis() - storage.syncLastTs() < 3600000L * 6
+                && storage.syncLastTs() > 0) {
+            return; // недавно синхронизировались — не дёргаем сервер
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    org.json.JSONObject pulled = SyncClient.pull(storage.syncServer(), storage.syncToken());
+                    final long remoteTs = pulled.optLong("ts", 0);
+                    if (remoteTs > storage.syncLastTs()) {
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Ui.toast(MainActivity.this,
+                                        "👨‍👩‍👧 Семья прислала обновления сада — Настройки → 🔄 Синхронизировать");
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {
+                    // фон — молчим
+                }
+            }
+        }, "family-hint").start();
+    }
+
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         RemoteDiseases.refreshAsync(this);
         setContentView(R.layout.activity_main);
         this.store = new Storage(this);
         Notifications.ensureChannel(this);
+        checkFamilyUpdates();
         findViewById(R.id.btn_plants).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 MainActivity.this.m5lambda$onCreate$0$bycslgardenerMainActivity(view);
