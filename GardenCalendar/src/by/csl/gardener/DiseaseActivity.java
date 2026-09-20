@@ -23,10 +23,17 @@ public class DiseaseActivity extends Activity {
     private String plantId;
     private LinearLayout root;
     private String filter = "";
+    private String kindFilter; // null = всё, "pest" = только вредители, "disease" = только болезни
 
     public static void show(Context ctx, String plantId) {
+        show(ctx, plantId, null);
+    }
+
+    /** Открыть справочник по культуре, сразу в разделе «вредители» («pest») или «болезни» («disease»). */
+    public static void show(Context ctx, String plantId, String kind) {
         Intent intent = new Intent(ctx, DiseaseActivity.class);
         intent.putExtra("plant", plantId);
+        if (kind != null) intent.putExtra("kind", kind);
         ctx.startActivity(intent);
     }
 
@@ -34,8 +41,8 @@ public class DiseaseActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         this.plantId = getIntent().getStringExtra("plant");
-        Plant plant = Plant.byId(this.plantId);
-        setTitle("Болезни: " + (plant != null ? plant.name : this.plantId));
+        this.kindFilter = getIntent().getStringExtra("kind");
+        updateTitle();
 
         ScrollView scroll = new ScrollView(this);
         this.root = new LinearLayout(this);
@@ -65,6 +72,25 @@ public class DiseaseActivity extends Activity {
         render();
     }
 
+    /** Вредитель по полю kind каталога: записи вредителей начинаются со слова «Вредитель». */
+    private boolean matchesKind(Disease dz) {
+        boolean pest = dz.kind != null && dz.kind.startsWith("Вредитель");
+        if ("pest".equals(this.kindFilter)) return pest;
+        if ("disease".equals(this.kindFilter)) return !pest;
+        return true;
+    }
+
+    private String kindTitle() {
+        if ("pest".equals(this.kindFilter)) return "Вредители";
+        if ("disease".equals(this.kindFilter)) return "Болезни";
+        return "Болезни и вредители";
+    }
+
+    private void updateTitle() {
+        Plant plant = Plant.byId(this.plantId);
+        setTitle(kindTitle() + ": " + (plant != null ? plant.name : this.plantId));
+    }
+
     private void render() {
         this.root.removeAllViews();
         Plant plant = Plant.byId(this.plantId);
@@ -81,17 +107,43 @@ public class DiseaseActivity extends Activity {
         });
         this.root.addView(refresh);
 
+        // Переключатель раздела: всё / только болезни / только вредители
+        LinearLayout kindRow = new LinearLayout(this);
+        kindRow.setOrientation(LinearLayout.HORIZONTAL);
+        final String[][] kinds = {{"", "Все"}, {"disease", "🍂 Болезни"}, {"pest", "🐛 Вредители"}};
+        for (final String[] kv : kinds) {
+            Button kb = new Button(this);
+            final String cur = this.kindFilter == null ? "" : this.kindFilter;
+            kb.setText(kv[1] + (kv[0].equals(cur) ? " ✓" : ""));
+            kb.setTextSize(13.0f);
+            kb.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    DiseaseActivity.this.kindFilter = kv[0].length() == 0 ? null : kv[0];
+                    DiseaseActivity.this.updateTitle();
+                    DiseaseActivity.this.render();
+                }
+            });
+            kindRow.addView(kb, new LinearLayout.LayoutParams(0, -2, 1.0f));
+        }
+        this.root.addView(kindRow);
+
         List<Disease> all = DiseaseDb.forPlant(this, this.plantId);
-        List<Disease> list = new java.util.ArrayList<>();
+        List<Disease> byKind = new java.util.ArrayList<>();
         for (Disease dz : all) {
+            if (matchesKind(dz)) byKind.add(dz);
+        }
+        List<Disease> list = new java.util.ArrayList<>();
+        for (Disease dz : byKind) {
             if (Search.matches(dz, this.filter)) {
                 list.add(dz);
             }
         }
+        String noun = "pest".equals(this.kindFilter) ? "вредителей"
+                : ("disease".equals(this.kindFilter) ? "болезней" : "болезней и вредителей");
         int updated = RemoteDiseases.cachedCount(this);
         TextView header = Ui.text(this, (this.filter.trim().length() > 0
-                ? "Найдено по запросу «" + this.filter.trim() + "»: " + list.size() + " из " + all.size() + ". "
-                : "Найдено болезней: " + list.size())
+                ? "Найдено по запросу «" + this.filter.trim() + "»: " + list.size() + " из " + byKind.size() + ". "
+                : "Найдено " + noun + ": " + list.size())
                 + (updated > 0 ? " (есть обновление с сервера: " + updated + " записей)" : " (встроенный справочник)")
                 + ". Сравните симптомы с растением — по фото и описанию определите болезнь, затем действуйте по шагам.",
                 13.0f, cSub, false);

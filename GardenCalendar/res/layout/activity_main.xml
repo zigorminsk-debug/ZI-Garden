@@ -143,6 +143,30 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_pests"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🐛 Вредители"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_diseases"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="🍂 Болезни"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/tasks_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

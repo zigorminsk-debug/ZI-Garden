@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 12;
+        boolean stagesOk = PestStages.ids().size() == 14;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 12 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 14 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1318,6 +1318,36 @@ public class LogicTest {
         check("вредители: в карточке показывается блок стадий развития", srcDis31.contains("PestStages.forPest"), "");
         check("почва: кнопка в главном меню, экран в манифесте",
                 srcMain31.contains("btn_soil") && srcMan31.contains(".SoilActivity") && srcLay31.contains("btn_soil"), "");
+
+        // ── 32. Быстрый переход: кнопки Вредители/Болезни ──
+        boolean kindSplitOk = true;
+        java.util.List<Disease> pests32 = new java.util.ArrayList<>();
+        DiseaseDataPests.fill(pests32);
+        for (Disease dz : pests32) {
+            if (!dz.kind.startsWith("Вредитель")) { kindSplitOk = false; break; }
+        }
+        java.util.List<Disease> dis32 = new java.util.ArrayList<>();
+        DiseaseDataA.fill(dis32); DiseaseDataB.fill(dis32); DiseaseDataC.fill(dis32);
+        if (kindSplitOk) {
+            for (Disease dz : dis32) {
+                if (dz.kind.startsWith("Вредитель")) { kindSplitOk = false; break; }
+            }
+        }
+        check("переходы: признак «Вредитель» в kind надёжно разделяет вредителей и болезни", kindSplitOk, "");
+
+        check("переходы: кнопки Вредители/Болезни на главном экране и выбор культуры",
+                srcLay31.contains("btn_pests") && srcLay31.contains("btn_diseases")
+                && srcMain31.contains("btn_pests") && srcMain31.contains("btn_diseases")
+                && srcMain31.contains("pickCulture"), "");
+        check("переходы: фильтр кинда и переключатель разделов в карточках справочника",
+                srcDis31.contains("kindFilter") && srcDis31.contains("matchesKind")
+                && srcDis31.contains("Вредители") && srcDis31.contains("putExtra(\"kind\", kind)"), "");
+        String srcPlants32 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantsActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("переходы: на каждом растении кнопки своих вредителей и болезней",
+                srcPlants32.contains("🐛") && srcPlants32.contains("🍂")
+                && srcPlants32.contains("pest") && srcPlants32.contains("disease")
+                && srcPlants32.contains("pestBtn") && srcPlants32.contains("dzBtn"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

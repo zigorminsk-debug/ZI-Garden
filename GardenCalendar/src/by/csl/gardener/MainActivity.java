@@ -96,6 +96,16 @@ public class MainActivity extends Activity {
                 MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) SoilActivity.class));
             }
         });
+        findViewById(R.id.btn_pests).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.pickCulture("pest");
+            }
+        });
+        findViewById(R.id.btn_diseases).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.pickCulture("disease");
+            }
+        });
         findViewById(R.id.btn_about).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 MainActivity.this.m9lambda$onCreate$4$bycslgardenerMainActivity(view);
@@ -232,6 +242,23 @@ public class MainActivity extends Activity {
             applyGpsFix(Geo.round4(location.getLatitude()), Geo.round4(location.getLongitude()), Geo.label(this, location.getLatitude(), location.getLongitude()), false);
         } catch (Exception unused) {
         }
+    }
+
+    /** Диалог выбора культуры с переходом сразу в раздел «вредители» или «болезни» справочника. */
+    private void pickCulture(final String kind) {
+        final java.util.List<Plant> all = Plant.all();
+        final String[] names = new String[all.size()];
+        for (int i = 0; i < all.size(); i++) {
+            names[i] = all.get(i).name;
+        }
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("pest".equals(kind) ? "🐛 Вредители: выберите культуру" : "🍂 Болезни: выберите культуру")
+                .setItems(names, new android.content.DialogInterface.OnClickListener() {
+                    public void onClick(android.content.DialogInterface dialog, int which) {
+                        DiseaseActivity.show(MainActivity.this, all.get(which).id, kind);
+                    }
+                })
+                .show();
     }
 
     private void onGpsButton() {

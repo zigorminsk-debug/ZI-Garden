@@ -40,7 +40,7 @@ public class PlantsActivity extends Activity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(1);
         linearLayout.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f));
-        TextView text = Ui.text(this, "Отметьте культуры, которые растут на участке. Календарь построит работы только по ним. Регион: " + this.reg.displayName + ". «ⓘ» или долгий тап по культуре — справка и выбор сроков созревания сортов (можно несколько). «✔» — культура хорошо подходит здесь, «⚠» — нетипична. Под отмеченной культурой раскрываются чекбоксы болезней: отмечайте, что болело в этом сезоне, — и календарь добавит профилактику в весенние и осенние работы следующего года.", 13.0f, getResources().getColor(R.color.text_sub), false);
+        TextView text = Ui.text(this, "Отметьте культуры, которые растут на участке. Календарь построит работы только по ним. Регион: " + this.reg.displayName + ". «ⓘ» или долгий тап по культуре — справка и выбор сроков созревания сортов (можно несколько). «🐛» — вредители этой культуры со стадиями и фото, «🍂» — её болезни. «✔» — культура хорошо подходит здесь, «⚠» — нетипична. Под отмеченной культурой раскрываются чекбоксы болезней: отмечайте, что болело в этом сезоне, — и календарь добавит профилактику в весенние и осенние работы следующего года.", 13.0f, getResources().getColor(R.color.text_sub), false);
         text.setPadding(0, 0, 0, Ui.dp(this, 10.0f));
         linearLayout.addView(text);
         LinkedHashMap<String, List<Plant>> linkedHashMap = new LinkedHashMap<>();
@@ -76,6 +76,27 @@ public class PlantsActivity extends Activity {
                     }
                 });
                 linearLayout2.addView(button);
+                // Быстрый переход к вредителям и болезням именно этой культуры
+                Button pestBtn = new Button(this);
+                pestBtn.setText("🐛");
+                pestBtn.setTextSize(14.0f);
+                pestBtn.setLayoutParams(new LinearLayout.LayoutParams(Ui.dp(this, 46.0f), Ui.dp(this, 44.0f)));
+                pestBtn.setOnClickListener(new View.OnClickListener() {
+                    public final void onClick(View view) {
+                        DiseaseActivity.show(PlantsActivity.this, str, "pest");
+                    }
+                });
+                linearLayout2.addView(pestBtn);
+                Button dzBtn = new Button(this);
+                dzBtn.setText("🍂");
+                dzBtn.setTextSize(14.0f);
+                dzBtn.setLayoutParams(new LinearLayout.LayoutParams(Ui.dp(this, 46.0f), Ui.dp(this, 44.0f)));
+                dzBtn.setOnClickListener(new View.OnClickListener() {
+                    public final void onClick(View view) {
+                        DiseaseActivity.show(PlantsActivity.this, str, "disease");
+                    }
+                });
+                linearLayout2.addView(dzBtn);
                 checkBox.setOnLongClickListener(new View.OnLongClickListener() {
                     public final boolean onLongClick(View view) {
                         return PlantsActivity.this.m3lambda$onCreate$1$bycslgardenerPlantsActivity(str, view);
