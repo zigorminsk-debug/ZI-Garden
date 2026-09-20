@@ -1280,25 +1280,25 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = true;
-        for (String pid : new String[]{"apple_codling_moth", "apple_aphid"}) {
+        boolean stagesOk = PestStages.ids().size() == 4;
+        for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
             for (PestStage st : ss) {
                 if (st.title == null || st.title.length() < 3
                         || st.where == null || st.where.length() < 30
                         || st.harm == null || st.harm.length() < 30
-                        || st.image == null || !st.image.startsWith("dzs_")) { stagesOk = false; break; }
+                        || st.image == null || !st.image.startsWith("dzs_")
+                        || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: плодожорка и тля — по 4 стадии, где развивается и какой вред", stagesOk, "");
+        check("стадии: у 4 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
-        for (String img : new String[]{"dzs_codling_egg", "dzs_codling_larva", "dzs_codling_pupa", "dzs_codling_adult",
-                "dzs_aphid_egg", "dzs_aphid_larva", "dzs_aphid_adult", "dzs_aphid_winged", "soil_siderat", "soil_compost"}) {
+        for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph"}) {
             if (!new java.io.File("res/drawable-nodpi/" + img + ".jpg").exists()) { imgsOk = false; break; }
         }
-        check("стадии и почва: все 10 новых фото лежат в drawable-nodpi", imgsOk, "");
+        check("почва: фото разделов справочника лежат в drawable-nodpi", imgsOk, "");
 
         boolean soilOk = SoilGuide.INTRO.length() > 50 && SoilGuide.all().size() >= 8;
         for (SoilGuide.Section sec : SoilGuide.all()) {
