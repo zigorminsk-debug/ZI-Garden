@@ -1279,6 +1279,47 @@ public class LogicTest {
         check("луна: календарь показывает фазы в днях и совет на неделю",
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
+        // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
+        boolean stagesOk = true;
+        for (String pid : new String[]{"apple_codling_moth", "apple_aphid"}) {
+            PestStage[] ss = PestStages.forPest(pid);
+            if (ss == null || ss.length != 4) { stagesOk = false; break; }
+            for (PestStage st : ss) {
+                if (st.title == null || st.title.length() < 3
+                        || st.where == null || st.where.length() < 30
+                        || st.harm == null || st.harm.length() < 30
+                        || st.image == null || !st.image.startsWith("dzs_")) { stagesOk = false; break; }
+            }
+        }
+        check("стадии: плодожорка и тля — по 4 стадии, где развивается и какой вред", stagesOk, "");
+
+        boolean imgsOk = true;
+        for (String img : new String[]{"dzs_codling_egg", "dzs_codling_larva", "dzs_codling_pupa", "dzs_codling_adult",
+                "dzs_aphid_egg", "dzs_aphid_larva", "dzs_aphid_adult", "dzs_aphid_winged", "soil_siderat", "soil_compost"}) {
+            if (!new java.io.File("res/drawable-nodpi/" + img + ".jpg").exists()) { imgsOk = false; break; }
+        }
+        check("стадии и почва: все 10 новых фото лежат в drawable-nodpi", imgsOk, "");
+
+        boolean soilOk = SoilGuide.INTRO.length() > 50 && SoilGuide.all().size() >= 8;
+        for (SoilGuide.Section sec : SoilGuide.all()) {
+            if (sec.tips == null || sec.tips.length < 4 || sec.body == null || sec.body.length() < 50
+                    || sec.season == null || sec.season.length() < 3) { soilOk = false; break; }
+        }
+        check("почва: справочник восстановления плодородия (сидераты, органика, мульча, ротация)", soilOk, "");
+
+        String srcDis31 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DiseaseActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcMain31 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcMan31 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcLay31 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("вредители: в карточке показывается блок стадий развития", srcDis31.contains("PestStages.forPest"), "");
+        check("почва: кнопка в главном меню, экран в манифесте",
+                srcMain31.contains("btn_soil") && srcMan31.contains(".SoilActivity") && srcLay31.contains("btn_soil"), "");
+
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

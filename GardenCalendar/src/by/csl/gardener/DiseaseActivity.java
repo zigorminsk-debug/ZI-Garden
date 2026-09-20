@@ -145,6 +145,34 @@ public class DiseaseActivity extends Activity {
             if (dz.summer != null && dz.summer.length() > 0) card.addView(Ui.text(this, "☀️ Лето: " + dz.summer, 13.0f, cMain, false));
             if (dz.autumn != null && dz.autumn.length() > 0) card.addView(Ui.text(this, "🍂 Осень: " + dz.autumn, 13.0f, cMain, false));
 
+            // Стадии развития вредителя: фото каждой стадии, где развивается и какой вред
+            PestStage[] stages = PestStages.forPest(dz.id);
+            if (stages != null && stages.length > 0) {
+                TextView stLabel = Ui.text(this, "🔄 Стадии развития: где живут и какой вред", 14.0f, cMain, true);
+                stLabel.setPadding(0, Ui.dp(this, 8.0f), 0, Ui.dp(this, 4.0f));
+                card.addView(stLabel);
+                for (PestStage st : stages) {
+                    int stRes = DiseaseDb.imageRes(st.image);
+                    if (stRes != 0) {
+                        ImageView simg = new ImageView(this);
+                        simg.setImageResource(stRes);
+                        simg.setAdjustViewBounds(true);
+                        final int zoomRes = stRes;
+                        simg.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                Ui.zoomPhoto(DiseaseActivity.this, zoomRes);
+                            }
+                        });
+                        card.addView(simg, new LinearLayout.LayoutParams(-1, -2));
+                    }
+                    TextView stTitle = Ui.text(this, "▸ " + st.title, 14.0f, cMain, true);
+                    stTitle.setPadding(0, Ui.dp(this, 4.0f), 0, 0);
+                    card.addView(stTitle);
+                    card.addView(Ui.text(this, "Где развивается: " + st.where, 13.0f, cMain, false));
+                    card.addView(Ui.text(this, "Какой вред: " + st.harm, 13.0f, cMain, false));
+                }
+            }
+
             if (dz.mats != null && dz.mats.length > 0) {
                 StringBuilder names = new StringBuilder();
                 for (String id : dz.mats) {
