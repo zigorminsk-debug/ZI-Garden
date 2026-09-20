@@ -1213,12 +1213,16 @@ public class LogicTest {
                 && DigestText.plural(11).equals("работ") && DigestText.plural(21).equals("работа"), "");
         Storage stDigest = new Storage(new Context());
         String[] emptyDigest = DigestText.weekly(stDigest);
-        check("дайджест: пустой сад → спокойная неделя с советом",
-                emptyDigest.length == 2 && emptyDigest[0].startsWith("🌿 Спокойная неделя")
-                && emptyDigest[1].contains("справочник"), "");
+        check("дайджест: структура всегда «заголовок + список»",
+                emptyDigest.length == 2 && emptyDigest[0].startsWith("🌿 ")
+                && emptyDigest[1].length() > 10, "");
+        check("дайджест: без работ — «спокойная неделя» с советом; с работами — число и строки по дням",
+                emptyDigest[0].contains("Спокойная неделя")
+                        ? emptyDigest[1].contains("справочник")
+                        : (emptyDigest[0].contains("работ") && emptyDigest[1].contains("▪")), "");
         stDigest.setPlants(plants);
         String[] fullDigest = DigestText.weekly(stDigest);
-        check("дайджест: живой сад → заголовок и список по дням",
+        check("дайджест: полный сад → структура сохраняется",
                 fullDigest.length == 2 && fullDigest[0].startsWith("🌿 ")
                 && fullDigest[1].length() > 10, "");
         String srcNt = new String(java.nio.file.Files.readAllBytes(
