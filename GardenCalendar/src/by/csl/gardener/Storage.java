@@ -208,6 +208,15 @@ public class Storage {
         this.p.edit().putString("sync_last_ts", String.valueOf(ts)).apply();
     }
 
+    /** Еженедельный дайджест-уведомление (воскресенье 10:00). По умолчанию включён. */
+    public boolean weeklyDigestEnabled() {
+        return !"0".equals(this.p.getString("weekly_digest", "1"));
+    }
+
+    public void setWeeklyDigest(boolean enabled) {
+        this.p.edit().putString("weekly_digest", enabled ? "1" : "0").apply();
+    }
+
     /**
      * Полностью заменяет данные трёх хранилищ содержимым карт (каждая секция сначала очищается).
      * Возвращает число записей, попавших в файл восстановления.

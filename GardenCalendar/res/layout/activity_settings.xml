@@ -191,6 +191,12 @@
             android:layout_height="wrap_content"
             android:textAllCaps="false" />
 
+        <CheckBox
+            android:id="@+id/weekly_digest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Еженедельный дайджест (воскресенье 10:00 — план работ на неделю)" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

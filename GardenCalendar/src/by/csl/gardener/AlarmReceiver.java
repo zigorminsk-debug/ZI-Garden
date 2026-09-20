@@ -21,6 +21,10 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
             return;
         }
+        if (intent != null && intent.getBooleanExtra(Notifications.EXTRA_WEEKLY, false)) {
+            showWeeklyDigest(context);
+            return;
+        }
         Notifications.ensureChannel(context);
         String stringExtra = intent.getStringExtra(Notifications.EXTRA_TASK);
         String stringExtra2 = intent.getStringExtra(Notifications.EXTRA_TITLE);
@@ -79,6 +83,37 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
         try {
             context.startService(new Intent(context, (Class<?>) RescheduleService.class));
+        } catch (Exception unused) {
+        }
+    }
+
+    /** Еженедельный дайджест по воскресеньям: сводка работ на 7 дней вперёд. */
+    private void showWeeklyDigest(Context context) {
+        Notifications.ensureChannel(context);
+        String[] digest = DigestText.weekly(new Storage(context));
+        Intent open = new Intent(context, (Class<?>) MainActivity.class);
+        open.setFlags(335544320);
+        PendingIntent tap = PendingIntent.getActivity(context, Notifications.REQ_WEEKLY, open, 201326592);
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= 26) {
+            builder = new Notification.Builder(context, Notifications.CHANNEL);
+        } else {
+            builder = new Notification.Builder(context);
+        }
+        builder.setContentTitle(digest[0])
+                .setContentText(digest[1])
+                .setStyle(new Notification.BigTextStyle().bigText(digest[1]))
+                .setSmallIcon(R.drawable.ic_leaf)
+                .setAutoCancel(true)
+                .setContentIntent(tap)
+                .setPriority(0);
+        NotificationManager manager = (NotificationManager) context.getSystemService("notification");
+        if (manager != null && Notifications.permissionGranted(context)) {
+            manager.notify(Notifications.REQ_WEEKLY, builder.build());
+        }
+        // перезапускаем планирование — дайджест вооружится на следующую неделю
+        try {
+            Notifications.scheduleAll(context);
         } catch (Exception unused) {
         }
     }

@@ -107,6 +107,18 @@ public class SettingsActivity extends Activity {
                 SettingsActivity.this.m18lambda$onCreate$3$bycslgardenerSettingsActivity(compoundButton, z);
             }
         });
+        CheckBox weeklyDigest = (CheckBox) findViewById(R.id.weekly_digest);
+        weeklyDigest.setChecked(this.store.weeklyDigestEnabled());
+        weeklyDigest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public final void onCheckedChanged(CompoundButton compoundButton, boolean z) {
+                SettingsActivity.this.store.setWeeklyDigest(z);
+                Ui.toast(SettingsActivity.this, z
+                        ? "Дайджест включён: каждое воскресенье в 10:00"
+                        : "Еженедельный дайджест выключен");
+                SettingsActivity settingsActivity = SettingsActivity.this;
+                settingsActivity.status(Notifications.scheduleAll(settingsActivity));
+            }
+        });
         final Button button = (Button) findViewById(R.id.notify_time);
         updateTimeButton(button);
         button.setOnClickListener(new View.OnClickListener() {

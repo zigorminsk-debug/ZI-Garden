@@ -117,7 +117,50 @@ public final class Notifications {
             setAlarm(context, alarmManager, d, due, atMs);
             count++;
         }
+        if (storage.weeklyDigestEnabled()) {
+            scheduleWeekly(context, alarmManager);
+        }
         return count;
+    }
+
+    /** Еженедельный дайджест: ближайшее ВОСКРЕСЕНЬЕ 10:00 (в рамках тихих часов 8–21). */
+    static final String EXTRA_WEEKLY = "by.csl.gardener.WEEKLY";
+    static final int REQ_WEEKLY = 770001;
+
+    static void scheduleWeekly(Context context, AlarmManager alarmManager) {
+        Calendar sun = Dates.today();
+        int dayOfWeek = sun.get(7); // 1 = воскресенье
+        int add = (8 - dayOfWeek) % 7;
+        if (add == 0) {
+            add = 7; // сегодня воскресенье — следующий дайджест через неделю
+        }
+        sun = Dates.plusDays(sun, add);
+        long atMs = Dates.atTime(sun.get(1), sun.get(2) + 1, sun.get(5), 10, 0);
+        atMs = clampQuiet(atMs);
+        Intent intent = new Intent(context, (Class<?>) AlarmReceiver.class);
+        intent.putExtra(EXTRA_WEEKLY, true);
+        PendingIntent broadcast = PendingIntent.getBroadcast(context, REQ_WEEKLY, intent, 201326592);
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                alarmManager.setWindow(0, atMs, 600000L, broadcast);
+            } else {
+                alarmManager.setExact(0, atMs, broadcast);
+            }
+        } catch (SecurityException unused) {
+            alarmManager.set(0, atMs, broadcast);
+        }
+    }
+
+    static void cancelWeekly(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService("alarm");
+        if (alarmManager == null) {
+            return;
+        }
+        Intent intent = new Intent(context, (Class<?>) AlarmReceiver.class);
+        PendingIntent existing = PendingIntent.getBroadcast(context, REQ_WEEKLY, intent, 67108864 /* NO_CREATE */);
+        if (existing != null) {
+            alarmManager.cancel(existing);
+        }
     }
 
     private static void setAlarm(Context context, AlarmManager alarmManager, Calendar calendar, List<Task> list, long j) {
@@ -168,6 +211,7 @@ public final class Notifications {
         if (alarmManager == null) {
             return;
         }
+        cancelWeekly(context);
         Storage storage = new Storage(context);
         Planner planner = new Planner(storage, Weather.fromJson(storage.weatherCache()));
         Calendar calendar = Dates.today();

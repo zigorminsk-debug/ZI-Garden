@@ -1206,6 +1206,41 @@ public class LogicTest {
         check("восстановление: общий диалог показывает дату копии и число записей",
                 srcBui.contains("Копия от") && srcBui.contains("записей") && srcBui.contains("importAll"), "");
 
+        // ───────────────────────── 29. ЕЖЕНЕДЕЛЬНЫЙ ДАЙДЖЕСТ ─────────────────────────
+        check("дайджест: склонения «работа/работы/работ»",
+                DigestText.plural(1).equals("работа") && DigestText.plural(2).equals("работы")
+                && DigestText.plural(4).equals("работы") && DigestText.plural(5).equals("работ")
+                && DigestText.plural(11).equals("работ") && DigestText.plural(21).equals("работа"), "");
+        Storage stDigest = new Storage(new Context());
+        String[] emptyDigest = DigestText.weekly(stDigest);
+        check("дайджест: пустой сад → спокойная неделя с советом",
+                emptyDigest.length == 2 && emptyDigest[0].startsWith("🌿 Спокойная неделя")
+                && emptyDigest[1].contains("справочник"), "");
+        stDigest.setPlants(plants);
+        String[] fullDigest = DigestText.weekly(stDigest);
+        check("дайджест: живой сад → заголовок и список по дням",
+                fullDigest.length == 2 && fullDigest[0].startsWith("🌿 ")
+                && fullDigest[1].length() > 10, "");
+        String srcNt = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Notifications.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcAl = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AlarmReceiver.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcSt29 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Storage.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("дайджест: планируется на воскресенье 10:00, обрабатывается и перезапускается",
+                srcNt.contains("scheduleWeekly") && srcNt.contains("EXTRA_WEEKLY")
+                && srcNt.contains("10, 0") && srcNt.contains("cancelWeekly")
+                && srcAl.contains("showWeeklyDigest") && srcAl.contains("DigestText.weekly")
+                && srcAl.contains("scheduleAll"), "");
+        check("дайджест: переключатель в настройках",
+                srcLay.contains("weekly_digest") && srcSet.contains("setWeeklyDigest")
+                && srcSt29.contains("weeklyDigestEnabled"), "");
+        check("дайджест: тихие часы соблюдаются",
+                srcNt.contains("clampQuiet(atMs)"), "");
+
         // ───────────────────────── 25. ЛУННЫЙ КАЛЕНДАРЬ ─────────────────────────
         check("луна: опорное новолуние 06.01.2000 → возраст почти ноль (обёрнутый)",
                 Moon.age(2000, 1, 6) > 28.9 && Moon.age(2000, 1, 6) < Moon.SYNODIC, "");
