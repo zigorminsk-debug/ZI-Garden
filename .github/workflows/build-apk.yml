@@ -52,6 +52,18 @@ jobs:
       - name: JVM logic tests (LogicTest)
         run: bash GardenCalendar/test.sh
 
+      - name: DEBUG dump LogicTest failures into repo
+        if: failure()
+        run: |
+          set +e
+          cd GardenCalendar && JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 bash test.sh > /tmp/lt.log 2>&1
+          cd ..
+          grep -E "FAIL|error|Exception" /tmp/lt.log | head -30 > debug-test-failures.txt || echo "нет перехваченных строк" > debug-test-failures.txt
+          git config user.name 'ZI Garden CI'
+          git config user.email 'ci@github.local'
+          git add debug-test-failures.txt
+          git commit -m "[skip ci] debug: LogicTest failures dump" -q && git push origin HEAD:refs/heads/arena/01a0aa7c-zi-garden
+
       - name: Sync server tests (python)
         run: cd sync-server && python3 -m unittest test_server -v
 
