@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 14;
+        boolean stagesOk = PestStages.ids().size() == 16;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 14 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 16 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1348,6 +1348,17 @@ public class LogicTest {
                 srcPlants32.contains("🐛") && srcPlants32.contains("🍂")
                 && srcPlants32.contains("pest") && srcPlants32.contains("disease")
                 && srcPlants32.contains("pestBtn") && srcPlants32.contains("dzBtn"), "");
+
+        // ── 33. Экран «О приложении»: без хардкода версии + водяной знак ──
+        String srcStr33 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/strings.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        String srcAbout33 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_about.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("о приложении: в заголовке нет захардкоженной версии («v2.5» удалено)",
+                !srcStr33.contains("v2.5"), "");
+        check("о приложении: баннер дачного участка — водяной знак на фоне",
+                srcAbout33.contains("FrameLayout") && srcAbout33.contains("android:alpha=\"0.12\"")
+                && srcAbout33.contains("banner_garden") && !srcAbout33.contains("fitCenter"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
