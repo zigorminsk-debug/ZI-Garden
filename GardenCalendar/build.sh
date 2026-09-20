@@ -29,10 +29,21 @@ echo "[1/8] aapt2 compile"
 aapt2 compile --dir "$ROOT/res" -o "$OUT/res.zip"
 
 # Версию можно переопределить извне (CI подставляет автономер);
-# при локальной сборке остаются значения по умолчанию.
-APP_VERSION_CODE="${APP_VERSION_CODE:-17}"
+# надёжный резерв: читаем имя из GitHub-тега, если сборка идёт по тегу vX.Y.
+if [ -z "${APP_VERSION_CODE:-}" ]; then
+  TAG="${GITHUB_REF_NAME:-}"
+  if [[ "$TAG" == v*.* ]]; then
+    V="${TAG#v}"
+    MAJ="${V%%.*}"; MIN="${V#*.}"; MIN="${MIN%%.*}"
+    APP_VERSION_CODE=$(( MAJ * 10000 + MIN * 1000 ))
+    APP_VERSION_NAME="$V"
+  else
+    APP_VERSION_CODE=17
+    APP_VERSION_NAME=2.5
+  fi
+fi
 APP_VERSION_NAME="${APP_VERSION_NAME:-2.5}"
-echo "Версия APK: $APP_VERSION_NAME (code $APP_VERSION_CODE)"
+echo "Версия APK: $APP_VERSION_NAME (code $APP_VERSION_CODE) [tag=${GITHUB_REF_NAME:-none}]"
 
 echo "[2/8] aapt2 link"
 aapt2 link -o "$OUT/app.unsigned.apk" \

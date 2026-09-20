@@ -1245,6 +1245,13 @@ public class LogicTest {
         check("дайджест: тихие часы соблюдаются",
                 srcNt.contains("clampQuiet(atMs)"), "");
 
+        // ── 30. Релизный pipeline: версия APK всегда берётся из тега ──
+        String srcBuild = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("build.sh").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("CI: сборка читает версию из имени тега даже без env",
+                srcBuild.contains("GITHUB_REF_NAME") && srcBuild.contains("MAJ * 10000")
+                && srcBuild.contains("APP_VERSION_CODE=$(( MAJ"), "");
+
         // ───────────────────────── 25. ЛУННЫЙ КАЛЕНДАРЬ ─────────────────────────
         check("луна: опорное новолуние 06.01.2000 → возраст почти ноль (обёрнутый)",
                 Moon.age(2000, 1, 6) > 28.9 && Moon.age(2000, 1, 6) < Moon.SYNODIC, "");
