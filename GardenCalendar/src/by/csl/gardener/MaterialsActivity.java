@@ -61,7 +61,7 @@ public class MaterialsActivity extends Activity {
         linearLayout3.setOrientation(1);
         linearLayout.addView(this.list);
         scrollView.addView(linearLayout);
-        setContentView(scrollView);
+        Ui.setContent(this, scrollView);
         render();
     }
 

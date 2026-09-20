@@ -25,7 +25,7 @@ public class JournalActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f));
         scroll.addView(root);
-        setContentView(scroll);
+        Ui.setContent(this, scroll);
 
         int cMain = getResources().getColor(R.color.text_main);
         int cSub = getResources().getColor(R.color.text_sub);

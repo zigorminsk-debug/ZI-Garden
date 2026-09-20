@@ -38,7 +38,7 @@ public class TasksActivity extends Activity {
         linearLayout2.setOrientation(1);
         linearLayout.addView(this.container);
         scrollView.addView(linearLayout);
-        setContentView(scrollView);
+        Ui.setContent(this, scrollView);
         render();
     }
 

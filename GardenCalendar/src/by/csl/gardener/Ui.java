@@ -48,6 +48,26 @@ public final class Ui {
         return linearLayout;
     }
 
+    /** Прозрачность водяного знака «дачный участок» на фоне экранов (вариант A — лёгкая дымка). */
+    public static final float WM_ALPHA = 0.12f;
+
+    /** setContentView с водяным знаком баннера на фоне всего экрана. */
+    public static void setContent(android.app.Activity activity, View content) {
+        android.widget.FrameLayout wrap = new android.widget.FrameLayout(activity);
+        android.widget.ImageView wm = new android.widget.ImageView(activity);
+        wm.setImageResource(R.drawable.banner_garden);
+        wm.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+        wm.setAlpha(WM_ALPHA);
+        wrap.addView(wm, new android.widget.FrameLayout.LayoutParams(-1, -1));
+        wrap.addView(content, new android.widget.FrameLayout.LayoutParams(-1, -1));
+        activity.setContentView(wrap);
+    }
+
+    /** То же для экранов с XML-разметкой. */
+    public static void setContent(android.app.Activity activity, int layoutRes) {
+        setContent(activity, activity.getLayoutInflater().inflate(layoutRes, (android.view.ViewGroup) null));
+    }
+
     public static View taskCard(final Context context, final Task task, final Runnable runnable) {
         LinearLayout card = card(context);
         LinearLayout linearLayout = new LinearLayout(context);

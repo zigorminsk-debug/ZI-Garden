@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 16;
+        boolean stagesOk = PestStages.ids().size() == 18;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 16 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 18 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1356,9 +1356,27 @@ public class LogicTest {
                 new java.io.File("res/layout/activity_about.xml").toPath()), java.nio.charset.StandardCharsets.UTF_8);
         check("о приложении: в заголовке нет захардкоженной версии («v2.5» удалено)",
                 !srcStr33.contains("v2.5"), "");
-        check("о приложении: баннер дачного участка — водяной знак на фоне",
-                srcAbout33.contains("FrameLayout") && srcAbout33.contains("android:alpha=\"0.12\"")
-                && srcAbout33.contains("banner_garden") && !srcAbout33.contains("fitCenter"), "");
+        check("о приложении: баннер оставлен в карточке (без водяного знака)",
+                srcAbout33.contains("fitCenter") && !srcAbout33.contains("android:alpha"), "");
+
+        // ── 34. Водяной знак на остальных экранах ──
+        String srcUi34 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Ui.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("водяной знак: хелпер Ui.setContent с баннером и альфой 0.12",
+                srcUi34.contains("WM_ALPHA") && srcUi34.contains("banner_garden")
+                && srcUi34.contains("setContent(android.app.Activity activity, View content)"), "");
+        String[] act34 = {"MainActivity", "SettingsActivity", "PlantsActivity", "TasksActivity",
+                "CalendarActivity", "MaterialsActivity", "DiseaseActivity", "SoilActivity", "JournalActivity"};
+        boolean wmOk = true;
+        for (String a : act34) {
+            String s34 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("src/by/csl/gardener/" + a + ".java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+            if (!s34.contains("Ui.setContent")) { wmOk = false; break; }
+        }
+        check("водяной знак: все 9 основных экранов через Ui.setContent", wmOk, "");
+        String srcAbout34 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("о приложении: свой setContentView без водяного знака (там баннер)", !srcAbout34.contains("Ui.setContent"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

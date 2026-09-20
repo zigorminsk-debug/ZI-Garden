@@ -68,7 +68,7 @@ public class DiseaseActivity extends Activity {
         wrap.setOrientation(LinearLayout.VERTICAL);
         wrap.addView(search, new LinearLayout.LayoutParams(-1, -2));
         wrap.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1.0f));
-        setContentView(wrap);
+        Ui.setContent(this, wrap);
         render();
     }
 

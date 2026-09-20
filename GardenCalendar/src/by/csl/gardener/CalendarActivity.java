@@ -39,7 +39,7 @@ public class CalendarActivity extends Activity {
         this.list.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 4.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f));
         scrollView.addView(this.list);
         linearLayout.addView(scrollView, new LinearLayout.LayoutParams(-1, 0, 1.0f));
-        setContentView(linearLayout);
+        Ui.setContent(this, linearLayout);
         Weather fromJson = Weather.fromJson(this.store.weatherCache());
         renderStrip(linearLayout2, fromJson);
         render(fromJson);

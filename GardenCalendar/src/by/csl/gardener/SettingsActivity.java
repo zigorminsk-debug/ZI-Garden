@@ -44,7 +44,7 @@ public class SettingsActivity extends Activity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(R.layout.activity_settings);
+        Ui.setContent(this, R.layout.activity_settings);
         this.store = new Storage(this);
         final Spinner spinner = (Spinner) findViewById(R.id.city);
         spinner.setAdapter((SpinnerAdapter) new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, CITIES));

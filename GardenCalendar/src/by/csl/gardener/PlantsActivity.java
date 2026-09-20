@@ -114,7 +114,7 @@ public class PlantsActivity extends Activity {
         final TextView text2 = Ui.text(this, "", 14.0f, getResources().getColor(R.color.green_900), true);
         linearLayout.addView(text2);
         scrollView.addView(linearLayout);
-        setContentView(scrollView);
+        Ui.setContent(this, scrollView);
         updateBadges();
         updateCount(text2);
         Iterator<CheckBox> it = this.boxes.iterator();
