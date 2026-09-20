@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 18;
+        boolean stagesOk = PestStages.ids().size() == 20;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 18 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 20 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
