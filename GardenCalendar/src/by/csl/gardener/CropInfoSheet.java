@@ -26,6 +26,51 @@ public final class CropInfoSheet {
         linearLayout.setOrientation(1);
         char c2 = 0;
         linearLayout.setPadding(Ui.dp(activity, 18.0f), Ui.dp(activity, 10.0f), Ui.dp(activity, 18.0f), 0);
+
+        // 📷 Своё фото культуры: показываем, если сохранено; кнопки «добавить/убрать»
+        if (PlantPhotos.has(activity, str)) {
+            android.graphics.Bitmap bmp = PlantPhotos.load(activity, str,
+                    Ui.dp(activity, 600.0f));
+            if (bmp != null) {
+                android.widget.ImageView photoView = new android.widget.ImageView(activity);
+                photoView.setImageBitmap(bmp);
+                photoView.setAdjustViewBounds(true);
+                photoView.setPadding(0, 0, 0, Ui.dp(activity, 8.0f));
+                linearLayout.addView(photoView);
+            }
+        }
+        android.widget.Button btnPhoto = new android.widget.Button(activity);
+        btnPhoto.setText(PlantPhotos.has(activity, str)
+                ? "📷 Заменить свою фотографию" : "📷 Добавить свою фотографию");
+        final AlertDialog[] self = new AlertDialog[1]; // чтобы закрыть себя при удалении
+        btnPhoto.setOnClickListener(new android.view.View.OnClickListener() {
+            public final void onClick(android.view.View view) {
+                PlantPhotos.pendingPlantId = str;
+                activity.startActivity(new android.content.Intent(activity, PhotoPickActivity.class));
+                if (self[0] != null) {
+                    self[0].dismiss();
+                }
+            }
+        });
+        linearLayout.addView(btnPhoto);
+        if (PlantPhotos.has(activity, str)) {
+            android.widget.Button btnRemove = new android.widget.Button(activity);
+            btnRemove.setText("🗑 Убрать свою фотографию");
+            btnRemove.setOnClickListener(new android.view.View.OnClickListener() {
+                public final void onClick(android.view.View view) {
+                    PlantPhotos.remove(activity, str);
+                    Ui.toast(activity, "Своя фотография убрана");
+                    if (self[0] != null) {
+                        self[0].dismiss();
+                    }
+                    CropInfoSheet.show(activity, str, storage);
+                }
+            });
+            linearLayout.addView(btnRemove);
+            TextView note = Ui.text(activity, "Своё фото хранится только на этом устройстве (в резервную копию не входит).", 12.0f, -10721696, false);
+            linearLayout.addView(note);
+        }
+
         TextView text = Ui.text(activity, byId2.card(), 14.0f, -14670049, false);
         text.setLineSpacing(Ui.dp(activity, 2.0f), 1.0f);
         linearLayout.addView(text);
@@ -54,19 +99,8 @@ public final class CropInfoSheet {
         }
         ScrollView scrollView = new ScrollView(activity);
         scrollView.addView(linearLayout);
-        final int maxH = (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.7d);
-        final ScrollView fScroll = scrollView;
-        android.app.AlertDialog dlg = new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).setNeutralButton("🦠 Болезни и лечение", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                DiseaseActivity.show(activity, str);
-            }
-        }).create();
-        dlg.show();
-        android.view.ViewGroup.LayoutParams lp = fScroll.getLayoutParams();
-        if (lp != null) {
-            lp.height = Math.min(lp.height > 0 ? lp.height : maxH, maxH);
-            fScroll.setLayoutParams(lp);
-        }
+        AlertDialog dialog = new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).show();
+        self[0] = dialog;
     }
 
     static void lambda$show$0(Set set, String[] strArr, Activity activity, Storage storage, String str, CompoundButton compoundButton, boolean z) {

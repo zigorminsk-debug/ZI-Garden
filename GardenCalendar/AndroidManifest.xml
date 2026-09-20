@@ -61,6 +61,13 @@
             </intent-filter>
         </activity>
 
+        <!-- Выбор своей фотографии культуры через системный файловый диалог. -->
+        <activity
+            android:name=".PhotoPickActivity"
+            android:exported="false"
+            android:label="Фото культуры"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <service android:name=".RescheduleService" android:exported="false" />
 
         <!-- Провайдер для выдачи скачанного APK установщику (самообновление) -->

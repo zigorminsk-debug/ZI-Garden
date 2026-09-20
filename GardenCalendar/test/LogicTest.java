@@ -1180,6 +1180,24 @@ public class LogicTest {
                 && serverPy.contains("FAMILY_RE"), "");
         check("сервер: автотест полного цикла семьи лежит рядом",
                 new java.io.File("../sync-server/test_server.py").isFile(), "");
+
+        // ───────────────────────── 28. СВОИ ФОТО КУЛЬТУР ─────────────────────────
+        String srcPhotos = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantPhotos.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcSheet = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/CropInfoSheet.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фото культур: хранилище ужимает и держит приватно",
+                srcPhotos.contains("plant_photos") && srcPhotos.contains("MAX_SIDE")
+                && srcPhotos.contains("saveFromUri") && srcPhotos.contains("inSampleSize"), "");
+        check("фото культур: карточка показывает фото и кнопки",
+                srcSheet.contains("PlantPhotos.has") && srcSheet.contains("btnPhoto")
+                && srcSheet.contains("pendingPlantId") && srcSheet.contains("PlantPhotos.remove")
+                && srcSheet.contains("Резервную копию не входит".replace("Резервную", "резервную")), "");
+        check("фото культур: приёмник выбора зарегистрирован",
+                manifest2.contains("PhotoPickActivity") && srcPhotos.contains("pendingPlantId")
+                && manifest2.contains("android:theme=\"@android:style/Theme.Translucent.NoTitleBar\""), "");
         check("копия: метка времени извлекается из файла",
                 Backup.timestamp(encodedBackup) > 0 && Backup.timestamp("мусор") == 0, "");
         String srcBui = new String(java.nio.file.Files.readAllBytes(
