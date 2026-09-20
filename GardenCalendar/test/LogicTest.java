@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 30;
+        boolean stagesOk = PestStages.ids().size() == 32;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 30 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 32 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1400,7 +1400,7 @@ public class LogicTest {
         String[] parts36 = head36.split("<Button");
         for (int k36 = 1; k36 < parts36.length; k36++) {
             String seg36 = parts36[k36];
-            if (!seg36.contains("@drawable/card_bg\"") || !seg36.contains("68dp")
+            if (!seg36.contains("@drawable/card_bg\"") || !seg36.contains("72dp")
                     || !seg36.contains("\\n")) { allTop36 = false; }
             tiles36++;
         }
