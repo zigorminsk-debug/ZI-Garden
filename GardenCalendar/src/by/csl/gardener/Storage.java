@@ -217,6 +217,15 @@ public class Storage {
         this.p.edit().putString("weekly_digest", enabled ? "1" : "0").apply();
     }
 
+    /** Архив выполненных работ на главном экране: раскрыт или свёрнут. По умолчанию свёрнут. */
+    public boolean archiveOpen() {
+        return "1".equals(this.p.getString("archive_open", "0"));
+    }
+
+    public void setArchiveOpen(boolean open) {
+        this.p.edit().putString("archive_open", open ? "1" : "0").apply();
+    }
+
     /**
      * Полностью заменяет данные трёх хранилищ содержимым карт (каждая секция сначала очищается).
      * Возвращает число записей, попавших в файл восстановления.

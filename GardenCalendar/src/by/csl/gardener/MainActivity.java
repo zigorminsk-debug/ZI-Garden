@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
 import by.csl.gardener.Geo;
 import by.csl.gardener.Weather;
@@ -384,31 +385,66 @@ public class MainActivity extends Activity {
         Calendar calendar = Dates.today();
         Calendar plusDays = Dates.plusDays(calendar, 7);
         this.lastDay = null;
-        int i = 0;
+        final Runnable refresh = new Runnable() {
+            public void run() {
+                MainActivity.this.m0lambda$renderTasks$1$bycslgardenerMainActivity();
+            }
+        };
+        final java.util.List<Task> archived = new java.util.ArrayList<>();
+        int shown = 0;
         for (Task task : tasks) {
             Calendar at = Dates.at(task.year, task.month, task.day);
-            if (!at.before(calendar) && !at.after(plusDays)) {
-                Calendar calendar2 = this.lastDay;
-                if (calendar2 == null || Dates.diffDays(calendar2, at) != 0) {
+            if (at.before(calendar) || at.after(plusDays)) {
+                continue;
+            }
+            if (task.done) {
+                archived.add(task);
+                continue;
+            }
+            if (shown < 12) {
+                if (this.lastDay == null || Dates.diffDays(this.lastDay, at) != 0) {
                     Ui.section(linearLayout, this, headerFor(at, calendar));
                 }
                 this.lastDay = at;
-                linearLayout.addView(Ui.taskCard(this, task, new Runnable() {
-                    public final void run() {
-                        MainActivity.this.m0lambda$renderTasks$1$bycslgardenerMainActivity();
-                    }
-                }));
-                i++;
-                if (i >= 12) {
-                    break;
-                }
+                linearLayout.addView(Ui.taskCard(this, task, refresh));
+                shown++;
             }
         }
-        if (i == 0) {
+        if (shown == 0 && archived.isEmpty()) {
             linearLayout.addView(Ui.text(this, "На ближайшие 7 дней работ нет. Добавьте растения или расширьте окно в «Календаре».", 14.0f, getResources().getColor(R.color.text_sub), false));
         }
-            TasksWidgetProvider.refresh(this);
-            Widgets.refreshAll(this);
+        if (!archived.isEmpty()) {
+            final LinearLayout archWrap = new LinearLayout(this);
+            archWrap.setOrientation(LinearLayout.VERTICAL);
+            final boolean openNow = this.store.archiveOpen();
+            final Button archBtn = new Button(this);
+            archBtn.setTextSize(14.0f);
+            archBtn.setText("🗂 Архив выполненных работ (" + archived.size() + ")" + (openNow ? " — скрыть" : " — показать"));
+            archWrap.setVisibility(openNow ? View.VISIBLE : View.GONE);
+            if (openNow) {
+                for (Task t : archived) {
+                    archWrap.addView(Ui.taskCard(this, t, refresh));
+                }
+            }
+            archBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View vv) {
+                    boolean nowOpen = archWrap.getVisibility() != View.VISIBLE;
+                    MainActivity.this.store.setArchiveOpen(nowOpen);
+                    archWrap.setVisibility(nowOpen ? View.VISIBLE : View.GONE);
+                    archWrap.removeAllViews();
+                    if (nowOpen) {
+                        for (Task t2 : archived) {
+                            archWrap.addView(Ui.taskCard(MainActivity.this, t2, refresh));
+                        }
+                    }
+                    archBtn.setText("🗂 Архив выполненных работ (" + archived.size() + ")" + (nowOpen ? " — скрыть" : " — показать"));
+                }
+            });
+            linearLayout.addView(archBtn);
+            linearLayout.addView(archWrap);
+        }
+        TasksWidgetProvider.refresh(this);
+        Widgets.refreshAll(this);
     }
 
     private String headerFor(Calendar calendar, Calendar calendar2) {

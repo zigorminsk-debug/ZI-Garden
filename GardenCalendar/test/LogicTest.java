@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 20;
+        boolean stagesOk = PestStages.ids().size() == 22;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 20 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 22 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1377,6 +1377,16 @@ public class LogicTest {
         String srcAbout34 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
         check("о приложении: свой setContentView без водяного знака (там баннер)", !srcAbout34.contains("Ui.setContent"), "");
+
+        // ── 35. Архив выполненных работ на главном экране ──
+        check("архив: выполненные работы уходят из общего списка в отдельный блок",
+                srcMain31.contains("archived.add(task)") && srcMain31.contains("task.done")
+                && srcMain31.contains("Архив выполненных работ"), "");
+        check("архив: состояние раскрытия сохраняется в настройках",
+                srcMain31.contains("setArchiveOpen") && srcMain31.contains("archiveOpen()")
+                && new String(java.nio.file.Files.readAllBytes(
+                        new java.io.File("src/by/csl/gardener/Storage.java").toPath()),
+                        java.nio.charset.StandardCharsets.UTF_8).contains("archive_open"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
