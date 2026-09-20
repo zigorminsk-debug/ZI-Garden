@@ -1251,6 +1251,9 @@ public class LogicTest {
         check("CI: сборка читает версию из имени тега даже без env",
                 srcBuild.contains("GITHUB_REF_NAME") && srcBuild.contains("MAJ * 10000")
                 && srcBuild.contains("APP_VERSION_CODE=$(( MAJ"), "");
+        check("CI: версия надёжно попадает в APK (sed-манифест + --replace-version)",
+                srcBuild.contains("AndroidManifest.versioned.xml") && srcBuild.contains("--replace-version")
+                && srcBuild.contains("android:versionCode=\\\"$APP_VERSION_CODE\\\""), "");
 
         // ───────────────────────── 25. ЛУННЫЙ КАЛЕНДАРЬ ─────────────────────────
         check("луна: опорное новолуние 06.01.2000 → возраст почти ноль (обёрнутый)",

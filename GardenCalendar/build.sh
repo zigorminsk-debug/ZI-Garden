@@ -46,13 +46,22 @@ APP_VERSION_NAME="${APP_VERSION_NAME:-2.5}"
 echo "Версия APK: $APP_VERSION_NAME (code $APP_VERSION_CODE) [tag=${GITHUB_REF_NAME:-none}]"
 
 echo "[2/8] aapt2 link"
+# ВАЖНО: aapt2 флаги --version-code/--version-name инжектят значения только
+# если атрибутов НЕТ в манифесте. У нас они прописаны, поэтому:
+#  1) переписываем атрибуты sed'ом в копии манифеста, 2) добавляем --replace-version.
+VMANIFEST="$GEN/AndroidManifest.versioned.xml"
+mkdir -p "$GEN"
+sed -e "s/android:versionCode=\"[^\"]*\"/android:versionCode=\"$APP_VERSION_CODE\"/" \
+    -e "s/android:versionName=\"[^\"]*\"/android:versionName=\"$APP_VERSION_NAME\"/" \
+    "$ROOT/AndroidManifest.xml" > "$VMANIFEST"
 aapt2 link -o "$OUT/app.unsigned.apk" \
   -I "$PLATFORM/android.jar" \
-  --manifest "$ROOT/AndroidManifest.xml" \
+  --manifest "$VMANIFEST" \
   --java "$GEN" \
   --auto-add-overlay \
   --min-sdk-version 21 --target-sdk-version 34 \
   --version-code "$APP_VERSION_CODE" --version-name "$APP_VERSION_NAME" \
+  --replace-version \
   "$OUT/res.zip"
 
 echo "[3/8] javac"
