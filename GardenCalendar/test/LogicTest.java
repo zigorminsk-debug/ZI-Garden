@@ -1280,7 +1280,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 28;
+        boolean stagesOk = PestStages.ids().size() == 30;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1292,7 +1292,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 28 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 30 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1387,6 +1387,27 @@ public class LogicTest {
                 && new String(java.nio.file.Files.readAllBytes(
                         new java.io.File("src/by/csl/gardener/Storage.java").toPath()),
                         java.nio.charset.StandardCharsets.UTF_8).contains("archive_open"), "");
+
+        // ── 36. Единое верхнее меню главного экрана ──
+        String xmlMain36 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int statsPos36 = xmlMain36.indexOf("@+id/stats");
+        String head36 = xmlMain36.substring(0, statsPos36);
+        String tail36 = xmlMain36.substring(statsPos36);
+        boolean allTop36 = true;
+        int tiles36 = 0;
+        String[] parts36 = head36.split("<Button");
+        for (int k36 = 1; k36 < parts36.length; k36++) {
+            String seg36 = parts36[k36];
+            if (!seg36.contains("@drawable/card_bg\"") || !seg36.contains("68dp")
+                    || !seg36.contains("\\n")) { allTop36 = false; }
+            tiles36++;
+        }
+        check("меню: все 11 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
+                tiles36 == 11 && allTop36, "");
+        check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
+                !tail36.contains("<Button"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

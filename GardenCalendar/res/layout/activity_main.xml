@@ -45,13 +45,184 @@
             android:textColor="@color/text_sub"
             android:textSize="11sp" />
 
-        <Button
-            android:id="@+id/btn_weather"
+        <!-- Единое верхнее меню: равные плитки с пиктограммами -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_weather"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🔄\nПогода"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_gps"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="📡\nGPS"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_plants"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🌿\nРастения"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_tasks"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="✅\nЗадачи"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="🔄 Обновить погоду"
-            android:textAllCaps="false" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_calendar"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🗓️\nКалендарь"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_materials"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🧪\nПокупки"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_soil"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🌱\nПочва"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_pests"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🐛\nВредители"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_diseases"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="🍂\nБолезни"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_settings"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="⚙️\nНастройки"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_about"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="ℹ️\nО программе"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="11sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/stats"
@@ -71,101 +242,6 @@
             android:textColor="@color/text_sub"
             android:textSize="13sp" />
 
-        <Button
-            android:id="@+id/btn_gps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="📡 Определить моё расположение"
-            android:textAllCaps="false" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_plants"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/plants"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_tasks"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="@string/tasks"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_calendar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/calendar"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_materials"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="@string/materials"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_soil"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="🌱 Почва и плодородие"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_pests"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="🐛 Вредители"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_diseases"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="🍂 Болезни"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
         <LinearLayout
             android:id="@+id/tasks_container"
             android:layout_width="match_parent"
@@ -181,30 +257,5 @@
             android:text="Захаревич Игорь · +375 29 337-14-12 · csl.by"
             android:textColor="@color/text_sub"
             android:textSize="12sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_settings"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="⚙️ Настройки"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_about"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="@string/about"
-                android:textAllCaps="false" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>
