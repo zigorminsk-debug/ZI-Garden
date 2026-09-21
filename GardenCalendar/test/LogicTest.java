@@ -21,11 +21,7 @@ public class LogicTest {
 
     private static void check(String what, boolean ok, String detail) {
         System.out.println((ok ? "PASS  " : "FAIL  ") + what + (detail.isEmpty() ? "" : " — " + detail));
-        if (!ok) {
-            failures++;
-            // временно: публикация провалов как аннотаций workflow для удалённой диагностики
-            System.out.println("::error ::" + what + (detail.isEmpty() ? "" : " — " + detail.replace("%", "%25").replace("\n", "%0A")));
-        }
+        if (!ok) failures++;
     }
 
     public static void main(String[] args) throws Exception {
@@ -524,16 +520,19 @@ public class LogicTest {
         Set<String> gE = new HashSet<>();
         gE.add("early");
         sE.setVarietyGroups("carrot", gE);
-        int dE = firstHarvestDay(new Planner(sE, w).tasks(30));
+        // фиксированный старт окна 1 сентября — до первых уборок любой группы сортов;
+        // проверка не зависит от текущей даты запуска тестов
+        Calendar fixedStart = Dates.at(2027, 9, 1);
+        int dE = firstHarvestDay(new Planner(sE, w).tasks(45, fixedStart));
         Context cL = new Context();
         Storage sL = new Storage(cL);
         sL.setPlants(oneCarrot);
         Set<String> gL = new HashSet<>();
         gL.add("late");
         sL.setVarietyGroups("carrot", gL);
-        int dL = firstHarvestDay(new Planner(sL, w).tasks(30));
-        // инвариант, не зависящий от даты: поздние сорта убираются СТРОГО позже ранних
-        // (числовая разница плавает внутри сезона: 20 дней в его середине, меньше у края)
+        int dL = firstHarvestDay(new Planner(sL, w).tasks(45, fixedStart));
+        // инвариант: поздние сорта убираются СТРОГО позже ранних
+        // (от старта 1 сентября: ранние — с 1 сентября, поздние — с 21 сентября)
         check("поздние сорта сдвигают уборку позже (морковь)", dE > 0 && dL > dE,
                 "ранние: день " + dE + ", поздние: день " + dL);
 
@@ -545,7 +544,7 @@ public class LogicTest {
         two.add("early");
         two.add("late");
         sM.setVarietyGroups("carrot", two);
-        List<Task> tm = new Planner(sM, w).tasks(30);
+        List<Task> tm = new Planner(sM, w).tasks(45, fixedStart);
         int harv = 0;
         boolean earlyT = false, lateT = false;
         for (Task t : tm) {

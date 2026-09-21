@@ -37,9 +37,13 @@ public class Planner {
         return this.region;
     }
 
-        /** Все задачи в окне [today, today + days). */
+    /** Все задачи в окне [today, today + days). */
     public java.util.List<by.csl.gardener.Task> tasks(int days) {
-        Calendar start = Dates.today();
+        return tasks(days, Dates.today());
+    }
+
+    /** То же окно, но с явной датой старта — детерминизм для тестов. */
+    public java.util.List<by.csl.gardener.Task> tasks(int days, Calendar start) {
         Set<String> plants = store.plants();
         int size = store.plantSize();
         List<Task> out = new ArrayList<>();
