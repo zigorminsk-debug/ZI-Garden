@@ -1,6 +1,6 @@
 {
-  "tag_name": "v2.44",
-  "name": "2.44",
+  "tag_name": "v2.45",
+  "name": "2.45",
   "body": "Автообновление приложения ZI Garden.",
   "assets": [
     {
@@ -9,7 +9,7 @@
     },
     {
       "name": "ZI-Garden-csl.by.apk",
-      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.44/ZI-Garden-csl.by-v2.5.apk"
+      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.45/ZI-Garden-csl.by-v2.5.apk"
     },
     {
       "name": "app-raw.apk",
