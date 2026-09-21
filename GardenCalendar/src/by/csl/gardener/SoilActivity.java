@@ -39,6 +39,15 @@ public class SoilActivity extends Activity {
         intro.setPadding(0, Ui.dp(this, 2.0f), 0, Ui.dp(this, 10.0f));
         root.addView(intro);
 
+        android.widget.Button defBtn = new android.widget.Button(this);
+        defBtn.setText("🔎 Признаки дефицита минералов и микроэлементов");
+        defBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                DeficiencyActivity.show(SoilActivity.this);
+            }
+        });
+        root.addView(defBtn);
+
         for (SoilGuide.Section sec : SoilGuide.all()) {
             LinearLayout card = Ui.card(this);
 

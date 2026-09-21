@@ -1283,7 +1283,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 56;
+        boolean stagesOk = PestStages.ids().size() == 58;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1295,7 +1295,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 56 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 58 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1474,6 +1474,41 @@ public class LogicTest {
                 && srcVis37.contains("Снять отметки"), "");
         check("календарь посещения: экран зарегистрирован в манифесте",
                 srcMan37.contains(".VisitCalendarActivity"), "");
+
+        // ── 38. Дефициты минералов и микроэлементов ──
+        check("дефициты: интро учит правилу «старые/молодые листья»",
+                DeficiencyGuide.INTRO.contains("нижних") && DeficiencyGuide.INTRO.contains("верхних"), "");
+        boolean defOk38 = DeficiencyGuide.all().size() >= 12;
+        boolean hasOld38 = false, hasYoung38 = false;
+        for (DeficiencyGuide.Item it38 : DeficiencyGuide.all()) {
+            if (it38.symbol == null || it38.symbol.length() < 1 || it38.name.length() < 3
+                    || it38.signs.length() < 40 || it38.mimic.length() < 20
+                    || it38.fix.length() < 30 || it38.prevent.length() < 20) { defOk38 = false; break; }
+            if (it38.youngLeaves) hasYoung38 = true; else hasOld38 = true;
+        }
+        check("дефициты: 12 элементов с признаками, помощью и профилактикой",
+                defOk38 && hasOld38 && hasYoung38, "элементов: " + DeficiencyGuide.all().size());
+        boolean markerOk38 = true;
+        for (DeficiencyGuide.Item it38 : DeficiencyGuide.all()) {
+            if (("N".equals(it38.symbol) || "P".equals(it38.symbol) || "K".equals(it38.symbol)
+                    || "Mg".equals(it38.symbol)) && it38.youngLeaves) markerOk38 = false;
+            if (("Fe".equals(it38.symbol) || "B".equals(it38.symbol) || "Ca".equals(it38.symbol))
+                    && !it38.youngLeaves) markerOk38 = false;
+        }
+        check("дефициты: подвижные (N, P, K, Mg) — на старых листьях, малоподвижные (Ca, Fe, B) — на молодых",
+                markerOk38, "");
+        String srcSoil38 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SoilActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcDef38 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DeficiencyActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMan38 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("дефициты: блок открыт с экрана «Почва», экран в манифесте",
+                srcSoil38.contains("DeficiencyActivity") && srcMan38.contains(".DeficiencyActivity")
+                && srcDef38.contains("DeficiencyGuide.all"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
