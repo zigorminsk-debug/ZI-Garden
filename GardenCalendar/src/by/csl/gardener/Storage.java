@@ -311,6 +311,41 @@ public class Storage {
         this.p.edit().putInt("lead_days", i).apply();
     }
 
+    // ── Режим участка и календарь посещения ──
+
+    /** «permanent» — постоянное проживание; «dacha» — дача на выходные и в отпуск. */
+    public String residenceMode() {
+        return this.p.getString("residence_mode", "permanent");
+    }
+
+    public void setResidenceMode(String mode) {
+        this.p.edit().putString("residence_mode", mode).apply();
+    }
+
+    /** Отмеченные дни присутствия на участке в формате «yyyy-MM-dd». */
+    public Set<String> visitDays() {
+        return new HashSet<>(this.p.getStringSet("visit_days", new HashSet<String>()));
+    }
+
+    public boolean isVisitDay(int year, int month, int day) {
+        return visitDays().contains(visitKey(year, month, day));
+    }
+
+    /** Отметить/снять день присутствия в календаре посещения. */
+    public void setVisitDay(int year, int month, int day, boolean present) {
+        Set<String> set = visitDays();
+        if (present) {
+            set.add(visitKey(year, month, day));
+        } else {
+            set.remove(visitKey(year, month, day));
+        }
+        this.p.edit().putStringSet("visit_days", set).apply();
+    }
+
+    private static String visitKey(int year, int month, int day) {
+        return String.format(java.util.Locale.US, "%04d-%02d-%02d", year, month, day);
+    }
+
     public boolean isDone(String str, int i) {
         return this.doneP.getBoolean(str + "#" + i, false);
     }

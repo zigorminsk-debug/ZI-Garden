@@ -90,6 +90,10 @@ public class Planner {
             }
         }
         addDiseasePrevention(out, start, plants, days);
+        // дачный режим: собираем работы к дням присутствия (календарь посещения; без отметок — выходные)
+        if ("dacha".equals(store.residenceMode())) {
+            shiftToVisitDays(out, store, start, days);
+        }
         Collections.sort(out, new Comparator<Task>() {
             @Override
             public int compare(Task a, Task b) {
@@ -106,6 +110,47 @@ public class Planner {
 
     private static String groupSuffix(String str) {
         return "early".equals(str) ? " (ранние сорта)" : "late".equals(str) ? " (поздние сорта)" : "";
+    }
+
+    /** День присутствия на участке: отмеченный в календаре посещения; без отметок — суббота или воскресенье. */
+    static boolean isPresentDay(Storage store, Calendar day) {
+        if (!store.visitDays().isEmpty()) {
+            return store.isVisitDay(day.get(Calendar.YEAR), day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
+        }
+        int dw = day.get(Calendar.DAY_OF_WEEK);
+        return dw == Calendar.SATURDAY || dw == Calendar.SUNDAY;
+    }
+
+    /** Ближайший день присутствия начиная с from (включительно) и не позже horizon; null — если такого нет. */
+    public static Calendar nextVisitDay(Storage store, Calendar from, Calendar horizon) {
+        Calendar probe = (Calendar) from.clone();
+        while (!probe.after(horizon)) {
+            if (isPresentDay(store, probe)) {
+                return probe;
+            }
+            probe = Dates.plusDays(probe, 1);
+        }
+        return null;
+    }
+
+    /**
+     * Дачный режим: каждая работа переносится на ближайший день присутствия
+     * (не дальше конца окна), чтобы к визиту на участок было выполнимо всё сразу.
+     */
+    private static void shiftToVisitDays(List<Task> out, Storage store, Calendar start, int days) {
+        Calendar windowEnd = Dates.plusDays(start, days - 1);
+        for (Task t : out) {
+            Calendar due = Dates.at(t.year, t.month, t.day);
+            if (due.before(start)) {
+                continue;
+            }
+            Calendar visit = nextVisitDay(store, due, windowEnd);
+            if (visit != null && !visit.equals(due)) {
+                t.year = visit.get(Calendar.YEAR);
+                t.month = visit.get(Calendar.MONTH) + 1;
+                t.day = visit.get(Calendar.DAY_OF_MONTH);
+            }
+        }
     }
 
     private Task build(Rule rule, Plant plant, int i, int i2, int i3, int i4, Calendar calendar, String str) {

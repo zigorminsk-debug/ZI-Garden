@@ -1283,7 +1283,7 @@ public class LogicTest {
                 srcCal.contains("Moon.emoji") && srcCal.contains("Moon.guide"), "");
 
         // ── 31. Вредители: стадии развития с фото + Справочник почвы ──
-        boolean stagesOk = PestStages.ids().size() == 52;
+        boolean stagesOk = PestStages.ids().size() == 54;
         for (String pid : PestStages.ids()) {
             PestStage[] ss = PestStages.forPest(pid);
             if (ss == null || ss.length != 4) { stagesOk = false; break; }
@@ -1295,7 +1295,7 @@ public class LogicTest {
                         || !new java.io.File("res/drawable-nodpi/" + st.image + ".jpg").exists()) { stagesOk = false; break; }
             }
         }
-        check("стадии: у 52 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
+        check("стадии: у 54 вредителей по 4 стадии «где развивается/какой вред», у каждой своё фото", stagesOk, "");
 
         boolean imgsOk = true;
         for (String img : new String[]{"soil_siderat", "soil_compost", "soil_mulch", "soil_ph", "soil_min", "soil_bio", "soil_diag", "soil_rotation", "soil_errors"}) {
@@ -1411,6 +1411,69 @@ public class LogicTest {
                 tiles36 == 11 && allTop36, "");
         check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
                 !tail36.contains("<Button"), "");
+
+        // ── 37. Режим участка и календарь посещения ──
+        Storage rs37 = new Storage(new Context());
+        check("режим участка: по умолчанию — постоянное проживание",
+                rs37.residenceMode().equals("permanent"), "");
+        rs37.setResidenceMode("dacha");
+        check("режим участка: дачный режим сохраняется", rs37.residenceMode().equals("dacha"), "");
+        check("календарь посещения: пуст по умолчанию", rs37.visitDays().isEmpty(), "");
+        rs37.setVisitDay(2027, 9, 10, true);
+        rs37.setVisitDay(2027, 9, 20, true);
+        rs37.setVisitDay(2027, 9, 10, false);
+        check("календарь посещения: отметки включаются и снимаются",
+                rs37.visitDays().size() == 1 && rs37.isVisitDay(2027, 9, 20) && !rs37.isVisitDay(2027, 9, 10), "");
+
+        rs37.setVisitDay(2027, 9, 10, true);
+        Calendar f37 = Dates.at(2027, 9, 6);   // понедельник
+        Calendar h37 = Dates.at(2027, 9, 19);  // воскресенье
+        Calendar v37 = Planner.nextVisitDay(rs37, f37, h37);
+        check("дачный режим: ближайший день присутствия — отмеченная пятница 10.09.2027",
+                v37 != null && v37.get(Calendar.DAY_OF_MONTH) == 10, "");
+        rs37.setVisitDay(2027, 9, 10, false);
+        rs37.setVisitDay(2027, 9, 20, false);
+        Calendar w37 = Planner.nextVisitDay(rs37, f37, h37);
+        check("дачный режим: без отметок присутствие — выходные (суббота 11.09)",
+                w37 != null && w37.get(Calendar.DAY_OF_MONTH) == 11, "");
+        Calendar n37 = Planner.nextVisitDay(rs37, Dates.at(2027, 9, 13), Dates.at(2027, 9, 17));
+        check("дачный режим: будни без отметок — дня присутствия нет",
+                n37 == null, "");
+
+        Context cV37 = new Context();
+        Storage sV37 = new Storage(cV37);
+        sV37.setPlants(oneCarrot);
+        sV37.setResidenceMode("dacha");
+        sV37.setVisitDay(2027, 9, 10, true);
+        sV37.setVisitDay(2027, 9, 20, true);
+        List<Task> vt37 = new Planner(sV37, w).tasks(25, Dates.at(2027, 9, 1));
+        boolean visitOk37 = !vt37.isEmpty();
+        for (Task t37 : vt37) {
+            boolean okDay37 = (t37.month == 9 && t37.day == 10)
+                    || (t37.month == 9 && t37.day == 20)
+                    || (t37.month == 9 && t37.day >= 21);
+            if (!okDay37) { visitOk37 = false; break; }
+        }
+        check("дачный режим: работы собираются к отмеченным визитам (10.09 и 20.09.2027)",
+                visitOk37, "задач: " + vt37.size());
+
+        String srcSet37 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SettingsActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcVis37 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/VisitCalendarActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMan37 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("настройки: выбор режима участка и кнопка календаря посещения",
+                srcSet37.contains("residence_group") && srcSet37.contains("btn_visit_calendar")
+                && srcSet37.contains("setResidenceMode"), "");
+        check("календарь посещения: отметка дней и быстрые действия по месяцу",
+                srcVis37.contains("setVisitDay") && srcVis37.contains("Отметить выходные")
+                && srcVis37.contains("Снять отметки"), "");
+        check("календарь посещения: экран зарегистрирован в манифесте",
+                srcMan37.contains(".VisitCalendarActivity"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

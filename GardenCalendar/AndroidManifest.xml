@@ -42,6 +42,7 @@
         <activity android:name=".MaterialsActivity" android:exported="false" android:label="@string/materials" />
         <activity android:name=".SoilActivity" android:exported="false" android:label="Почва и плодородие" />
         <activity android:name=".SettingsActivity" android:exported="false" android:label="@string/settings" />
+        <activity android:name=".VisitCalendarActivity" android:exported="false" android:label="Календарь посещения" />
         <activity android:name=".AboutActivity" android:exported="false" android:label="@string/about" />
         <activity android:name=".JournalActivity" android:exported="false" android:label="Журнал сада" />
         <!-- Принимает тап по .json-вложению из Gmail/проводника: предлагает восстановить данные. -->

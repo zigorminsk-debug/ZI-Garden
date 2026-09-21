@@ -100,6 +100,25 @@ public class SettingsActivity extends Activity {
                 SettingsActivity.this.recreate();
             }
         });
+        // ── Режим участка: постоянно или дача (выходные и отпуск) ──
+        RadioGroup residence = (RadioGroup) findViewById(R.id.residence_group);
+        residence.check("dacha".equals(this.store.residenceMode()) ? R.id.residence_dacha : R.id.residence_permanent);
+        residence.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup radioGroup2, int checkedId) {
+                SettingsActivity.this.store.setResidenceMode(checkedId == R.id.residence_dacha ? "dacha" : "permanent");
+                Ui.toast(SettingsActivity.this, checkedId == R.id.residence_dacha
+                        ? "Дачный режим: план собирается к выходным и отмеченным визитам"
+                        : "Постоянный режим: работы на любой подходящий день");
+                SettingsActivity.this.updateVisitHint();
+            }
+        });
+        findViewById(R.id.btn_visit_calendar).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                SettingsActivity.this.startActivity(new android.content.Intent(SettingsActivity.this, VisitCalendarActivity.class));
+            }
+        });
+        updateVisitHint();
+
         CheckBox checkBox = (CheckBox) findViewById(R.id.notify_enabled);
         checkBox.setChecked(this.store.notifyEnabled());
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -188,6 +207,18 @@ public class SettingsActivity extends Activity {
         });
         updateSyncStatus(null);
         status(Notifications.scheduleAll(this));
+    }
+
+    /** Подсказка под календарём посещения: сколько дней отмечено и куда собирается план. */
+    void updateVisitHint() {
+        TextView hint = (TextView) findViewById(R.id.visit_hint);
+        if (hint == null) {
+            return;
+        }
+        int n = this.store.visitDays().size();
+        hint.setText(n == 0
+                ? "Дни посещения не отмечены — в дачном режиме план собирается к субботам и воскресеньям. Отметьте отпуск и приезды, чтобы план подстроился."
+                : "Отмечено дней посещения: " + n + ". В дачном режиме все работы будут переноситься к ближайшему такому дню.");
     }
 
     private static final int REQ_BACKUP_SAVE = 46;
