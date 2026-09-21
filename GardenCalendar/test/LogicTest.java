@@ -1504,8 +1504,8 @@ public class LogicTest {
             withImg38++;
             if (!new java.io.File("res/drawable-nodpi/" + it38.image + ".jpg").exists()) { imgsOk38 = false; break; }
         }
-        check("дефициты: фото карточек лежат в drawable-nodpi (минимум 10 элементов)",
-                imgsOk38 && withImg38 >= 10, "с фото: " + withImg38);
+        check("дефициты: фото всех 12 карточек лежат в drawable-nodpi",
+                imgsOk38 && withImg38 == 12, "с фото: " + withImg38);
         String srcSoil38 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/SoilActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
