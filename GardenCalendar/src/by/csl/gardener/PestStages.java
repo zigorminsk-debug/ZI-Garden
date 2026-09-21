@@ -1142,6 +1142,3 @@ public final class PestStages {
         return MAP.keySet();
     }
 }
-MAP.keySet();
-    }
-}
