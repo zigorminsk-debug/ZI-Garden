@@ -42,6 +42,23 @@ public class DeficiencyActivity extends Activity {
 
         for (DeficiencyGuide.Item it : DeficiencyGuide.all()) {
             LinearLayout card = Ui.card(this);
+
+            if (it.image != null) {
+                int imgRes = DiseaseDb.imageRes(it.image);
+                if (imgRes != 0) {
+                    android.widget.ImageView img = new android.widget.ImageView(this);
+                    img.setImageResource(imgRes);
+                    img.setAdjustViewBounds(true);
+                    final int zoom = imgRes;
+                    img.setOnClickListener(new android.view.View.OnClickListener() {
+                        public void onClick(android.view.View view) {
+                            Ui.zoomPhoto(DeficiencyActivity.this, zoom);
+                        }
+                    });
+                    card.addView(img, new LinearLayout.LayoutParams(-1, -2));
+                }
+            }
+
             card.addView(Ui.text(this, it.symbol + " · " + it.name
                     + (it.youngLeaves ? " — смотрим на молодых верхних листьях"
                                       : " — смотрим на старых нижних листьях"),

@@ -1497,6 +1497,15 @@ public class LogicTest {
         }
         check("дефициты: подвижные (N, P, K, Mg) — на старых листьях, малоподвижные (Ca, Fe, B) — на молодых",
                 markerOk38, "");
+        int withImg38 = 0;
+        boolean imgsOk38 = true;
+        for (DeficiencyGuide.Item it38 : DeficiencyGuide.all()) {
+            if (it38.image == null) continue;
+            withImg38++;
+            if (!new java.io.File("res/drawable-nodpi/" + it38.image + ".jpg").exists()) { imgsOk38 = false; break; }
+        }
+        check("дефициты: фото карточек лежат в drawable-nodpi (минимум 10 элементов)",
+                imgsOk38 && withImg38 >= 10, "с фото: " + withImg38);
         String srcSoil38 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/SoilActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
