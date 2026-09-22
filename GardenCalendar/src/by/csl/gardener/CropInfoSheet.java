@@ -118,7 +118,7 @@ public final class CropInfoSheet {
         btnHarvest.setOnClickListener(new android.view.View.OnClickListener() {
             public final void onClick(android.view.View view) {
                 HarvestDialog.ask(activity, Dates.today().get(java.util.Calendar.YEAR), str,
-                        byId2 == null ? str : byId2.name, "запись вручную");
+                        byId == null ? str : byId.name, "запись вручную");
             }
         });
         linearLayout.addView(btnHarvest);
