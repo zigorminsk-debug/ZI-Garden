@@ -1407,8 +1407,8 @@ public class LogicTest {
                     || !seg36.contains("\\n")) { allTop36 = false; }
             tiles36++;
         }
-        check("меню: все 11 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
-                tiles36 == 11 && allTop36, "");
+        check("меню: все 12 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
+                tiles36 == 12 && allTop36, "");
         check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
                 !tail36.contains("<Button"), "");
 
@@ -1497,6 +1497,13 @@ public class LogicTest {
         }
         check("дефициты: подвижные (N, P, K, Mg) — на старых листьях, малоподвижные (Ca, Fe, B) — на молодых",
                 markerOk38, "");
+        boolean excessOk38 = true;
+        for (DeficiencyGuide.Item it38 : DeficiencyGuide.all()) {
+            if (it38.excess == null || it38.excess.length() < 30) { excessOk38 = false; break; }
+        }
+        check("дефициты: у всех 12 элементов описан и переизбыток",
+                excessOk38 && DeficiencyGuide.all().size() == 12, "");
+
         int withImg38 = 0;
         boolean imgsOk38 = true;
         for (DeficiencyGuide.Item it38 : DeficiencyGuide.all()) {
@@ -1518,6 +1525,48 @@ public class LogicTest {
         check("дефициты: блок открыт с экрана «Почва», экран в манифесте",
                 srcSoil38.contains("DeficiencyActivity") && srcMan38.contains(".DeficiencyActivity")
                 && srcDef38.contains("DeficiencyGuide.all"), "");
+
+        // ── 39. Ручной перенос сроков ──
+        Storage sh39 = new Storage(new Context());
+        check("перенос: по умолчанию переносов нет", sh39.shiftedDate("t1") == null, "");
+        sh39.setShifted("t1", 2027, 9, 12);
+        int[] got39 = sh39.shiftedDate("t1");
+        check("перенос: дата хранится и читается",
+                got39 != null && got39[0] == 2027 && got39[1] == 9 && got39[2] == 12, "");
+        sh39.clearShifted("t1");
+        check("перенос: снятие одного переноса", sh39.shiftedDate("t1") == null, "");
+        sh39.setShifted("t2", 2027, 10, 1);
+        sh39.setShifted("t3", 2027, 10, 2);
+        sh39.clearShifts();
+        check("перенос: очистка всех переносов (новый сезон)",
+                sh39.shiftedDate("t2") == null && sh39.shiftedDate("t3") == null, "");
+
+        Context cS39 = new Context();
+        Storage sS39 = new Storage(cS39);
+        sS39.setPlants(oneCarrot);
+        List<Task> base39 = new Planner(sS39, w).tasks(45, fixedStart);
+        check("перенос: базовые задачи планируются", !base39.isEmpty(), "задач: " + base39.size());
+        Task pick39 = base39.get(0);
+        Calendar nd39 = Dates.plusDays(Dates.at(pick39.year, pick39.month, pick39.day), 5);
+        sS39.setShifted(pick39.id, nd39.get(Calendar.YEAR), nd39.get(Calendar.MONTH) + 1, nd39.get(Calendar.DAY_OF_MONTH));
+        List<Task> moved39 = new Planner(sS39, w).tasks(45, fixedStart);
+        boolean movedOk39 = false;
+        for (Task t39 : moved39) {
+            if (t39.id.equals(pick39.id) && t39.year == nd39.get(Calendar.YEAR)
+                    && t39.month == nd39.get(Calendar.MONTH) + 1
+                    && t39.day == nd39.get(Calendar.DAY_OF_MONTH)) { movedOk39 = true; break; }
+        }
+        check("перенос: планировщик применяет ручной сдвиг (+5 дней)", movedOk39, "");
+        String srcDlg39 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/TaskDialog.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMain39 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("перенос: кнопки +1/+3/+7 и возврат в диалоге задачи",
+                srcDlg39.contains("+7 дней") && srcDlg39.contains("Вернуть исходный срок"), "");
+        check("минералы: отдельная плитка в главном меню",
+                srcMain39.contains("btn_minerals"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

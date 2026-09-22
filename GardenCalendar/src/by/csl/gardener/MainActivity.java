@@ -97,6 +97,11 @@ public class MainActivity extends Activity {
                 MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) SoilActivity.class));
             }
         });
+        findViewById(R.id.btn_minerals).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) DeficiencyActivity.class));
+            }
+        });
         findViewById(R.id.btn_pests).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 MainActivity.this.pickCulture("pest");

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import by.csl.gardener.Task;
+import java.util.Calendar;
 
 public final class TaskDialog {
     private TaskDialog() {
@@ -145,6 +146,52 @@ public final class TaskDialog {
             linearLayout.addView(text7);
             linearLayout.addView(Ui.text(context, "Цены — справочные, по рознице Республики Беларусь (csl.by и др.).", 11.0f, -7695732, false));
         }
+        // 🗓 Ручной перенос срока
+        final Storage dlgStore = new Storage(context);
+        TextView shiftTitle = Ui.text(context, "🗓 Перенести срок", 15.0f, -14670049, true);
+        shiftTitle.setPadding(0, Ui.dp(context, 14.0f), 0, Ui.dp(context, 4.0f));
+        linearLayout.addView(shiftTitle);
+        int[] curShift = dlgStore.shiftedDate(task.id);
+        if (curShift != null) {
+            TextView cur = Ui.text(context, "Перенесено вами на " + Dates.fmt(curShift[0], curShift[1], curShift[2]), 13.0f, -10721696, false);
+            cur.setPadding(0, 0, 0, Ui.dp(context, 4.0f));
+            linearLayout.addView(cur);
+            Button restore = new Button(context);
+            restore.setText("↩ Вернуть исходный срок");
+            restore.setAllCaps(false);
+            restore.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    dlgStore.clearShifted(task.id);
+                    Ui.toast(context, "Срок возвращён");
+                    runnable.run();
+                }
+            });
+            linearLayout.addView(restore);
+        }
+        LinearLayout shiftRow = new LinearLayout(context);
+        shiftRow.setOrientation(LinearLayout.HORIZONTAL);
+        int[] offs = {1, 3, 7};
+        String[] lbls = {"+1 день", "+3 дня", "+7 дней"};
+        for (int oi = 0; oi < offs.length; oi++) {
+            final int off = offs[oi];
+            Button b = new Button(context);
+            b.setText(lbls[oi]);
+            b.setAllCaps(false);
+            b.setTextSize(13.0f);
+            shiftRow.addView(b, new LinearLayout.LayoutParams(0, -2, 1.0f));
+            b.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    Calendar nd = Dates.plusDays(Dates.at(task.year, task.month, task.day), off);
+                    dlgStore.setShifted(task.id, nd.get(Calendar.YEAR),
+                            nd.get(Calendar.MONTH) + 1, nd.get(Calendar.DAY_OF_MONTH));
+                    Ui.toast(context, "Перенесено на " + Dates.fmtShort(nd.get(Calendar.YEAR),
+                            nd.get(Calendar.MONTH) + 1, nd.get(Calendar.DAY_OF_MONTH)));
+                    runnable.run();
+                }
+            });
+        }
+        linearLayout.addView(shiftRow);
+
         TextView text8 = Ui.text(context, "⚠️ Работайте в перчатках и респираторе. Соблюдайте срок ожидания до сбора урожая, указанный на упаковке препарата. Не смешивайте препараты без проверки совместимости.", 12.0f, -5091328, false);
         text8.setPadding(r8, Ui.dp(context, 12.0f), r8, r8);
         linearLayout.addView(text8);

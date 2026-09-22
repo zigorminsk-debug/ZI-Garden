@@ -67,6 +67,8 @@ public class DeficiencyActivity extends Activity {
             card.addView(Ui.text(this, it.signs, 13.0f, cMain, false));
             card.addView(label("С чем путают"));
             card.addView(Ui.text(this, it.mimic, 13.0f, cSub, false));
+            card.addView(label("⚠️ Переизбыток"));
+            card.addView(Ui.text(this, it.excess, 13.0f, cMain, false));
             card.addView(label("Скорая помощь"));
             card.addView(Ui.text(this, it.fix, 13.0f, cMain, false));
             card.addView(label("Профилактика"));

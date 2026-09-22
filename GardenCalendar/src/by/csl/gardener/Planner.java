@@ -94,6 +94,15 @@ public class Planner {
         if ("dacha".equals(store.residenceMode())) {
             shiftToVisitDays(out, store, start, days);
         }
+        // ручной перенос: работы, сдвинутые пользователем в диалоге задачи
+        for (Task t : out) {
+            int[] shifted = store.shiftedDate(t.id);
+            if (shifted != null) {
+                t.year = shifted[0];
+                t.month = shifted[1];
+                t.day = shifted[2];
+            }
+        }
         Collections.sort(out, new Comparator<Task>() {
             @Override
             public int compare(Task a, Task b) {

@@ -342,6 +342,42 @@ public class Storage {
         this.p.edit().putStringSet("visit_days", set).apply();
     }
 
+    // ── Ручной перенос сроков работ ──
+
+    /** Запомнить, что работу перенесли на новую дату (в пределах сезона). */
+    public void setShifted(String taskId, int y, int m, int d) {
+        this.p.edit().putString("shift_" + taskId, y + "-" + m + "-" + d).apply();
+    }
+
+    /** Дата переноса работы или null. */
+    public int[] shiftedDate(String taskId) {
+        String v = this.p.getString("shift_" + taskId, null);
+        if (v == null) {
+            return null;
+        }
+        String[] b = v.split("-");
+        try {
+            return new int[]{Integer.parseInt(b[0]), Integer.parseInt(b[1]), Integer.parseInt(b[2])};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void clearShifted(String taskId) {
+        this.p.edit().remove("shift_" + taskId).apply();
+    }
+
+    /** Снять все переносы (новый сезон). */
+    public void clearShifts() {
+        SharedPreferences.Editor edit = this.p.edit();
+        for (String k : this.p.getAll().keySet()) {
+            if (k.startsWith("shift_")) {
+                edit.remove(k);
+            }
+        }
+        edit.apply();
+    }
+
     private static String visitKey(int year, int month, int day) {
         return String.format(java.util.Locale.US, "%04d-%02d-%02d", year, month, day);
     }

@@ -650,7 +650,8 @@ public class SettingsActivity extends Activity {
 
     void m22lambda$onCreate$7$bycslgardenerSettingsActivity(DialogInterface dialogInterface, int i) {
         this.store.clearDoneForCurrentYear(Dates.today().get(1));
-        Ui.toast(this, "Отметки сброшены");
+        this.store.clearShifts();
+        Ui.toast(this, "Отметки и переносы сроков сброшены");
     }
 
     void m24lambda$onCreate$9$bycslgardenerSettingsActivity(View view) {
