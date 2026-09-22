@@ -97,6 +97,32 @@ public final class CropInfoSheet {
                 c2 = 0;
             }
         }
+        // 🌾 Урожай культуры: итог за этот год, прошлогодний для сравнения, запись вручную
+        int yearNow = Dates.today().get(java.util.Calendar.YEAR);
+        String hNow = storage == null ? "" : storage.harvestSummary(yearNow, str);
+        String hPrev = storage == null ? "" : storage.harvestSummary(yearNow - 1, str);
+        if (hNow.length() > 0 || hPrev.length() > 0) {
+            StringBuilder hLine = new StringBuilder("🌾 Урожай ").append(yearNow).append(": ")
+                    .append(hNow.length() > 0 ? hNow : "пока ничего");
+            if (hPrev.length() > 0) {
+                hLine.append(" · в ").append(yearNow - 1).append(": ").append(hPrev);
+            }
+            TextView hText = Ui.text(activity, hLine.toString(), 13.0f,
+                    activity.getResources().getColor(R.color.green_900), true);
+            hText.setPadding(0, Ui.dp(activity, 10.0f), 0, 0);
+            linearLayout.addView(hText);
+        }
+        android.widget.Button btnHarvest = new android.widget.Button(activity);
+        btnHarvest.setText("🧺 Записать урожай");
+        btnHarvest.setAllCaps(false);
+        btnHarvest.setOnClickListener(new android.view.View.OnClickListener() {
+            public final void onClick(android.view.View view) {
+                HarvestDialog.ask(activity, Dates.today().get(java.util.Calendar.YEAR), str,
+                        byId2 == null ? str : byId2.name, "запись вручную");
+            }
+        });
+        linearLayout.addView(btnHarvest);
+
         ScrollView scrollView = new ScrollView(activity);
         scrollView.addView(linearLayout);
         AlertDialog dialog = new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).show();

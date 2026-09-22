@@ -92,6 +92,12 @@ final class ShareText {
 
     /** Итоги сезона текстом: выполненные работы по культурам, бюджет закупок и последние записи журнала. */
     static String seasonSummary(java.util.List<String> journalRows, Planner.Budget budget, int year, String regionName) {
+        return seasonSummary(journalRows, budget, year, regionName, null);
+    }
+
+    /** То же + урожай года: пары «культура — итог» (кг/шт/л); null — блока урожая не будет. */
+    static String seasonSummary(java.util.List<String> journalRows, Planner.Budget budget, int year, String regionName,
+            java.util.Map<String, String> harvest) {
         StringBuilder sb = new StringBuilder(900);
         sb.append("🌿 Итоги сезона ").append(year);
         if (regionName != null && regionName.length() > 0) {
@@ -146,6 +152,25 @@ final class ShareText {
                     .append("план: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(budget.planned), budget.currency))
                     .append(" · куплено: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(budget.boughtCost), budget.currency))
                     .append(" · осталось: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(Math.max(0.0d, budget.planned - budget.boughtCost)), budget.currency));
+        }
+        if (harvest != null && !harvest.isEmpty()) {
+            sb.append("\n\n🌾 Урожай года:\n");
+            int shownH = 0;
+            int restH = 0;
+            for (java.util.Map.Entry<String, String> e : harvest.entrySet()) {
+                if (shownH < 8) {
+                    if (shownH > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(e.getKey()).append(" — ").append(e.getValue());
+                    shownH++;
+                } else {
+                    restH++;
+                }
+            }
+            if (restH > 0) {
+                sb.append(", ещё ").append(restH).append(" культур");
+            }
         }
         sb.append("\n\n📒 Последние работы:");
         if (yearRows.isEmpty()) {

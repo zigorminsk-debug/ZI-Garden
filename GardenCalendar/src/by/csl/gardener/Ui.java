@@ -154,6 +154,11 @@ public final class Ui {
         if (z) {
             // Журнал сада: фиксируем выполненную работу (надо сроки ожидания после обработок следить)
             new Storage(context).addJournal(task.op, task.plantName, task.title, WaitDays.matsCsv(task));
+            // Урожай: после «Сбора урожая» предлагаем записать, сколько собрали
+            if (Operation.HARVEST.equals(task.op) && task.plantId != null
+                    && (context instanceof android.app.Activity)) {
+                HarvestDialog.ask((android.app.Activity) context, task.year, task.plantId, task.plantName, task.title);
+            }
         }
         task.done = z;
         if (runnable != null) {

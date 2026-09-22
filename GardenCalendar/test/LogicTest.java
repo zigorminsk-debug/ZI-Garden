@@ -1821,6 +1821,57 @@ public class LogicTest {
                 && srcMain43.contains("forecast_chart") && srcMain43.contains("ForecastModel.build")
                 && srcView43.contains("onDraw") && srcView43.contains("setCells"), "");
 
+        // ── 44. Учёт урожая ──
+        Context cH44 = new Context();
+        Storage sH44 = new Storage(cH44);
+        check("урожай: изначально записей нет", sH44.harvestSummary(2027, "carrot").isEmpty(), "");
+        sH44.addHarvest(2027, "carrot", 12.5d, "кг");
+        sH44.addHarvest(2027, "carrot", 7.5d, "кг");
+        check("урожай: сумма по культуре за год",
+                "20.0 кг".equals(sH44.harvestSummary(2027, "carrot")), sH44.harvestSummary(2027, "carrot"));
+        sH44.addHarvest(2027, "carrot", 5.0d, "шт");
+        check("урожай: единицы считаются раздельно",
+                "20.0 кг, 5.0 шт".equals(sH44.harvestSummary(2027, "carrot")), sH44.harvestSummary(2027, "carrot"));
+        check("урожай: годы не смешиваются", sH44.harvestSummary(2026, "carrot").isEmpty(), "");
+        sH44.addHarvest(2026, "carrot", 3.0d, "кг");
+        check("урожай: история прошлого года хранится отдельно",
+                "3.0 кг".equals(sH44.harvestSummary(2026, "carrot")), "");
+        java.util.Map<String, String> h44 = new java.util.LinkedHashMap<String, String>();
+        h44.put("Морковь", "20.0 кг");
+        h44.put("Яблоня", "96.5 кг");
+        String rep44 = ShareText.seasonSummary(new java.util.ArrayList<String>(), null, 2027,
+                "Минск и окрестности", h44);
+        check("итоги: урожай в отчёте сезона",
+                rep44.contains("Урожай года") && rep44.contains("Морковь — 20.0 кг")
+                && rep44.contains("Яблоня — 96.5 кг"), "");
+        String rep44b = ShareText.seasonSummary(new java.util.ArrayList<String>(), null, 2027,
+                "Минск и окрестности", null);
+        check("итоги: без урожая блок не выводится", !rep44b.contains("Урожай года"), "");
+        String srcUi44 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Ui.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcDlg44 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/TaskDialog.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcHarv44 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/HarvestDialog.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcCrop44 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/CropInfoSheet.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcJrn44 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/JournalActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("урожай: вопрос при отметке «Сбор урожая» (карточка и диалог задачи)",
+                srcUi44.contains("HarvestDialog.ask") && srcDlg44.contains("HarvestDialog.ask"), "");
+        check("урожай: в карточке культуры итог, сравнение с прошлым годом и запись вручную",
+                srcCrop44.contains("Записать урожай") && srcCrop44.contains("harvestSummary(yearNow - 1, str)"), "");
+        check("урожай: диалог с единицами кг/шт/л и пропуском",
+                srcHarv44.contains("кг") && srcHarv44.contains("шт") && srcHarv44.contains("л")
+                && srcHarv44.contains("Пропустить"), "");
+        check("урожай: итоги сезона собираются по всем культурам",
+                srcJrn44.contains("harvestSummary(year, plant.id)"), "");
+
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

@@ -86,7 +86,14 @@ public class JournalActivity extends Activity {
         int year = Dates.today().get(Calendar.YEAR);
         Planner.Budget budget = new Planner(this.store, Weather.fromJson(this.store.weatherCache())).seasonBudget(year);
         String region = Region.detect(this.store.lat(), this.store.lon()).displayName;
-        String text = ShareText.seasonSummary(this.store.journal(Journal.MAX_ENTRIES), budget, year, region);
+        java.util.Map<String, String> harvest = new java.util.LinkedHashMap<String, String>();
+        for (Plant plant : Plant.all()) {
+            String sum = this.store.harvestSummary(year, plant.id);
+            if (sum.length() > 0) {
+                harvest.put(plant.name, sum);
+            }
+        }
+        String text = ShareText.seasonSummary(this.store.journal(Journal.MAX_ENTRIES), budget, year, region, harvest);
         android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
         send.setType("text/plain");
         send.putExtra(android.content.Intent.EXTRA_SUBJECT, "ZI Garden — итоги сезона " + year);

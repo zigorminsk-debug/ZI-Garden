@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Storage {
     private static final String DONE = "done_prefs";
@@ -428,6 +429,74 @@ public class Storage {
             jSONArray.put(it.next());
         }
         this.p.edit().putString("bought", jSONArray.toString()).apply();
+    }
+
+    /** Урожай по культуре и году: записи «сколько собрали» с единицей (кг/шт/л), в том числе вручную. */
+    public void addHarvest(int year, String plantId, double amount, String unit) {
+        String key = "harvest_" + year + "_" + plantId;
+        JSONArray arr = new JSONArray();
+        try {
+            arr = new JSONArray(this.p.getString(key, "[]"));
+        } catch (Exception unused) {
+        }
+        JSONObject entry = new JSONObject();
+        try {
+            entry.put("t", System.currentTimeMillis());
+            entry.put("a", amount);
+            entry.put("u", unit);
+        } catch (Exception unused) {
+        }
+        arr.put(entry);
+        this.p.edit().putString(key, arr.toString()).apply();
+    }
+
+    /** Сумма урожая культуры за год в одной единице. */
+    public double harvestTotal(int year, String plantId, String unit) {
+        try {
+            JSONArray arr = new JSONArray(this.p.getString("harvest_" + year + "_" + plantId, "[]"));
+            double sum = 0.0d;
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject entry = arr.getJSONObject(i);
+                if (unit.equals(entry.optString("u"))) {
+                    sum += entry.optDouble("a", 0.0d);
+                }
+            }
+            return sum;
+        } catch (Exception unused) {
+            return 0.0d;
+        }
+    }
+
+    /** Единицы, в которых записывали урожай культуры за год (в порядке первых записей). */
+    public List<String> harvestUnits(int year, String plantId) {
+        List<String> out = new ArrayList<>();
+        try {
+            JSONArray arr = new JSONArray(this.p.getString("harvest_" + year + "_" + plantId, "[]"));
+            for (int i = 0; i < arr.length(); i++) {
+                String u = arr.getJSONObject(i).optString("u", "");
+                if (u.length() > 0 && !out.contains(u)) {
+                    out.add(u);
+                }
+            }
+        } catch (Exception unused) {
+        }
+        return out;
+    }
+
+    /** Итог урожая за год в читаемом виде: «20.0 кг» или «20.0 кг, 5.0 шт»; пусто — «». */
+    public String harvestSummary(int year, String plantId) {
+        StringBuilder sb = new StringBuilder();
+        for (String u : harvestUnits(year, plantId)) {
+            double total = harvestTotal(year, plantId, u);
+            if (total <= 0.0d) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(String.format(java.util.Locale.US, "%.1f %s", Double.valueOf(total), u));
+        }
+        return sb.toString();
     }
 
     /** Журнал сада: ровно одна запись на выполненную работу (операция, культура, название, материалы). */
