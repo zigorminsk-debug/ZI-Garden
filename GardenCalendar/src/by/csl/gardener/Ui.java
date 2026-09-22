@@ -120,7 +120,7 @@ public final class Ui {
         text3.setAlpha(task.done ? 0.45f : 1.0f);
         linearLayout2.addView(text3);
         if (Scheme.forTask(task) != 0) {
-            linearLayout2.addView(text(context, "📐 Есть схема обрезки — нажмите на карточку", 12.0f, -15374912, false));
+            linearLayout2.addView(text(context, "📐 Есть схема обрезки — нажмите на карточку", 12.0f, context.getResources().getColor(R.color.accent), false));
         }
         Iterator<Task.Item> it = task.items.iterator();
         int i = 0;
@@ -130,7 +130,7 @@ public final class Ui {
             }
         }
         if (i > 0) {
-            linearLayout2.addView(text(context, "Материалы: " + i + " · " + money(task.totalCost(), task.currency), 12.0f, -15374912, false));
+            linearLayout2.addView(text(context, "Материалы: " + i + " · " + money(task.totalCost(), task.currency), 12.0f, context.getResources().getColor(R.color.accent), false));
         }
         linearLayout.addView(linearLayout2);
         card.addView(linearLayout);
@@ -178,7 +178,7 @@ public final class Ui {
         textView.setTextSize(2, 12.0f);
         int i3 = task.weatherState;
         if (i3 != 0) {
-            i2 = -5091328;
+            i2 = context.getResources().getColor(R.color.warn_text);
             i = R.drawable.warn_bg;
             if (i3 == 1) {
                 str = "🌧 " + task.weatherNote;
@@ -190,7 +190,7 @@ public final class Ui {
         } else {
             str = "✅ " + task.weatherNote;
             i = R.drawable.ok_bg;
-            i2 = -14983648;
+            i2 = context.getResources().getColor(R.color.green_900);
         }
         if (task.weatherState != 0 && task.suggestDayOffset > 0) {
             Calendar plusDays = Dates.plusDays(Dates.at(task.year, task.month, task.day), task.suggestDayOffset);

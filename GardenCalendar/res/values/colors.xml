@@ -15,4 +15,6 @@
     <color name="bar">#1B5E20</color>
     <color name="card_fill">#FFFFFF</color>
     <color name="card_stroke">#E0E5DF</color>
+    <color name="warn_text">#B25000</color>
+    <color name="text_note">#8A928C</color>
 </resources>

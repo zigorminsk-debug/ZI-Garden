@@ -28,7 +28,7 @@ public final class TaskDialog {
         StringBuilder sb = new StringBuilder();
         sb.append(byId == null ? "🌱 " : byId.icon + " ");
         sb.append(task.plantName);
-        linearLayout.addView(Ui.text(context, sb.toString(), 24.0f, -14983648, true));
+        linearLayout.addView(Ui.text(context, sb.toString(), 24.0f, context.getResources().getColor(R.color.green_900), true));
         float f = 6.0f;
         int i = -2;
         int i2 = -1;
@@ -65,13 +65,13 @@ public final class TaskDialog {
             linearLayout.addView(diseaseBtn);
         }
         Plant dlgPlant = Plant.byId(task.plantId);
-        TextView dlgTitle = Ui.text(context, (dlgPlant != null && dlgPlant.iconRes != 0 ? dlgPlant.name : (dlgPlant != null ? dlgPlant.icon + " " + dlgPlant.name : "")) + " — " + Operation.icon(task.op) + " " + task.title, 17.0f, -14670049, true);
+        TextView dlgTitle = Ui.text(context, (dlgPlant != null && dlgPlant.iconRes != 0 ? dlgPlant.name : (dlgPlant != null ? dlgPlant.icon + " " + dlgPlant.name : "")) + " — " + Operation.icon(task.op) + " " + task.title, 17.0f, context.getResources().getColor(R.color.text_main), true);
         if (dlgPlant != null && dlgPlant.iconRes != 0) {
             dlgTitle.setCompoundDrawablesWithIntrinsicBounds(dlgPlant.iconRes, 0, 0, 0);
             dlgTitle.setCompoundDrawablePadding(Ui.dp(context, 6.0f));
         }
         linearLayout.addView(dlgTitle);
-        linearLayout.addView(Ui.text(context, Operation.label(task.op) + " · окно: " + task.window + " · " + Dates.fmt(task.year, task.month, task.day) + ", " + Dates.weekday(task.year, task.month, task.day), 13.0f, -10721696, false));
+        linearLayout.addView(Ui.text(context, Operation.label(task.op) + " · окно: " + task.window + " · " + Dates.fmt(task.year, task.month, task.day) + ", " + Dates.weekday(task.year, task.month, task.day), 13.0f, context.getResources().getColor(R.color.text_sub), false));
         TextView weatherBadge = Ui.weatherBadge(context, task);
         if (weatherBadge != null) {
             LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(-1, -2);
@@ -81,7 +81,7 @@ public final class TaskDialog {
         }
         int forTask = Scheme.forTask(task);
         if (forTask != 0) {
-            TextView text = Ui.text(context, "Схема выполнения", 15.0f, -14670049, true);
+            TextView text = Ui.text(context, "Схема выполнения", 15.0f, context.getResources().getColor(R.color.text_main), true);
             text.setPadding(0, Ui.dp(context, 14.0f), 0, Ui.dp(context, 6.0f));
             linearLayout.addView(text);
             ImageView imageView = new ImageView(context);
@@ -90,25 +90,25 @@ public final class TaskDialog {
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
             linearLayout.addView(imageView);
-            TextView text2 = Ui.text(context, Scheme.captionFor(forTask), 12.0f, -10721696, false);
+            TextView text2 = Ui.text(context, Scheme.captionFor(forTask), 12.0f, context.getResources().getColor(R.color.text_sub), false);
             text2.setPadding(0, Ui.dp(context, 4.0f), 0, Ui.dp(context, 4.0f));
             text2.setLineSpacing(Ui.dp(context, 2.0f), 1.0f);
             linearLayout.addView(text2);
         }
-        TextView text3 = Ui.text(context, "Как выполнять", 15.0f, -14670049, true);
+        TextView text3 = Ui.text(context, "Как выполнять", 15.0f, context.getResources().getColor(R.color.text_main), true);
         text3.setPadding(0, Ui.dp(context, 14.0f), 0, Ui.dp(context, 4.0f));
         linearLayout.addView(text3);
-        TextView text4 = Ui.text(context, task.text, 14.0f, -14670049, false);
+        TextView text4 = Ui.text(context, task.text, 14.0f, context.getResources().getColor(R.color.text_main), false);
         text4.setLineSpacing(Ui.dp(context, 3.0f), 1.0f);
         linearLayout.addView(text4);
         if (task.items.isEmpty()) {
             r8 = 0;
         } else {
-            TextView text5 = Ui.text(context, "Материалы и дозировки", 15.0f, -14670049, true);
+            TextView text5 = Ui.text(context, "Материалы и дозировки", 15.0f, context.getResources().getColor(R.color.text_main), true);
             text5.setPadding(0, Ui.dp(context, 14.0f), 0, Ui.dp(context, 4.0f));
             linearLayout.addView(text5);
             if (task.solutionL > 0.0d) {
-                TextView text6 = Ui.text(context, "Рабочий раствор: " + Planner.num(task.solutionL) + " л на растение (готовить в день применения)", 13.0f, -15374912, false);
+                TextView text6 = Ui.text(context, "Рабочий раствор: " + Planner.num(task.solutionL) + " л на растение (готовить в день применения)", 13.0f, context.getResources().getColor(R.color.accent), false);
                 text6.setPadding(0, 0, 0, Ui.dp(context, 6.0f));
                 linearLayout.addView(text6);
             }
@@ -123,37 +123,37 @@ public final class TaskDialog {
                 StringBuilder sb2 = new StringBuilder();
                 sb2.append(item.alternative ? "↔ " : "• ");
                 sb2.append(item.name);
-                linearLayout2.addView(Ui.text(context, sb2.toString(), 14.0f, item.alternative ? -10721696 : -14670049, !item.alternative));
-                linearLayout2.addView(Ui.text(context, "Норма: " + item.dose, 13.0f, -10721696, false));
+                linearLayout2.addView(Ui.text(context, sb2.toString(), 14.0f, item.alternative ? context.getResources().getColor(R.color.text_sub) : context.getResources().getColor(R.color.text_main), !item.alternative));
+                linearLayout2.addView(Ui.text(context, "Норма: " + item.dose, 13.0f, context.getResources().getColor(R.color.text_sub), false));
                 StringBuilder sb3 = new StringBuilder();
                 sb3.append(item.alternative ? "Если брать его: " : "Нужно: ");
                 sb3.append(item.need);
-                linearLayout2.addView(Ui.text(context, sb3.toString(), 13.0f, item.alternative ? -10721696 : -14983648, !item.alternative));
+                linearLayout2.addView(Ui.text(context, sb3.toString(), 13.0f, item.alternative ? context.getResources().getColor(R.color.text_sub) : context.getResources().getColor(R.color.green_900), !item.alternative));
                 if (item.price > 0.0d) {
                     StringBuilder sb4 = new StringBuilder("Цена упаковки: ");
                     sb4.append(Ui.money(item.price, item.currency));
                     sb4.append(item.alternative ? "" : " · ориентировочно " + Ui.money(item.price * item.packs, item.currency));
-                    linearLayout2.addView(Ui.text(context, sb4.toString(), 12.0f, -15374912, false));
+                    linearLayout2.addView(Ui.text(context, sb4.toString(), 12.0f, context.getResources().getColor(R.color.accent), false));
                 }
                 linearLayout.addView(linearLayout2);
                 f = 6.0f;
                 i = -2;
                 i2 = -1;
             }
-            TextView text7 = Ui.text(context, "Ориентировочная стоимость: " + Ui.money(task.totalCost(), task.currency) + " (без учёта заменителей)", 14.0f, -14983648, true);
+            TextView text7 = Ui.text(context, "Ориентировочная стоимость: " + Ui.money(task.totalCost(), task.currency) + " (без учёта заменителей)", 14.0f, context.getResources().getColor(R.color.green_900), true);
             r8 = 0;
             text7.setPadding(0, Ui.dp(context, 4.0f), 0, Ui.dp(context, 4.0f));
             linearLayout.addView(text7);
-            linearLayout.addView(Ui.text(context, "Цены — справочные, по рознице Республики Беларусь (csl.by и др.).", 11.0f, -7695732, false));
+            linearLayout.addView(Ui.text(context, "Цены — справочные, по рознице Республики Беларусь (csl.by и др.).", 11.0f, context.getResources().getColor(R.color.text_note), false));
         }
         // 🗓 Ручной перенос срока
         final Storage dlgStore = new Storage(context);
-        TextView shiftTitle = Ui.text(context, "🗓 Перенести срок", 15.0f, -14670049, true);
+        TextView shiftTitle = Ui.text(context, "🗓 Перенести срок", 15.0f, context.getResources().getColor(R.color.text_main), true);
         shiftTitle.setPadding(0, Ui.dp(context, 14.0f), 0, Ui.dp(context, 4.0f));
         linearLayout.addView(shiftTitle);
         int[] curShift = dlgStore.shiftedDate(task.id);
         if (curShift != null) {
-            TextView cur = Ui.text(context, "Перенесено вами на " + Dates.fmt(curShift[0], curShift[1], curShift[2]), 13.0f, -10721696, false);
+            TextView cur = Ui.text(context, "Перенесено вами на " + Dates.fmt(curShift[0], curShift[1], curShift[2]), 13.0f, context.getResources().getColor(R.color.text_sub), false);
             cur.setPadding(0, 0, 0, Ui.dp(context, 4.0f));
             linearLayout.addView(cur);
             Button restore = new Button(context);
@@ -192,7 +192,7 @@ public final class TaskDialog {
         }
         linearLayout.addView(shiftRow);
 
-        TextView text8 = Ui.text(context, "⚠️ Работайте в перчатках и респираторе. Соблюдайте срок ожидания до сбора урожая, указанный на упаковке препарата. Не смешивайте препараты без проверки совместимости.", 12.0f, -5091328, false);
+        TextView text8 = Ui.text(context, "⚠️ Работайте в перчатках и респираторе. Соблюдайте срок ожидания до сбора урожая, указанный на упаковке препарата. Не смешивайте препараты без проверки совместимости.", 12.0f, context.getResources().getColor(R.color.warn_text), false);
         text8.setPadding(r8, Ui.dp(context, 12.0f), r8, r8);
         linearLayout.addView(text8);
         scrollView.addView(linearLayout);

@@ -67,15 +67,15 @@ public final class CropInfoSheet {
                 }
             });
             linearLayout.addView(btnRemove);
-            TextView note = Ui.text(activity, "Своё фото хранится только на этом устройстве (в резервную копию не входит).", 12.0f, -10721696, false);
+            TextView note = Ui.text(activity, "Своё фото хранится только на этом устройстве (в резервную копию не входит).", 12.0f, activity.getResources().getColor(R.color.text_sub), false);
             linearLayout.addView(note);
         }
 
-        TextView text = Ui.text(activity, byId2.card(), 14.0f, -14670049, false);
+        TextView text = Ui.text(activity, byId2.card(), 14.0f, activity.getResources().getColor(R.color.text_main), false);
         text.setLineSpacing(Ui.dp(activity, 2.0f), 1.0f);
         linearLayout.addView(text);
         if (byId2.hasVarieties() && storage != null) {
-            TextView text2 = Ui.text(activity, "🍓 Сроки созревания сортов на участке (можно отметить несколько — уборка планируется по каждой группе):", 14.0f, -14983648, true);
+            TextView text2 = Ui.text(activity, "🍓 Сроки созревания сортов на участке (можно отметить несколько — уборка планируется по каждой группе):", 14.0f, activity.getResources().getColor(R.color.green_900), true);
             text2.setPadding(0, Ui.dp(activity, 10.0f), 0, Ui.dp(activity, 4.0f));
             linearLayout.addView(text2);
             final LinkedHashSet linkedHashSet = new LinkedHashSet(storage.varietyGroups(str));

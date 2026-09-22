@@ -61,21 +61,21 @@ public class CalendarActivity extends Activity {
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(Ui.dp(this, 58.0f), -2);
             layoutParams.rightMargin = Ui.dp(this, 6.0f);
             linearLayout2.setLayoutParams(layoutParams);
-            linearLayout2.addView(Ui.text(this, Dates.weekdayShort(i2, i3, i4).toUpperCase(Locale.US), 11.0f, -10721696, false));
-            TextView text = Ui.text(this, String.valueOf(i4), 18.0f, -14983648, true);
+            linearLayout2.addView(Ui.text(this, Dates.weekdayShort(i2, i3, i4).toUpperCase(Locale.US), 11.0f, getResources().getColor(R.color.text_sub), false));
+            TextView text = Ui.text(this, String.valueOf(i4), 18.0f, getResources().getColor(R.color.green_900), true);
             text.setGravity(17);
             linearLayout2.addView(text);
-            linearLayout2.addView(Ui.text(this, Dates.MONTHS[i3 - 1].substring(0, 3), 10.0f, -10721696, false));
+            linearLayout2.addView(Ui.text(this, Dates.MONTHS[i3 - 1].substring(0, 3), 10.0f, getResources().getColor(R.color.text_sub), false));
             Weather.Day dayFor = weather == null ? null : weather.dayFor(i2, i3, i4);
             if (dayFor != null) {
-                TextView text2 = Ui.text(this, dayFor.icon(), 16.0f, -14670049, false);
+                TextView text2 = Ui.text(this, dayFor.icon(), 16.0f, getResources().getColor(R.color.text_main), false);
                 text2.setGravity(17);
                 linearLayout2.addView(text2);
-                TextView text3 = Ui.text(this, String.format(Locale.US, "%.0f…%.0f", Double.valueOf(dayFor.tMin), Double.valueOf(dayFor.tMax)), 10.0f, -10721696, false);
+                TextView text3 = Ui.text(this, String.format(Locale.US, "%.0f…%.0f", Double.valueOf(dayFor.tMin), Double.valueOf(dayFor.tMax)), 10.0f, getResources().getColor(R.color.text_sub), false);
                 text3.setGravity(17);
                 linearLayout2.addView(text3);
             }
-            TextView moon = Ui.text(this, Moon.emoji(i2, i3, i4), 11.0f, -10721696, false);
+            TextView moon = Ui.text(this, Moon.emoji(i2, i3, i4), 11.0f, getResources().getColor(R.color.text_sub), false);
             moon.setGravity(17);
             linearLayout2.addView(moon);
             linearLayout.addView(linearLayout2);
@@ -110,7 +110,7 @@ public class CalendarActivity extends Activity {
         this.list.addView(sharePlan);
 
         // 🌙 Лунный календарь: фаза и совет дня (ориентир по традиции, не замена погоде)
-        TextView moonGuide = Ui.text(this, Moon.guide(calendar2), 13.0f, -10721696, false);
+        TextView moonGuide = Ui.text(this, Moon.guide(calendar2), 13.0f, getResources().getColor(R.color.text_sub), false);
         moonGuide.setPadding(0, 0, 0, Ui.dp(this, 4.0f));
         this.list.addView(moonGuide);
         for (int i3 = 21; i < i3; i3 = 21) {
@@ -147,7 +147,7 @@ public class CalendarActivity extends Activity {
                     sb2.append(dayFor.summary());
                     calendar = calendar2;
                     sb2.append(String.format(Locale.US, " · осадки %.1f мм (%.0f%%)", Double.valueOf(dayFor.precipMm), Double.valueOf(dayFor.precipProb)));
-                    TextView text = Ui.text(this, sb2.toString(), 13.0f, -15374912, false);
+                    TextView text = Ui.text(this, sb2.toString(), 13.0f, getResources().getColor(R.color.accent), false);
                     text.setPadding(0, 0, 0, Ui.dp(this, 4.0f));
                     this.list.addView(text);
                 } else {

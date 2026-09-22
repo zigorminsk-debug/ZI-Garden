@@ -1654,6 +1654,81 @@ public class LogicTest {
                 actsCount40 >= 12 && actsCount40 == actsThemed40,
                 "экранов: " + actsCount40 + ", с темой: " + actsThemed40);
 
+        // ── 41. Бюджет покупок и итоги сезона ──
+        Context cS41 = new Context();
+        Storage sS41 = new Storage(cS41);
+        sS41.setPlants(oneCarrot);
+        int year41 = fixedStart.get(Calendar.YEAR);
+        Planner.Budget b41 = new Planner(sS41, w).seasonBudget(year41);
+        check("бюджет: план покупок сезона посчитан",
+                b41.planned > 0.0d && b41.positions >= 1 && b41.packs >= 1,
+                "план: " + String.format(Locale.US, "%.2f", b41.planned) + " " + b41.currency
+                + ", позиций: " + b41.positions);
+        double sum41 = 0.0d;
+        boolean monthsOk41 = b41.byMonth.length == 12;
+        for (double v41 : b41.byMonth) {
+            sum41 += v41;
+            if (v41 < 0.0d) monthsOk41 = false;
+        }
+        check("бюджет: месячная разбивка сходится в план сезона",
+                monthsOk41 && Math.abs(sum41 - b41.planned) < 0.01d,
+                "сумма месяцев: " + String.format(Locale.US, "%.2f", sum41));
+        check("бюджет: без отметок купленное равно нулю", b41.boughtCost == 0.0d, "");
+        List<Task> year41tasks = new Planner(sS41, w).tasks(366, Dates.at(year41, 1, 1));
+        String buyId41 = null;
+        for (Task t41 : year41tasks) {
+            for (Task.Item it41 : t41.items) {
+                if (it41.price > 0.0d && !it41.alternative) {
+                    for (Material m41 : Material.all()) {
+                        if (m41.name.equals(it41.name)) { buyId41 = m41.id; break; }
+                    }
+                }
+                if (buyId41 != null) break;
+            }
+            if (buyId41 != null) break;
+        }
+        check("бюджет: в сезоне есть покупаемые материалы", buyId41 != null, "");
+        if (buyId41 != null) {
+            java.util.List<String> one41 = new java.util.ArrayList<String>();
+            one41.add(buyId41);
+            sS41.setBought(one41);
+            Planner.Budget bought41 = new Planner(sS41, w).seasonBudget(year41);
+            check("бюджет: купленное учтено в итогах сезона",
+                    bought41.boughtCost > 0.0d && bought41.boughtCost <= bought41.planned,
+                    "куплено: " + String.format(Locale.US, "%.2f", bought41.boughtCost));
+            sS41.setBought(new java.util.ArrayList<String>());
+        }
+        String srcPlan41 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Planner.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMat41 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MaterialsActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("бюджет: карточка итогов сезона на экране покупок",
+                srcMat41.contains("Бюджет сезона") && srcMat41.contains("MONTHS_NOM")
+                && srcPlan41.contains("seasonBudget"), "");
+        boolean magic41 = true;
+        String[] files41 = {"CalendarActivity", "MaterialsActivity", "TaskDialog", "CropInfoSheet", "Ui"};
+        for (String fn41 : files41) {
+            String src41 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("src/by/csl/gardener/" + fn41 + ".java").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            if (src41.contains("-14670049") || src41.contains("-10721696") || src41.contains("-14983648")
+                    || src41.contains("-15374912") || src41.contains("-5091328") || src41.contains("-7695732")) {
+                magic41 = false;
+            }
+        }
+        check("тема: магические цвета заменены ресурсами (тёмная тема читаема)", magic41, "");
+        String colsDay41 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/colors.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String colsNight41 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values-night/colors.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: цвета warn_text и text_note в обеих палитрах",
+                colsDay41.contains("warn_text") && colsNight41.contains("warn_text")
+                && colsDay41.contains("text_note") && colsNight41.contains("text_note"), "");
+
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

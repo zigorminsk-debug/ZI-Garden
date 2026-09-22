@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -545,6 +546,72 @@ public class Planner {
             }
         });
         return arrayList;
+    }
+
+    /** Итоги сезона по покупкам: полный план года, купленное и разбивка расходов по месяцам. */
+    public static class Budget {
+        public double planned;
+        public double boughtCost;
+        public int positions;
+        public int packs;
+        public double[] byMonth = new double[12];
+        public String currency = "BYN";
+    }
+
+    /**
+     * Бюджет сезона: все работы года (без фильтра по дате и выполненности),
+     * стоимость — по справочным ценам региона. «Куплено» — позиции, отмеченные
+     * галочками в списке покупок (список общий, сбрасывается отдельной кнопкой).
+     */
+    public Budget seasonBudget(int year) {
+        Budget budget = new Budget();
+        List<Task> tasks = tasks(366, Dates.at(year, 1, 1));
+        HashSet<String> primary = new HashSet<>();
+        for (Task task : tasks) {
+            for (Task.Item item : task.items) {
+                if (!item.alternative) {
+                    primary.add(item.name);
+                }
+            }
+        }
+        HashMap<String, ShopItem> byName = new HashMap<>();
+        for (Task task : tasks) {
+            if (task.year != year) {
+                continue;
+            }
+            for (Task.Item item : task.items) {
+                if (item.price <= 0.0d || (item.alternative && !primary.contains(item.name))) {
+                    continue;
+                }
+                double cost = item.packs * item.price;
+                budget.planned += cost;
+                budget.byMonth[task.month - 1] += cost;
+                ShopItem shopItem = byName.get(item.name);
+                if (shopItem == null) {
+                    shopItem = new ShopItem();
+                    Material byId = Material.byId(guessId(item.name));
+                    shopItem.materialId = byId == null ? item.name : byId.id;
+                    shopItem.name = item.name;
+                    shopItem.pack = item.pack;
+                    shopItem.price = item.price;
+                    shopItem.currency = item.currency;
+                    shopItem.unit = byId == null ? "" : byId.unit;
+                    shopItem.packQty = byId == null ? 1.0d : byId.packQty;
+                    byName.put(item.name, shopItem);
+                    budget.currency = item.currency;
+                }
+                shopItem.packs += item.packs;
+            }
+        }
+        List<String> bought = this.store.bought();
+        for (ShopItem shopItem : byName.values()) {
+            budget.positions++;
+            budget.packs += shopItem.packs;
+            if (bought.contains(shopItem.materialId)) {
+                budget.boughtCost += shopItem.cost();
+            }
+        }
+        return budget;
     }
 
     private String guessId(String str) {
