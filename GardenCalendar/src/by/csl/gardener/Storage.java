@@ -78,6 +78,15 @@ public class Storage {
         this.p.edit().putInt("font_size", i).apply();
     }
 
+    /** Тема оформления: 0 — как в системе, 1 — светлая, 2 — тёмная. */
+    public int themeMode() {
+        return this.p.getInt("theme_mode", 0);
+    }
+
+    public void setThemeMode(int i) {
+        this.p.edit().putInt("theme_mode", i).apply();
+    }
+
     public String diseaseUpdateUrl() {
         return this.p.getString("disease_update_url", "https://csl.by/garden/diseases.json");
     }

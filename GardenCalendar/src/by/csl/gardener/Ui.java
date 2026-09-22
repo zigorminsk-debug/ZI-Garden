@@ -1,6 +1,7 @@
 package by.csl.gardener;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CheckBox;
@@ -19,7 +20,22 @@ public final class Ui {
 
     /** Размер шрифта из настроек применён к контексту активности (логика — в Fonts). */
     public static Context applyFont(Context context) {
-        return Fonts.applyFont(context);
+        return Fonts.applyFont(applyTheme(context));
+    }
+
+    /** Тема оформления: 0 — как в системе, 1 — светлая, 2 — тёмная. Применяется раньше шрифта. */
+    public static Context applyTheme(Context context) {
+        int mode = new Storage(context).themeMode();
+        if (mode == 0) {
+            return context;
+        }
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
+        int night = mode == 2 ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO;
+        if ((configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK) == night) {
+            return context;
+        }
+        configuration.uiMode = (configuration.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | night;
+        return context.createConfigurationContext(configuration);
     }
 
     public static int dp(Context context, float f) {
@@ -205,7 +221,7 @@ public final class Ui {
 
     public static View divider(Context context) {
         View view = new View(context);
-        view.setBackgroundColor(-2300968);
+        view.setBackgroundColor(context.getResources().getColor(R.color.card_stroke));
         view.setLayoutParams(new LinearLayout.LayoutParams(-1, Math.max(1, dp(context, 1.0f))));
         return view;
     }

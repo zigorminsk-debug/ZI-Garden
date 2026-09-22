@@ -1568,6 +1568,92 @@ public class LogicTest {
         check("минералы: отдельная плитка в главном меню",
                 srcMain39.contains("btn_minerals"), "");
 
+        // ── 40. Тёмная тема ──
+        Storage th40 = new Storage(new Context());
+        check("тема: по умолчанию — как в системе", th40.themeMode() == 0, "");
+        th40.setThemeMode(2);
+        check("тема: сохранение тёмного режима", th40.themeMode() == 2, "");
+        th40.setThemeMode(1);
+        check("тема: сохранение светлого режима", th40.themeMode() == 1, "");
+        String colsDay40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/colors.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String colsNight40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values-night/colors.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        java.util.Set<String> namesDay40 = new java.util.TreeSet<String>();
+        java.util.regex.Matcher mA40 = java.util.regex.Pattern.compile("name=\"([a-z_0-9]+)\"").matcher(colsDay40);
+        while (mA40.find()) { namesDay40.add(mA40.group(1)); }
+        java.util.Set<String> namesNight40 = new java.util.TreeSet<String>();
+        java.util.regex.Matcher mB40 = java.util.regex.Pattern.compile("name=\"([a-z_0-9]+)\"").matcher(colsNight40);
+        while (mB40.find()) { namesNight40.add(mB40.group(1)); }
+        check("тема: ночная палитра покрывает все цвета дневной",
+                namesDay40.size() >= 15 && namesDay40.equals(namesNight40),
+                "день: " + namesDay40.size() + ", ночь: " + namesNight40.size());
+        String stylesDay40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/styles.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String stylesNight40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values-night/styles.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: тёмная тема — Material без Light, фон и текст из палитры",
+                stylesNight40.contains("Theme.Material.NoActionBar") && !stylesNight40.contains("Light")
+                && stylesNight40.contains("@color/bg") && stylesNight40.contains("@color/text_main"), "");
+        check("тема: статус-бар в обеих темах через @color/bar",
+                stylesDay40.contains("<item name=\"android:statusBarColor\">@color/bar</item>")
+                && stylesNight40.contains("<item name=\"android:statusBarColor\">@color/bar</item>"), "");
+        String card40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/drawable/card_bg.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String ok40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/drawable/ok_bg.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String warn40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/drawable/warn_bg.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: карточки и плашки берут цвета из ресурсов (тёмные варианты)",
+                card40.contains("@color/card_fill") && card40.contains("@color/card_stroke")
+                && ok40.contains("@color/ok_bg") && warn40.contains("@color/warn_bg"), "");
+        String srcUi40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Ui.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: обёртка контекста в Ui.applyTheme (до масштаба шрифта)",
+                srcUi40.contains("UI_MODE_NIGHT_YES") && srcUi40.contains("UI_MODE_NIGHT_NO")
+                && srcUi40.contains("createConfigurationContext")
+                && srcUi40.contains("Fonts.applyFont(applyTheme(context))"), "");
+        check("тема: программные цвета без «магических чисел»",
+                !srcUi40.contains("-2300968") && srcUi40.contains("R.color.card_stroke"), "");
+        String srcSet40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SettingsActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String layoutSet40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_settings.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: выбор в настройках — система / светлая / тёмная",
+                layoutSet40.contains("theme_group") && layoutSet40.contains("theme_dark")
+                && srcSet40.contains("setThemeMode") && srcSet40.contains("recreate()"), "");
+        String srcMain40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тема: главный экран перерисовывается при смене темы",
+                srcMain40.contains("themeMode()") && srcMain40.contains("recreate()"), "");
+        String man40 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        java.util.regex.Matcher acts40 = java.util.regex.Pattern
+                .compile("<activity\\b[^>]*?android:name=\"\\.([A-Za-z0-9_]+)\"").matcher(man40);
+        int actsCount40 = 0, actsThemed40 = 0;
+        while (acts40.find()) {
+            actsCount40++;
+            String srcAct40 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("src/by/csl/gardener/" + acts40.group(1) + ".java").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            if (srcAct40.contains("attachBaseContext") && srcAct40.contains("Ui.applyFont")) actsThemed40++;
+        }
+        check("тема: все экраны приложения применяют тему и шрифт",
+                actsCount40 >= 12 && actsCount40 == actsThemed40,
+                "экранов: " + actsCount40 + ", с темой: " + actsThemed40);
+
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

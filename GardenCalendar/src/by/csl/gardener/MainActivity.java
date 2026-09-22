@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
     private String pendingTaskId;
     private Storage store;
     private Weather weather;
+    private int themeAtCreate;
 
     /** Тихая подсказка от семьи: если на сервере данные новее наших — один раз сообщим. */
     private void checkFamilyUpdates() {
@@ -70,6 +71,7 @@ public class MainActivity extends Activity {
         RemoteDiseases.refreshAsync(this);
         Ui.setContent(this, R.layout.activity_main);
         this.store = new Storage(this);
+        this.themeAtCreate = this.store.themeMode();
         Notifications.ensureChannel(this);
         checkFamilyUpdates();
         findViewById(R.id.btn_plants).setOnClickListener(new View.OnClickListener() {
@@ -172,6 +174,11 @@ public class MainActivity extends Activity {
 
     protected void onResume() {
         super.onResume();
+        if (this.themeAtCreate != this.store.themeMode()) {
+            this.themeAtCreate = this.store.themeMode();
+            recreate();
+            return;
+        }
         this.weather = Weather.fromJson(this.store.weatherCache());
         m1lambda$showPendingTask$0$bycslgardenerMainActivity();
         Notifications.scheduleAll(this);

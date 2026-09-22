@@ -100,6 +100,15 @@ public class SettingsActivity extends Activity {
                 SettingsActivity.this.recreate();
             }
         });
+        RadioGroup themeGroup = (RadioGroup) findViewById(R.id.theme_group);
+        int themeMode = this.store.themeMode();
+        themeGroup.check(themeMode == 1 ? R.id.theme_light : themeMode == 2 ? R.id.theme_dark : R.id.theme_system);
+        themeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public final void onCheckedChanged(RadioGroup radioGroup2, int i2) {
+                SettingsActivity.this.store.setThemeMode(i2 == R.id.theme_light ? 1 : i2 == R.id.theme_dark ? 2 : 0);
+                SettingsActivity.this.recreate();
+            }
+        });
         // ── Режим участка: постоянно или дача (выходные и отпуск) ──
         RadioGroup residence = (RadioGroup) findViewById(R.id.residence_group);
         residence.check("dacha".equals(this.store.residenceMode()) ? R.id.residence_dacha : R.id.residence_permanent);
