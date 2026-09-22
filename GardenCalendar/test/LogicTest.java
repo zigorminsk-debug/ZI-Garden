@@ -1760,6 +1760,67 @@ public class LogicTest {
         check("итоги: отчёт собирается в ShareText.seasonSummary",
                 srcShare42.contains("seasonSummary") && srcShare42.contains("Закупки сезона"), "");
 
+        // ── 43. Погода с графиком на главной ──
+        Weather wF43 = new Weather();
+        wF43.fetchedAt = System.currentTimeMillis();
+        Calendar base43 = Dates.today();
+        for (int k43 = 0; k43 < 10; k43++) {
+            Calendar c43 = Dates.plusDays(base43, k43);
+            Weather.Day d43 = new Weather.Day();
+            d43.year = c43.get(Calendar.YEAR);
+            d43.month = c43.get(Calendar.MONTH) + 1;
+            d43.day = c43.get(Calendar.DAY_OF_MONTH);
+            d43.tMax = 15.0d + k43;
+            d43.tMin = 5.0d + k43;
+            d43.precipMm = k43 % 3 == 0 ? 3.0d : 0.0d;
+            d43.precipProb = 40.0d;
+            d43.code = 1;
+            wF43.days.add(d43);
+        }
+        List<ForecastModel.Cell> cells43 = ForecastModel.build(wF43, new java.util.ArrayList<Task>(), 7);
+        check("погода-полоса: 7 дней из 10-дневного прогноза",
+                cells43.size() == 7, "ячеек: " + cells43.size());
+        check("погода-полоса: в ячейках день недели, дата и иконка",
+                cells43.get(0).weekday.length() >= 2 && cells43.get(0).icon.length() > 0
+                && cells43.get(0).day == base43.get(Calendar.DAY_OF_MONTH), "");
+        check("погода-полоса: температура и осадки прокинуты в ячейки",
+                cells43.get(0).tMax == 15.0d && cells43.get(0).tMin == 5.0d
+                && cells43.get(0).precipMm == 3.0d, "");
+        double[] range43 = ForecastModel.tempRange(cells43);
+        check("погода-полоса: диапазон температур недели для столбиков",
+                range43[0] == 5.0d && range43[1] == 21.0d,
+                String.format(Locale.US, "%.1f…%.1f", Double.valueOf(range43[0]), Double.valueOf(range43[1])));
+        check("погода-полоса: масштаб осадков не меньше 5 мм",
+                ForecastModel.precipScale(cells43) >= 5.0d, "");
+        Task wTask43 = new Task();
+        wTask43.year = base43.get(Calendar.YEAR);
+        wTask43.month = base43.get(Calendar.MONTH) + 1;
+        wTask43.day = base43.get(Calendar.DAY_OF_MONTH);
+        wTask43.weatherState = 1;
+        java.util.List<Task> wTasks43 = new java.util.ArrayList<Task>();
+        wTasks43.add(wTask43);
+        List<ForecastModel.Cell> cells43b = ForecastModel.build(wF43, wTasks43, 7);
+        check("погода-полоса: день с погодным сдвигом работы помечен точкой",
+                cells43b.get(0).warn && !cells43b.get(1).warn, "");
+        check("погода-полоса: без прогноза ячеек нет",
+                ForecastModel.build(null, null, 7).isEmpty(), "");
+        List<ForecastModel.Cell> cells43c = ForecastModel.build(wF43, null, 15);
+        check("погода-полоса: полоса обрезается по длине прогноза",
+                cells43c.size() == 10, "ячеек: " + cells43c.size());
+        String srcMain43 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String layoutMain43 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcView43 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ForecastView.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("погода-полоса: нарисована на главной (кастомный вид в разметке и коде)",
+                layoutMain43.contains("by.csl.gardener.ForecastView")
+                && srcMain43.contains("forecast_chart") && srcMain43.contains("ForecastModel.build")
+                && srcView43.contains("onDraw") && srcView43.contains("setCells"), "");
+
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

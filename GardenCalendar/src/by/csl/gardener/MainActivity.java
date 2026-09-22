@@ -347,28 +347,17 @@ public class MainActivity extends Activity {
             sb2.append(", ");
             sb2.append(Weather.textFor(this.weather.currentCode));
             textView2.setText(sb2.toString());
-            StringBuilder sb3 = new StringBuilder();
-            int min = Math.min(5, this.weather.days.size());
-            for (int i = 0; i < min; i++) {
-                Weather.Day day = this.weather.days.get(i);
-                if (i > 0) {
-                    sb3.append('\n');
-                }
-                sb3.append(Dates.weekdayShort(day.year, day.month, day.day));
-                sb3.append(' ');
-                sb3.append(Dates.fmtShort(day.year, day.month, day.day));
-                sb3.append(' ');
-                sb3.append(day.icon());
-                sb3.append(' ');
-                sb3.append(String.format(Locale.US, "%.0f…%.0f°", Double.valueOf(day.tMin), Double.valueOf(day.tMax)));
-                if (day.precipMm >= 0.5d) {
-                    sb3.append(String.format(Locale.US, ", %.1f мм", Double.valueOf(day.precipMm)));
-                }
-            }
-            textView3.setText(sb3.toString());
+            textView3.setText("Прогноз на 7 дней · столбик — температура · синий — осадки (мм) · оранжевая точка — погода мешает работам");
             textView4.setText("Обновлено " + Dates.time(this.weather.fetchedAt) + " · источник: Open-Meteo");
         }
         Planner planner = new Planner(this.store, this.weather);
+        ForecastView chart = (ForecastView) findViewById(R.id.forecast_chart);
+        if (this.weather != null && this.weather.hasForecast()) {
+            chart.setVisibility(View.VISIBLE);
+            chart.setCells(ForecastModel.build(this.weather, planner.tasks(21), 7));
+        } else {
+            chart.setVisibility(View.GONE);
+        }
         int[] stats = planner.stats();
         ((TextView) findViewById(R.id.stats)).setText(String.format(Locale.US, "Ближайшие 3 недели: %d работ, выполнено %d, на сегодня %d, отложено по погоде %d", Integer.valueOf(stats[0]), Integer.valueOf(stats[1]), Integer.valueOf(stats[2]), Integer.valueOf(stats[3])));
         Set<String> plants = this.store.plants();
