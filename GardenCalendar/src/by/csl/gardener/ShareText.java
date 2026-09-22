@@ -89,4 +89,82 @@ final class ShareText {
         sb.append("\n\n— из приложения ZI Garden");
         return sb.toString();
     }
+
+    /** Итоги сезона текстом: выполненные работы по культурам, бюджет закупок и последние записи журнала. */
+    static String seasonSummary(java.util.List<String> journalRows, Planner.Budget budget, int year, String regionName) {
+        StringBuilder sb = new StringBuilder(900);
+        sb.append("🌿 Итоги сезона ").append(year);
+        if (regionName != null && regionName.length() > 0) {
+            sb.append(" · ").append(regionName);
+        }
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        int done = 0;
+        java.util.List<String[]> yearRows = new java.util.ArrayList<>();
+        java.util.Map<String, Integer> byPlant = new java.util.HashMap<>();
+        if (journalRows != null) {
+            for (String raw : journalRows) {
+                String[] f = Journal.decode(raw);
+                if (f == null) continue;
+                cal.setTimeInMillis(Journal.when(f));
+                if (cal.get(java.util.Calendar.YEAR) != year) continue;
+                done++;
+                yearRows.add(f);
+                String plant = f[Journal.F_PLANT].length() > 0 ? f[Journal.F_PLANT] : "Прочее";
+                Integer c = byPlant.get(plant);
+                byPlant.put(plant, c == null ? Integer.valueOf(1) : Integer.valueOf(c.intValue() + 1));
+            }
+        }
+        sb.append("\n\n✅ Выполнено работ: ").append(done);
+        if (!byPlant.isEmpty()) {
+            java.util.List<java.util.Map.Entry<String, Integer>> plants =
+                    new java.util.ArrayList<>(byPlant.entrySet());
+            java.util.Collections.sort(plants, new java.util.Comparator<java.util.Map.Entry<String, Integer>>() {
+                @Override
+                public int compare(java.util.Map.Entry<String, Integer> a, java.util.Map.Entry<String, Integer> b) {
+                    int c = b.getValue().intValue() - a.getValue().intValue();
+                    return c != 0 ? c : a.getKey().compareTo(b.getKey());
+                }
+            });
+            sb.append('\n');
+            int shown = 0;
+            int rest = 0;
+            for (java.util.Map.Entry<String, Integer> e : plants) {
+                if (shown < 6) {
+                    if (shown > 0) sb.append(", ");
+                    sb.append(e.getKey()).append(" — ").append(e.getValue());
+                    shown++;
+                } else {
+                    rest += e.getValue().intValue();
+                }
+            }
+            if (rest > 0) {
+                sb.append(", ещё ").append(rest).append(" работ по другим культурам");
+            }
+        }
+        if (budget != null) {
+            sb.append("\n\n💰 Закупки сезона (справочные цены):\n")
+                    .append("план: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(budget.planned), budget.currency))
+                    .append(" · куплено: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(budget.boughtCost), budget.currency))
+                    .append(" · осталось: ").append(String.format(java.util.Locale.US, "%.2f %s", Double.valueOf(Math.max(0.0d, budget.planned - budget.boughtCost)), budget.currency));
+        }
+        sb.append("\n\n📒 Последние работы:");
+        if (yearRows.isEmpty()) {
+            sb.append("\nпока ничего не отмечено выполненным");
+        } else {
+            int limit = Math.min(15, yearRows.size());
+            for (int i = 0; i < limit; i++) {
+                String[] f = yearRows.get(i);
+                cal.setTimeInMillis(Journal.when(f));
+                sb.append("\n• ").append(Dates.fmt(cal.get(java.util.Calendar.YEAR),
+                        cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH)))
+                        .append(" · ").append(f[Journal.F_PLANT].length() > 0 ? f[Journal.F_PLANT] + " — " : "")
+                        .append(f[Journal.F_TITLE]);
+            }
+            if (yearRows.size() > limit) {
+                sb.append("\n…ещё ").append(yearRows.size() - limit).append(" — смотрите в приложении");
+            }
+        }
+        sb.append("\n\n— из приложения ZI Garden");
+        return sb.toString();
+    }
 }

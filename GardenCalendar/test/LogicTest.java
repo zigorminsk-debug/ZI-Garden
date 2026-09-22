@@ -1729,6 +1729,37 @@ public class LogicTest {
                 colsDay41.contains("warn_text") && colsNight41.contains("warn_text")
                 && colsDay41.contains("text_note") && colsNight41.contains("text_note"), "");
 
+        // ── 42. Итоги сезона: отчёт с отправкой ──
+        Context cJ42 = new Context();
+        Storage sJ42 = new Storage(cJ42);
+        int year42 = Dates.today().get(Calendar.YEAR);
+        String empty42 = ShareText.seasonSummary(sJ42.journal(Journal.MAX_ENTRIES),
+                new Planner(sJ42, w).seasonBudget(year42), year42, "Минск и окрестности");
+        check("итоги: пустой сезон — дружелюбный отчёт",
+                empty42.contains("Итоги сезона") && empty42.contains("Выполнено работ: 0")
+                && empty42.contains("пока ничего не отмечено") && empty42.contains("ZI Garden"), "");
+        sJ42.addJournal("feed_root", "Морковь", "Подкормка моркови", "Удобрение для овощей");
+        sJ42.addJournal("feed_root", "Морковь", "Вторая подкормка моркови", "");
+        sJ42.addJournal("spray", "Яблоня", "Обработка от парши", "Хорус");
+        String rep42 = ShareText.seasonSummary(sJ42.journal(Journal.MAX_ENTRIES),
+                new Planner(sJ42, w).seasonBudget(year42), year42, "Минск и окрестности");
+        check("итоги: работы посчитаны и сгруппированы по культурам",
+                rep42.contains("Выполнено работ: 3") && rep42.contains("Морковь — 2")
+                && rep42.contains("Яблоня — 1") && rep42.contains("Обработка от парши"), "");
+        check("итоги: бюджет закупок в отчёте",
+                rep42.contains("Закупки сезона") && rep42.contains("план:")
+                && rep42.contains("куплено:"), "");
+        String srcJrn42 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/JournalActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcShare42 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ShareText.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("итоги: кнопка отправки в журнале сада",
+                srcJrn42.contains("Отправить итоги сезона") && srcJrn42.contains("ACTION_SEND"), "");
+        check("итоги: отчёт собирается в ShareText.seasonSummary",
+                srcShare42.contains("seasonSummary") && srcShare42.contains("Закупки сезона"), "");
+
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
