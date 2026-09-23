@@ -299,6 +299,15 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/phenology_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="12dp" />
+
         <TextView
             android:id="@+id/stats"
             android:layout_width="match_parent"

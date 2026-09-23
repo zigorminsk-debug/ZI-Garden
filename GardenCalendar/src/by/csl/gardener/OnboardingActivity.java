@@ -139,6 +139,19 @@ public class OnboardingActivity extends Activity {
         this.nextButton = next;
         root.addView(nav);
 
+        Button pick = new Button(this);
+        pick.setText("🌿 Сразу выбрать свои культуры");
+        pick.setVisibility(View.GONE);
+        pick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PlantsActivity.show(OnboardingActivity.this);
+                finishIntro();
+            }
+        });
+        this.pickButton = pick;
+        root.addView(pick);
+
         TextView hint = Ui.text(this,
                 "Всё это всегда под рукой — приложение работает и без интернета",
                 12.0f, cSub, false);
@@ -153,6 +166,7 @@ public class OnboardingActivity extends Activity {
     }
 
     private Button nextButton;
+    private Button pickButton;
     private int cMain;
     private int cSub;
     private int cAccent;
@@ -189,6 +203,7 @@ public class OnboardingActivity extends Activity {
         dots.setText(sb.toString());
 
         nextButton.setText(index < SLIDES.length - 1 ? "Далее →" : "Начать 🌱");
+        pickButton.setVisibility(index == SLIDES.length - 1 ? View.VISIBLE : View.GONE);
     }
 
     /** Завершить знакомство и запомнить, что оно пройдено. */

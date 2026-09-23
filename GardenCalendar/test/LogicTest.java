@@ -2296,6 +2296,44 @@ public class LogicTest {
                 srcOb53.contains("Схемы, фенология, виджеты")
                 && srcOb53.contains("черёмуховых холодов"), "");
 
+        // ── 54. Фенология на главном экране и выбор культур из онбординга ──
+        check("главный экран: эмодзи сезонов из справочника",
+                "🌱".equals(PhenologyGuide.seasonEmoji("Весна"))
+                && "☀️".equals(PhenologyGuide.seasonEmoji("Лето"))
+                && "🍂".equals(PhenologyGuide.seasonEmoji("Осень"))
+                && "❄️".equals(PhenologyGuide.seasonEmoji("Зима")), "");
+        boolean phCard54 = true;
+        for (int m54 = 1; m54 <= 12; m54++) {
+            if (PhenologyGuide.bySeason(PhenologyGuide.seasonFor(m54)).size() < 2) phCard54 = false;
+        }
+        check("главный экран: у карточки «Сейчас в природе» есть приметы в любом месяце",
+                phCard54, "");
+        String srcMain54 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcLayout54 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("главный экран: карточка «Сейчас в природе» в разметке и заполняется кодом",
+                srcLayout54.contains("@+id/phenology_card")
+                && srcMain54.contains("R.id.phenology_card")
+                && srcMain54.contains("setupPhenologyCard")
+                && srcMain54.contains("PhenologyActivity.show(MainActivity.this)"), "");
+        int statsPos54 = srcLayout54.indexOf("@+id/stats");
+        check("главный экран: карточка фенологии — не кнопка, меню не тронуто (15 плиток до статистики)",
+                statsPos54 > 0 && srcLayout54.substring(0, statsPos54).contains("@+id/phenology_card")
+                && srcLayout54.split("<Button").length == 16, "");
+        String srcOb54 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcPlants54 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantsActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("онбординг: на последнем экране — «Сразу выбрать свои культуры»",
+                srcOb54.contains("Сразу выбрать свои культуры")
+                && srcOb54.contains("PlantsActivity.show")
+                && srcPlants54.contains("public static void show"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

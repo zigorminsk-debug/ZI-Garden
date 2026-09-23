@@ -150,6 +150,20 @@ public final class PhenologyGuide {
         return "Зима";
     }
 
+    /** Эмодзи сезона (для карточек «Сейчас в природе»). */
+    public static String seasonEmoji(String season) {
+        if ("Весна".equals(season)) {
+            return "🌱";
+        }
+        if ("Лето".equals(season)) {
+            return "☀️";
+        }
+        if ("Осень".equals(season)) {
+            return "🍂";
+        }
+        return "❄️";
+    }
+
     /** Короткая сводка «что сейчас важнее всего» для текущего сезона. */
     public static String seasonSummary(String season) {
         if ("Весна".equals(season)) {

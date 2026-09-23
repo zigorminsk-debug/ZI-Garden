@@ -13,7 +13,6 @@ import android.widget.TextView;
 public class PhenologyActivity extends Activity {
 
     private static final String[] SEASONS = {"Весна", "Лето", "Осень", "Зима"};
-    private static final String[] SEASON_EMOJI = {"🌱", "☀️", "🍂", "❄️"};
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -58,7 +57,7 @@ public class PhenologyActivity extends Activity {
         }
 
         LinearLayout now = Ui.card(this);
-        now.addView(Ui.text(this, SEASON_EMOJI[seasonIdx] + " Сейчас в природе: " + season.toLowerCase(),
+        now.addView(Ui.text(this, PhenologyGuide.seasonEmoji(season) + " Сейчас в природе: " + season.toLowerCase(),
                 16.0f, cMain, true));
         TextView nowText = Ui.text(this, PhenologyGuide.seasonSummary(season), 13.0f, cMain, false);
         nowText.setPadding(0, Ui.dp(this, 4.0f), 0, 0);
@@ -79,7 +78,7 @@ public class PhenologyActivity extends Activity {
         // ── Все сезоны ──
         for (int i = 0; i < SEASONS.length; i++) {
             String s = SEASONS[i];
-            Ui.section(root, this, SEASON_EMOJI[i] + " " + s);
+            Ui.section(root, this, PhenologyGuide.seasonEmoji(s) + " " + s);
             for (PhenologyGuide.Sign sign : PhenologyGuide.bySeason(s)) {
                 LinearLayout card = Ui.card(this);
                 card.addView(Ui.text(this, sign.emoji + " " + sign.title, 15.0f, cMain, true));

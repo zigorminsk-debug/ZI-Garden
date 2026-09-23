@@ -34,6 +34,33 @@ public class MainActivity extends Activity {
     private Weather weather;
     private int themeAtCreate;
 
+    /** Карточка «Сейчас в природе»: сезон и его приметы, тап — раздел фенологии. */
+    private void setupPhenologyCard() {
+        LinearLayout card = (LinearLayout) findViewById(R.id.phenology_card);
+        String season = PhenologyGuide.seasonFor(
+                java.util.Calendar.getInstance().get(java.util.Calendar.MONTH) + 1);
+        StringBuilder sb = new StringBuilder();
+        for (PhenologyGuide.Sign s : PhenologyGuide.bySeason(season)) {
+            if (sb.length() > 0) {
+                sb.append(" · ");
+            }
+            sb.append(s.title);
+        }
+        int cMain = getResources().getColor(R.color.text_main);
+        int cSub = getResources().getColor(R.color.text_sub);
+        card.addView(Ui.text(this,
+                PhenologyGuide.seasonEmoji(season) + " Сейчас в природе: " + season.toLowerCase(),
+                14.0f, cMain, true));
+        TextView signs = Ui.text(this, sb.toString(), 12.0f, cSub, false);
+        signs.setPadding(0, Ui.dp(this, 3.0f), 0, 0);
+        card.addView(signs);
+        card.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                PhenologyActivity.show(MainActivity.this);
+            }
+        });
+    }
+
     /** Тихая подсказка от семьи: если на сервере данные новее наших — один раз сообщим. */
     private void checkFamilyUpdates() {
         final Storage storage = this.store == null ? new Storage(this) : this.store;
@@ -73,6 +100,7 @@ public class MainActivity extends Activity {
         this.store = new Storage(this);
         this.themeAtCreate = this.store.themeMode();
         OnboardingActivity.showIfNeeded(this);
+        setupPhenologyCard();
         Notifications.ensureChannel(this);
         checkFamilyUpdates();
         findViewById(R.id.btn_plants).setOnClickListener(new View.OnClickListener() {
@@ -165,7 +193,7 @@ public class MainActivity extends Activity {
     }
 
     void m5lambda$onCreate$0$bycslgardenerMainActivity(View view) {
-        startActivity(new Intent(this, (Class<?>) PlantsActivity.class));
+        PlantsActivity.show(this);
     }
 
     void m6lambda$onCreate$1$bycslgardenerMainActivity(View view) {

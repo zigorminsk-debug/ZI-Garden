@@ -24,6 +24,10 @@ public class PlantsActivity extends Activity {
         super.attachBaseContext(Ui.applyFont(context));
     }
 
+    public static void show(android.content.Context ctx) {
+        ctx.startActivity(new android.content.Intent(ctx, PlantsActivity.class));
+    }
+
     private final List<CheckBox> boxes = new ArrayList();
     private final Map<String, CheckBox> byId = new HashMap();
     private final Map<String, LinearLayout> dzBoxes = new HashMap();
