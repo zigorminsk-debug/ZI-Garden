@@ -73,7 +73,7 @@ CI (GitHub Actions) на каждый коммит: тесты → сборка 
 ## Структура репозитория
 
 ```
-GardenCalendar/   — приложение (src/, res/, тесты логики, build.sh, test.sh)
+GardenCalendar/   — приложение (src/, res/, img_src/, тесты логики, build.sh, test.sh)
 sync-server/      — сервер семейной синхронизации (Python)
 pages/            — OTA-зеркало обновлений (app.apk + latest.json)
 .github/          — CI-воркфлоу

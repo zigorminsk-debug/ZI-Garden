@@ -12,8 +12,10 @@
 1. **Проект не компилировался: отсутствовали 7 классов.** Функция «Справочник болезней» была
    объявлена в манифесте (`.DiseaseActivity`) и использовалась `test/LogicTest.java`, но файлов
    не было в git: `Disease.java`, `DiseaseActivity.java`, `DiseaseDataA/B/C.java`, `DiseaseDb.java`,
-   `RemoteDiseases.java`. Восстановлены из релизного архива `GardenCalendar-src-v2.5.tar.gz` (лежит
-   в корне репозитория) — это та же версия v2.5, что собирает `build.sh`.
+   `RemoteDiseases.java`. Восстановлены из релизного архива `GardenCalendar-src-v2.5.tar.gz`
+   (архив позже удалён из рабочей копии ради гигиены репозитория; байт-в-байт доступен
+   в истории git: `git log --oneline -- GardenCalendar-src-v2.5.tar.gz`) — это та же
+   версия v2.5, что собирает `build.sh`.
 2. **Отсутствовали 19 ресурсов `res/drawable-nodpi/`:**
    `banner_garden.jpg`, 10 фото болезней `dz_*.jpg`, 8 схем обрезки `scheme_prune_*.jpg`.
    На них ссылаются `Scheme.java`, `R.drawable`, тесты. Восстановлены из того же архива.
