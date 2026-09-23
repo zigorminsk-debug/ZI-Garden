@@ -28,6 +28,11 @@ public class AboutActivity extends Activity {
                 AppUpdate.openReleasePage(AboutActivity.this);
             }
         });
+        findViewById(R.id.show_onboarding).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                OnboardingActivity.show(AboutActivity.this);
+            }
+        });
         ((TextView) findViewById(R.id.phone)).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 AboutActivity.this.m0lambda$onCreate$0$bycslgardenerAboutActivity(view);

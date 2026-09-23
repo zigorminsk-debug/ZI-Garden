@@ -72,6 +72,7 @@ public class MainActivity extends Activity {
         Ui.setContent(this, R.layout.activity_main);
         this.store = new Storage(this);
         this.themeAtCreate = this.store.themeMode();
+        OnboardingActivity.showIfNeeded(this);
         Notifications.ensureChannel(this);
         checkFamilyUpdates();
         findViewById(R.id.btn_plants).setOnClickListener(new View.OnClickListener() {

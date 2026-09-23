@@ -48,6 +48,13 @@
             android:layout_marginTop="4dp"
             android:text="🌐 Скачать новую версию в браузере" />
 
+        <Button
+            android:id="@+id/show_onboarding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="👋 Показать введение заново" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -2140,6 +2140,55 @@ public class LogicTest {
                 && srcAct45.contains("Частые ошибки"), "");
 
 
+        // ── 51. Онбординг: знакомство при первом запуске ──
+        Storage stOb51 = new Storage(new Context());
+        check("онбординг: до прохождения флаг не выставлен",
+                !stOb51.onboardingDone(), "");
+        stOb51.setOnboardingDone(true);
+        check("онбординг: после прохождения флаг выставлен",
+                stOb51.onboardingDone(), "");
+        String srcOb51 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        java.util.regex.Matcher obM51 = java.util.regex.Pattern.compile(
+                "new Slide\\(\\s*\"([^\"]*)\"\\s*,\\s*\"([^\"]*)\"\\s*,\\s*\"([^\"]*)\"\\s*,\\s*\"([^\"]*)\"\\s*\\)",
+                java.util.regex.Pattern.DOTALL).matcher(srcOb51);
+        int obCount51 = 0;
+        boolean obFields51 = true;
+        while (obM51.find()) {
+            obCount51++;
+            if (obM51.group(2).trim().length() < 5) obFields51 = false;
+            if (obM51.group(3).trim().length() < 50) obFields51 = false;
+            if (obM51.group(4).trim().length() < 10) obFields51 = false;
+        }
+        check("онбординг: не меньше 5 экранов знакомства",
+                obCount51 >= 5, "найдено " + obCount51);
+        check("онбординг: у каждого экрана заполнены заголовок, текст и подсказка «где найти»",
+                obFields51 && obCount51 >= 5, "");
+        check("онбординг: первый показ — только пока флаг не выставлен",
+                srcOb51.contains("showIfNeeded") && srcOb51.contains("!store.onboardingDone()")
+                && srcOb51.contains("setOnboardingDone(true)"), "");
+        String srcMain51 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcAbout51 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMan51 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcLayout51 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_about.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("онбординг: главный экран показывает его при первом запуске",
+                srcMain51.contains("OnboardingActivity.showIfNeeded(this)"), "");
+        check("онбординг: повторный показ из «О программе» (кнопка + разметка)",
+                srcAbout51.contains("OnboardingActivity.show(")
+                && srcAbout51.contains("R.id.show_onboarding")
+                && srcLayout51.contains("@+id/show_onboarding"), "");
+        check("онбординг: активность зарегистрирована в манифесте",
+                srcMan51.contains(".OnboardingActivity"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

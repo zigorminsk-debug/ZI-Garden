@@ -301,6 +301,15 @@ public class Storage {
         this.p.edit().putBoolean("notify", z).apply();
     }
 
+    /** Онбординг пройден (иначе при запуске показываем знакомство с приложением). */
+    public boolean onboardingDone() {
+        return this.p.getBoolean("onboarding_done", false);
+    }
+
+    public void setOnboardingDone(boolean z) {
+        this.p.edit().putBoolean("onboarding_done", z).apply();
+    }
+
     public int notifyHour() {
         return this.p.getInt("notify_hour", 8);
     }
