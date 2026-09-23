@@ -1407,8 +1407,8 @@ public class LogicTest {
                     || !seg36.contains("\\n")) { allTop36 = false; }
             tiles36++;
         }
-        check("меню: все 13 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
-                tiles36 == 13 && allTop36, "");
+        check("меню: все 14 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
+                tiles36 == 14 && allTop36, "");
         check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
                 !tail36.contains("<Button"), "");
 
@@ -1956,6 +1956,28 @@ public class LogicTest {
                 srcAct46.contains("plant.icon") && srcAct46.contains("plant.name"), "");
         check("посадка: в списке только культуры с инструкцией (byPlant != null)",
                 srcAct46.contains("PlantingGuide.byPlant(p.id) != null"), "");
+
+
+        // ── 47. Поиск по всем справочникам ──
+        String srcSearch47 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SearchActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("поиск: живой ввод (TextWatcher) и порог минимум 2 буквы",
+                srcSearch47.contains("TextWatcher") && srcSearch47.contains("addTextChangedListener")
+                && srcSearch47.contains("length() < 2"), "");
+        check("поиск: ищет по всем справочникам (посадка, культуры, болезни, вредители, дефициты)",
+                srcSearch47.contains("PlantingActivity.showFor") && srcSearch47.contains("CropInfoSheet.show")
+                && srcSearch47.contains("DiseaseActivity.show") && srcSearch47.contains("DeficiencyActivity.show")
+                && srcSearch47.contains("PlantingGuide.all()") && srcSearch47.contains("DiseaseDb.all(")
+                && srcSearch47.contains("DeficiencyGuide.all()"), "");
+        check("поиск: вредители отличаются от болезней по полю kind",
+                srcSearch47.contains("startsWith(\"Вредитель\")") && srcSearch47.contains("\"pest\"")
+                && srcSearch47.contains("\"disease\""), "");
+        check("поиск: есть пустое состояние и стартовые примеры запросов",
+                srcSearch47.contains("Ничего не нашлось") && srcSearch47.contains("Попробуйте, например:"), "");
+        check("поиск: 14-я плитка меню зарегистрирована и подключена",
+                xmlMain36.contains("@+id/btn_search") && srcMain45.contains("R.id.btn_search")
+                && srcMain45.contains("SearchActivity.class") && man45.contains(".SearchActivity"), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
