@@ -45,6 +45,11 @@ public class PlantingActivity extends Activity {
         ctx.startActivity(new Intent(ctx, PlantingActivity.class).putExtra("plantId", plantId));
     }
 
+    /** Открыть инструкцию конкретного агроприёма (используется и поиском). */
+    public static void showTechnique(Context ctx, String techniqueId) {
+        ctx.startActivity(new Intent(ctx, PlantingActivity.class).putExtra("technique", techniqueId));
+    }
+
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -131,8 +136,7 @@ public class PlantingActivity extends Activity {
         LinearLayout card = Ui.card(this);
         card.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                startActivity(new Intent(PlantingActivity.this, PlantingActivity.class)
-                        .putExtra("technique", it.id));
+                showTechnique(PlantingActivity.this, it.id);
             }
         });
         LinearLayout row = new LinearLayout(this);

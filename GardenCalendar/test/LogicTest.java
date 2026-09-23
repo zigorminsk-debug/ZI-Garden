@@ -2249,6 +2249,53 @@ public class LogicTest {
         check("фенология: активность зарегистрирована в манифесте",
                 srcMan52.contains(".PhenologyActivity"), "");
 
+        // ── 53. Поиск по агроприёмам и фенологии ──
+        TechniqueGuide.Item graft53 = TechniqueGuide.byId("prop_grafting");
+        check("поиск приёмов: прививка находится по слову из названия",
+                graft53 != null && Search.matchesTechnique(graft53, "прививк"), "");
+        check("поиск приёмов: находится по слову из содержания (копулировка)",
+                graft53 != null && Search.matchesTechnique(graft53, "копулировка"), "");
+        check("поиск приёмов: несколько слов — все должны встретиться",
+                graft53 != null && Search.matchesTechnique(graft53, "прививка весна")
+                && !Search.matchesTechnique(graft53, "прививка борщевик"), "");
+        check("поиск приёмов: пустой запрос показывает всё, чужое слово — нет",
+                graft53 != null && Search.matchesTechnique(graft53, "   ")
+                && !Search.matchesTechnique(graft53, "азот"), "");
+        PhenologyGuide.Sign cherry53 = null;
+        for (PhenologyGuide.Sign s53 : PhenologyGuide.all()) {
+            if (s53.title.contains("Черёмуха")) {
+                cherry53 = s53;
+            }
+        }
+        check("поиск примет: черёмуха находится по названию",
+                cherry53 != null && Search.matchesSign(cherry53, "черёмух"), "");
+        check("поиск примет: находится по слову из работ (картофель)",
+                cherry53 != null && Search.matchesSign(cherry53, "картоф"), "");
+        check("поиск примет: пустой запрос показывает всё, чужое слово — нет",
+                cherry53 != null && Search.matchesSign(cherry53, "")
+                && !Search.matchesSign(cherry53, "борщевик"), "");
+        String srcSearch53 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SearchActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcPlant53 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcOb53 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("поиск: разделы агроприёмов и фенологии на экране поиска",
+                srcSearch53.contains("addTechniques") && srcSearch53.contains("addPhenology")
+                && srcSearch53.contains("Агроприёмы") && srcSearch53.contains("Фенология")
+                && srcSearch53.contains("Search.matchesTechnique")
+                && srcSearch53.contains("Search.matchesSign"), "");
+        check("поиск: переходы — приём открывает инструкцию, примета — фенологию",
+                srcSearch53.contains("PlantingActivity.showTechnique")
+                && srcSearch53.contains("PhenologyActivity.show")
+                && srcPlant53.contains("showTechnique"), "");
+        check("онбординг: слайд «Схемы, фенология, виджеты» упоминает фенологию",
+                srcOb53.contains("Схемы, фенология, виджеты")
+                && srcOb53.contains("черёмуховых холодов"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

@@ -76,7 +76,8 @@ public class SearchActivity extends Activity {
         searchCard.addView(input, inputParams);
         TextView hint = Ui.text(this,
                 "Ищет сразу во всех разделах: посадка (46 культур), карточки культур, "
-                        + "болезни, вредители и дефициты элементов. Введите минимум 2 буквы.",
+                        + "болезни, вредители, дефициты элементов, агроприёмы и фенология. "
+                        + "Введите минимум 2 буквы.",
                 12.0f, cSub, false);
         hint.setPadding(0, Ui.dp(this, 6.0f), 0, 0);
         searchCard.addView(hint);
@@ -116,13 +117,16 @@ public class SearchActivity extends Activity {
         total += addDiseases(q, false);
         total += addDiseases(q, true);
         total += addDeficiencies(q);
+        total += addTechniques(q);
+        total += addPhenology(q);
 
         if (total == 0) {
             LinearLayout empty = Ui.card(this);
             empty.addView(Ui.text(this, "😕 Ничего не нашлось", 14.0f, cMain, true));
             TextView e = Ui.text(this,
                     "Попробуйте другое слово: название культуры («смородина»), болезни («парша», "
-                            + "«мучнистая роса»), вредителя («тля», «плодожорка») или элемент («азот», «калий»).",
+                            + "«мучнистая роса»), вредителя («тля», «плодожорка»), элемент («азот», «калий»), "
+                            + "приём («прививка», «обрезка») или примету («черёмуха»).",
                     12.0f, cSub, false);
             e.setPadding(0, Ui.dp(this, 4.0f), 0, 0);
             empty.addView(e);
@@ -134,7 +138,7 @@ public class SearchActivity extends Activity {
     private LinearLayout examplesCard() {
         LinearLayout card = Ui.card(this);
         card.addView(Ui.text(this, "Попробуйте, например:", 13.0f, cMain, true));
-        String[] examples = {"парша", "тля", "азот", "яблоня", "мульча"};
+        String[] examples = {"парша", "тля", "азот", "яблоня", "мульча", "прививка", "черёмуха"};
         for (final String ex : examples) {
             TextView chip = Ui.text(this, "🔎 " + ex, 14.0f, cGreen, true);
             chip.setPadding(0, Ui.dp(this, 8.0f), 0, 0);
@@ -244,6 +248,54 @@ public class SearchActivity extends Activity {
             section.addView(row(it.symbol, it.name, "Симптомы и скорая помощь", new View.OnClickListener() {
                 public void onClick(View view) {
                     DeficiencyActivity.show(SearchActivity.this);
+                }
+            }));
+            found++;
+            if (found >= 12) {
+                break;
+            }
+        }
+        return found;
+    }
+
+    /** Агроприёмы: обрезка, рассада, размножение. */
+    private int addTechniques(String q) {
+        int found = 0;
+        LinearLayout section = null;
+        for (final TechniqueGuide.Item it : TechniqueGuide.all()) {
+            if (!Search.matchesTechnique(it, q)) {
+                continue;
+            }
+            if (section == null) {
+                section = startSection("🛠 Агроприёмы");
+            }
+            section.addView(row(it.icon, it.title, it.group + " · сроки, техника, ошибки", new View.OnClickListener() {
+                public void onClick(View view) {
+                    PlantingActivity.showTechnique(SearchActivity.this, it.id);
+                }
+            }));
+            found++;
+            if (found >= 12) {
+                break;
+            }
+        }
+        return found;
+    }
+
+    /** Фенология: природные ориентиры сроков работ. */
+    private int addPhenology(String q) {
+        int found = 0;
+        LinearLayout section = null;
+        for (final PhenologyGuide.Sign s : PhenologyGuide.all()) {
+            if (!Search.matchesSign(s, q)) {
+                continue;
+            }
+            if (section == null) {
+                section = startSection("🌸 Фенология");
+            }
+            section.addView(row(s.emoji, s.title, s.season + " · " + s.period, new View.OnClickListener() {
+                public void onClick(View view) {
+                    PhenologyActivity.show(SearchActivity.this);
                 }
             }));
             found++;
