@@ -2349,6 +2349,36 @@ public class LogicTest {
                 srcUpd55.contains("скачайте вручную через браузер")
                 && srcUpd55.contains("openReleasePage"), "");
 
+        // ── 56. Релизы: настоящие примечания в теле релиза и latest.json ──
+        String wf56;
+        try {
+            wf56 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("../.github/workflows/build-apk.yml").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e56) {
+            wf56 = ""; // локальный запуск вне репозитория — проверки ниже честно провалятся в CI
+        }
+        String mirror56;
+        try {
+            mirror56 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("../pages/latest.json").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e56b) {
+            mirror56 = "";
+        }
+        check("релизы: тело берётся из сообщения релизного коммита, а не автогенерация",
+                wf56.contains("git log -1 --format=%B")
+                && wf56.contains("body_path: release_notes.md")
+                && !wf56.contains("generate_release_notes: true"), "");
+        check("зеркало: latest.json несёт примечания релиза (NOTES из коммита)",
+                wf56.contains("NOTES=\"$(cat release_notes.md)\"")
+                && wf56.contains("os.environ.get(\"NOTES\", \"\")"), "");
+        check("зеркало: body не заглушка «Автообновление…», apk-ссылки на месте",
+                mirror56.contains("\"body\"")
+                && !mirror56.contains("\"body\": \"Автообновление")
+                && mirror56.contains("releases/download/")
+                && mirror56.contains("raw.githubusercontent.com"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
