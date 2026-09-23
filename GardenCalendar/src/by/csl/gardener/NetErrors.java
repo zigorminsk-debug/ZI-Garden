@@ -19,7 +19,7 @@ final class NetErrors {
             return "GitHub временно ограничил запросы (403) — повторите через час";
         }
         if (msg.contains("404")) {
-            return "релизов на GitHub пока нет (404)";
+            return "адрес не найден (404) — неверный адрес либо доступ закрыт";
         }
         if (msg.contains("HTTP")) {
             return "GitHub ответил ошибкой " + msg;

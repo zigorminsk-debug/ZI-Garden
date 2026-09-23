@@ -229,6 +229,13 @@ public final class AppUpdate {
 
     /** Причина сбоя сети по-русски. */
     static String ruError(Exception e) {
+        // 404 для анонимных запросов чаще всего значит: репозиторий приватный
+        // (обновления видны только владельцу в браузере), реже — релизов нет.
+        String msg = e == null || e.getMessage() == null ? "" : e.getMessage();
+        if (msg.contains("404")) {
+            return "обновления недоступны без входа в GitHub (404) — "
+                    + "репозиторий приватный либо релизов нет; скачайте вручную через браузер";
+        }
         return NetErrors.ru(e);
     }
 

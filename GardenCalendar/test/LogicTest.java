@@ -2334,6 +2334,21 @@ public class LogicTest {
                 && srcOb54.contains("PlantsActivity.show")
                 && srcPlants54.contains("public static void show"), "");
 
+        // ── 55. Обновления: честное сообщение при 404 (приватный репозиторий) ──
+        String srcNet55 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/NetErrors.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcUpd55 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AppUpdate.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("обновления: 404 объясняет приватность репозитория, а не «релизов нет»",
+                srcUpd55.contains("репозиторий приватный либо релизов нет")
+                && !srcUpd55.contains("релизов на GitHub пока нет")
+                && !srcNet55.contains("релизов на GitHub пока нет"), "");
+        check("обновления: при 404 подсказан путь через браузер",
+                srcUpd55.contains("скачайте вручную через браузер")
+                && srcUpd55.contains("openReleasePage"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
