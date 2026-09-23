@@ -26,6 +26,11 @@ public class PlantingActivity extends Activity {
             "Овощные культуры", "Виноград и лианы", "Декоративные", "Теплица и постройки"
     };
 
+    /** Порядок разделов агроприёмов. */
+    private static final String[] TECH_GROUPS = {
+            "Обрезка и формировка", "Рассада", "Размножение"
+    };
+
     @Override
     protected void attachBaseContext(Context context) {
         super.attachBaseContext(Ui.applyFont(context));
@@ -49,7 +54,13 @@ public class PlantingActivity extends Activity {
         if (entry != null) {
             renderDetail(entry);
         } else {
-            renderList();
+            String technique = getIntent().getStringExtra("technique");
+            TechniqueGuide.Item item = technique != null ? TechniqueGuide.byId(technique) : null;
+            if (item != null) {
+                renderTechnique(item);
+            } else {
+                renderList();
+            }
         }
     }
 
@@ -74,7 +85,8 @@ public class PlantingActivity extends Activity {
         introText.setPadding(0, Ui.dp(this, 4.0f), 0, 0);
         intro.addView(introText);
         TextView count = Ui.text(this,
-                "В справочнике: " + PlantingGuide.all().size() + " культур · 👆 выберите культуру ниже",
+                "В справочнике: " + PlantingGuide.all().size() + " культур + "
+                        + TechniqueGuide.all().size() + " агроприёмов · 👆 выберите ниже",
                 12.0f, cSub, true);
         count.setPadding(0, Ui.dp(this, 6.0f), 0, 0);
         intro.addView(count);
@@ -95,6 +107,93 @@ public class PlantingActivity extends Activity {
                 root.addView(pickerRow(plant));
             }
         }
+
+        // ── Агроприёмы: обрезка, рассада, размножение ──
+        for (String techGroup : TECH_GROUPS) {
+            List<TechniqueGuide.Item> items = new ArrayList<>();
+            for (TechniqueGuide.Item it : TechniqueGuide.all()) {
+                if (techGroup.equals(it.group)) {
+                    items.add(it);
+                }
+            }
+            if (items.isEmpty()) {
+                continue;
+            }
+            Ui.section(root, this, techGroup);
+            for (final TechniqueGuide.Item it : items) {
+                root.addView(techRow(it));
+            }
+        }
+    }
+
+    /** Строка агроприёма: иконка, название, тап — переход к инструкции. */
+    private View techRow(final TechniqueGuide.Item it) {
+        LinearLayout card = Ui.card(this);
+        card.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                startActivity(new Intent(PlantingActivity.this, PlantingActivity.class)
+                        .putExtra("technique", it.id));
+            }
+        });
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+        TextView icon = Ui.text(this, it.icon, 22.0f, getResources().getColor(R.color.text_main), false);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(Ui.dp(this, 44.0f), -2);
+        row.addView(icon, iconParams);
+
+        LinearLayout texts = new LinearLayout(this);
+        texts.setOrientation(LinearLayout.VERTICAL);
+        texts.addView(Ui.text(this, it.title, 15.0f, getResources().getColor(R.color.green_900), true));
+        TextView hint = Ui.text(this, "Агроприём: сроки · инструмент · техника · ошибки", 12.0f,
+                getResources().getColor(R.color.text_sub), false);
+        hint.setPadding(0, Ui.dp(this, 2.0f), 0, 0);
+        texts.addView(hint);
+        row.addView(texts, new LinearLayout.LayoutParams(-1, -2));
+
+        TextView arrow = Ui.text(this, "›", 22.0f, getResources().getColor(R.color.text_sub), true);
+        row.addView(arrow, new LinearLayout.LayoutParams(-2, -2));
+
+        card.addView(row);
+        return card;
+    }
+
+    /** Режим инструкции по агроприёму. */
+    private void renderTechnique(TechniqueGuide.Item it) {
+        setTitle(it.title);
+
+        ScrollView scroll = new ScrollView(this);
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 12.0f), Ui.dp(this, 16.0f));
+        scroll.addView(root);
+        Ui.setContent(this, scroll);
+
+        LinearLayout back = Ui.card(this);
+        back.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        back.addView(Ui.text(this, "📋 ← Все культуры и приёмы", 14.0f,
+                getResources().getColor(R.color.green_900), true));
+        root.addView(back);
+
+        int cMain = getResources().getColor(R.color.text_main);
+        LinearLayout card = Ui.card(this);
+        card.addView(Ui.text(this, it.icon + " " + it.title, 15.0f,
+                getResources().getColor(R.color.green_900), true));
+        addDiagram(card, it.diagram);
+        card.addView(label("🕒 Когда проводить"));
+        card.addView(Ui.text(this, it.whenText, 13.0f, cMain, false));
+        card.addView(label("🛠 Инструмент и материалы"));
+        card.addView(Ui.text(this, it.tools, 13.0f, cMain, false));
+        card.addView(label("📐 Техника шаг за шагом"));
+        card.addView(Ui.text(this, it.how, 13.0f, cMain, false));
+        card.addView(label("⚠️ Частые ошибки"));
+        card.addView(Ui.text(this, it.mistakes, 13.0f, cMain, false));
+        root.addView(card);
     }
 
     /** Строка выбора культуры: иконка, название, тап — переход к рекомендациям. */

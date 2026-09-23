@@ -2087,6 +2087,49 @@ public class LogicTest {
                 man45.contains(".PhotosActivity"), "");
 
 
+        // ── 50. Агроприёмы: обрезка, рассада, размножение ──
+        String srcTech50 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("приёмы: в справочнике не меньше 10 агроприёмов",
+                TechniqueGuide.all().size() >= 10, "сейчас " + TechniqueGuide.all().size());
+        boolean techFields50 = true;
+        java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
+        java.util.List<String> techGroups50 = new java.util.ArrayList<>();
+        for (TechniqueGuide.Item it50 : TechniqueGuide.all()) {
+            if (it50.title == null || it50.title.trim().isEmpty()) techFields50 = false;
+            if (it50.whenText == null || it50.whenText.trim().isEmpty()) techFields50 = false;
+            if (it50.tools == null || it50.tools.trim().isEmpty()) techFields50 = false;
+            if (it50.how == null || it50.how.trim().isEmpty()) techFields50 = false;
+            if (it50.mistakes == null || it50.mistakes.trim().isEmpty()) techFields50 = false;
+            if (it50.diagram == null || it50.diagram.trim().isEmpty()) techFields50 = false;
+            techDiagrams50.add(it50.diagram);
+            if (!techGroups50.contains(it50.group)) techGroups50.add(it50.group);
+        }
+        check("приёмы: у каждого приёма заполнены все разделы и схема", techFields50, "");
+        boolean techDiagFiles50 = true;
+        java.io.File nodpiTech50 = new java.io.File("res/drawable-nodpi");
+        for (String d50 : techDiagrams50) {
+            if (!new java.io.File(nodpiTech50, d50 + ".jpg").exists()) {
+                techDiagFiles50 = false;
+                System.out.println("  нет схемы приёма: " + d50);
+            }
+        }
+        check("приёмы: файл каждой схемы существует в ресурсах", techDiagFiles50, "");
+        check("приёмы: схемы уникальны — по одной на приём",
+                new java.util.HashSet<>(techDiagrams50).size() == TechniqueGuide.all().size(), "");
+        check("приёмы: три раздела — обрезка, рассада, размножение",
+                techGroups50.size() == 3 && techGroups50.contains("Обрезка и формировка")
+                && techGroups50.contains("Рассада") && techGroups50.contains("Размножение"), "");
+        check("приёмы: поиск по id (pruning_spring есть, zzz нет)",
+                TechniqueGuide.byId("pruning_spring") != null && TechniqueGuide.byId("zzz") == null, "");
+        check("приёмы: экран посадки показывает приёмы и открывает по technique",
+                srcAct45.contains("Агроприёмы") && srcAct45.contains("putExtra(\"technique\"")
+                && srcAct45.contains("TechniqueGuide.byId(technique)")
+                && srcAct45.contains("Когда проводить") && srcAct45.contains("Техника шаг за шагом")
+                && srcAct45.contains("Частые ошибки"), "");
+
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
