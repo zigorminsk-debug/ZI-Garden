@@ -2263,7 +2263,7 @@ public class LogicTest {
                 && !Search.matchesTechnique(graft53, "азот"), "");
         PhenologyGuide.Sign cherry53 = null;
         for (PhenologyGuide.Sign s53 : PhenologyGuide.all()) {
-            if (s53.title.contains("Черёмуха")) {
+            if (s53.title.toLowerCase().contains("черёмуха")) {
                 cherry53 = s53;
             }
         }
