@@ -2018,6 +2018,75 @@ public class LogicTest {
                 && srcJrn48.contains("CsvExport.harvest(") && srcJrn48.contains("createChooser"), "");
 
 
+        // ── 49. Фото-дневник культуры ──
+        java.io.File root49 = new java.io.File("out-test/photo49");
+        if (root49.isDirectory()) {
+            java.io.File[] lvl1 = root49.listFiles();
+            if (lvl1 != null) {
+                for (java.io.File f : lvl1) {
+                    if (f.isDirectory()) {
+                        java.io.File[] lvl2 = f.listFiles();
+                        if (lvl2 != null) {
+                            for (java.io.File g : lvl2) {
+                                if (g.isDirectory()) {
+                                    java.io.File[] lvl3 = g.listFiles();
+                                    if (lvl3 != null) {
+                                        for (java.io.File h : lvl3) {
+                                            h.delete();
+                                        }
+                                    }
+                                }
+                                g.delete();
+                            }
+                        }
+                    }
+                    f.delete();
+                }
+            }
+            root49.delete();
+        }
+        java.io.File ph1 = PhotoDiary.add(root49, "apple",
+                new java.io.ByteArrayInputStream(new byte[]{1, 2, 3}), 1727000000000L);
+        PhotoDiary.add(root49, "apple",
+                new java.io.ByteArrayInputStream(new byte[]{4, 5}), 1727000001000L);
+        check("фото: сохраняется в photos/<культура>/<время>.jpg",
+                ph1 != null && ph1.exists()
+                && ph1.getParentFile().getName().equals("apple")
+                && ph1.getParentFile().getParentFile().getName().equals("photos"), "");
+        java.util.List<java.io.File> phList49 = PhotoDiary.photos(root49, "apple");
+        check("фото: список по возрастанию времени",
+                phList49.size() == 2
+                && phList49.get(0).getName().compareTo(phList49.get(1).getName()) < 0, "");
+        check("фото: метка времени читается из имени",
+                PhotoDiary.takenAt(ph1) == 1727000000000L, "");
+        check("фото: чужая культура не видит фото",
+                PhotoDiary.photos(root49, "pear").isEmpty(), "");
+        check("фото: удаление файла",
+                PhotoDiary.delete(phList49.get(0)) && PhotoDiary.photos(root49, "apple").size() == 1, "");
+        java.io.File phEvil = PhotoDiary.add(root49, "../evil",
+                new java.io.ByteArrayInputStream(new byte[]{6}), 5L);
+        check("фото: id культуры экранируется в безопасное имя каталога",
+                phEvil != null && phEvil.getParentFile().getName().equals("___evil")
+                && !phEvil.getParentFile().getAbsolutePath().contains("..evil"), "");
+        String srcPhotos49 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PhotosActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcCrop49 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/CropInfoSheet.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фото: экран с выбором из галереи и сохранением результата",
+                srcPhotos49.contains("ACTION_GET_CONTENT") && srcPhotos49.contains("onActivityResult")
+                && srcPhotos49.contains("PhotoDiary.add(") && srcPhotos49.contains("image/*"), "");
+        check("фото: просмотр, удаление с подтверждением и масштабирование",
+                srcPhotos49.contains("Удалить это фото?") && srcPhotos49.contains("setOnLongClickListener")
+                && srcPhotos49.contains("inSampleSize"), "");
+        check("фото: вход из карточки культуры со счётчиком",
+                srcCrop49.contains("Фото-дневник") && srcCrop49.contains("PhotoDiary.count(")
+                && srcCrop49.contains("PhotosActivity.show("), "");
+        check("фото: PhotosActivity зарегистрирована в манифесте",
+                man45.contains(".PhotosActivity"), "");
+
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

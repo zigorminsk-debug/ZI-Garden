@@ -123,6 +123,18 @@ public final class CropInfoSheet {
         });
         linearLayout.addView(btnHarvest);
 
+        // 📸 Фото-дневник: снимки культуры по сезонам
+        int photoCount = PhotoDiary.count(activity, str);
+        android.widget.Button btnPhotos = new android.widget.Button(activity);
+        btnPhotos.setText("📸 Фото-дневник · " + photoCount + " фото");
+        btnPhotos.setAllCaps(false);
+        btnPhotos.setOnClickListener(new android.view.View.OnClickListener() {
+            public final void onClick(android.view.View view) {
+                PhotosActivity.show(activity, str);
+            }
+        });
+        linearLayout.addView(btnPhotos);
+
         ScrollView scrollView = new ScrollView(activity);
         scrollView.addView(linearLayout);
         AlertDialog dialog = new AlertDialog.Builder(activity).setIcon(byId.iconRes != 0 ? byId.iconRes : 0).setTitle((byId.iconRes != 0 ? "" : byId.icon + " ") + byId.name).setView(scrollView).setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null).show();
