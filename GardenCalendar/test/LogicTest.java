@@ -2440,6 +2440,29 @@ public class LogicTest {
         check("своё фото культуры и схемы задач открываются по тапу на весь экран",
                 srcCrop58.contains("Ui.zoomPhoto") && srcTask58.contains("Ui.zoomPhoto"), "");
 
+        // ── 59. Баннер погоды крупнее; баннер «О программе» — тоже с жестами ──
+        String xmlMain = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int iNow = xmlMain.indexOf("@+id/weather_now\"");
+        int iFc = xmlMain.indexOf("@+id/forecast\"");
+        int iUpd = xmlMain.indexOf("@+id/weather_updated\"");
+        check("баннер погоды: «Сейчас» — 20sp, сводка — 15sp, «обновлено» — 12sp",
+                iNow >= 0 && xmlMain.indexOf("textSize=\"20sp\"", iNow) - iNow < 400
+                && iFc >= 0 && xmlMain.indexOf("textSize=\"15sp\"", iFc) - iFc < 500
+                && iUpd >= 0 && xmlMain.indexOf("textSize=\"12sp\"", iUpd) - iUpd < 400, "");
+        String xmlAbout = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_about.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcAbout = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/AboutActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("баннер «О программе»: есть id и тап открывает жестовый просмотр",
+                xmlAbout.contains("@+id/banner")
+                && srcAbout.contains("R.id.banner")
+                && srcAbout.contains("Ui.zoomPhoto")
+                && srcAbout.contains("R.drawable.banner_garden"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

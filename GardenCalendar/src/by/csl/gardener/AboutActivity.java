@@ -16,6 +16,13 @@ public class AboutActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_about);
+        // баннер — тоже фото: тап открывает полноэкранный просмотр с жестами
+        findViewById(R.id.banner).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Ui.zoomPhoto(AboutActivity.this, R.drawable.banner_garden);
+            }
+        });
         ((TextView) findViewById(R.id.version)).setText(
                 "Версия " + AppUpdate.ownVersionName(this) + " · обновления — с GitHub");
         findViewById(R.id.check_update).setOnClickListener(new View.OnClickListener() {
