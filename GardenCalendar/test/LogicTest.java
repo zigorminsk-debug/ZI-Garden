@@ -1944,6 +1944,20 @@ public class LogicTest {
                 fullCover45, "");
 
 
+        // ── 46. Посадка: интерактивный выбор культуры ──
+        String srcAct46 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("посадка: список культур с переходом к рекомендациям (tap по строке)",
+                srcAct46.contains("putExtra(\"plantId\"") && srcAct46.contains("static void showFor"), "");
+        check("посадка: рекомендации открываются по plantId и есть возврат к списку",
+                srcAct46.contains("getStringExtra(\"plantId\"") && srcAct46.contains("Все культуры"), "");
+        check("посадка: в строке выбора — иконка и название культуры",
+                srcAct46.contains("plant.icon") && srcAct46.contains("plant.name"), "");
+        check("посадка: в списке только культуры с инструкцией (byPlant != null)",
+                srcAct46.contains("PlantingGuide.byPlant(p.id) != null"), "");
+
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
