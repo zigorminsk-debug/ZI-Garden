@@ -1,7 +1,7 @@
 {
-  "tag_name": "v2.76",
-  "name": "2.76",
-  "body": "fix: setMeasuredDimension требует int — явное приведение высоты полосы погоды",
+  "tag_name": "v2.77",
+  "name": "2.77",
+  "body": "v2.77: баннер погоды крупнее; баннер «О программе» — жестовый просмотр\n\nБаннер погоды на главном экране: «Сейчас: …» 16→20sp (как заголовок\nлокации), сводка «Прогноз на 7 дней…» 13→15sp, строка «Обновлено…»\n11→12sp. Всё в sp — по-прежнему масштабируется настройкой шрифта.\n\nБаннер «О программе» получил id и открывается по тапу полноэкранным\nпросмотром с жестами (щипок до 8×, панорамирование, двойной тап) —\nтеперь жестами открывается каждая картинка в приложении.\n\nЛогика: §59 — 2 проверки. Итого 412.",
   "assets": [
     {
       "name": "app.apk",
@@ -9,7 +9,7 @@
     },
     {
       "name": "ZI-Garden-csl.by.apk",
-      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.76/ZI-Garden-csl.by-v2.5.apk"
+      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.77/ZI-Garden-csl.by-v2.5.apk"
     },
     {
       "name": "app-raw.apk",
