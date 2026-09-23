@@ -2091,8 +2091,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 10 агроприёмов",
-                TechniqueGuide.all().size() >= 10, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 13 агроприёмов",
+                TechniqueGuide.all().size() >= 13, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2123,6 +2123,16 @@ public class LogicTest {
                 && techGroups50.contains("Рассада") && techGroups50.contains("Размножение"), "");
         check("приёмы: поиск по id (pruning_spring есть, zzz нет)",
                 TechniqueGuide.byId("pruning_spring") != null && TechniqueGuide.byId("zzz") == null, "");
+        check("приёмы: партия 2 — деление куста, усы земляники, семена",
+                TechniqueGuide.byId("prop_division") != null
+                && TechniqueGuide.byId("prop_runners") != null
+                && TechniqueGuide.byId("prop_seeds") != null
+                && TechniqueGuide.byId("prop_division").diagram.equals("prop_division")
+                && TechniqueGuide.byId("prop_runners").diagram.equals("prop_runners")
+                && TechniqueGuide.byId("prop_seeds").diagram.equals("prop_seeds")
+                && "Размножение".equals(TechniqueGuide.byId("prop_division").group)
+                && "Размножение".equals(TechniqueGuide.byId("prop_runners").group)
+                && "Размножение".equals(TechniqueGuide.byId("prop_seeds").group), "");
         check("приёмы: экран посадки показывает приёмы и открывает по technique",
                 srcAct45.contains("Агроприёмы") && srcAct45.contains("putExtra(\"technique\"")
                 && srcAct45.contains("TechniqueGuide.byId(technique)")
