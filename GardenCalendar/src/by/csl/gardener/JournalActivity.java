@@ -54,6 +54,17 @@ public class JournalActivity extends Activity {
         });
         root.addView(share);
 
+        Button csv = new Button(this);
+        csv.setText("📊 Экспорт в CSV");
+        csv.setAllCaps(false);
+        csv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exportCsv();
+            }
+        });
+        root.addView(csv);
+
         long now = System.currentTimeMillis();
         Calendar c = Calendar.getInstance();
         for (String raw : rows) {
@@ -100,6 +111,40 @@ public class JournalActivity extends Activity {
         send.putExtra(android.content.Intent.EXTRA_TEXT, text);
         try {
             startActivity(android.content.Intent.createChooser(send, "Отправить итоги через…"));
+        } catch (Exception e) {
+            Ui.toast(this, "Не нашлось приложения для отправки");
+        }
+    }
+
+    /** Экспорт данных сада в CSV: журнал работ или урожай по годам. */
+    private void exportCsv() {
+        final String[] items = {"Журнал работ (все записи)", "Урожай по годам и культурам"};
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("📊 Что экспортировать в CSV?")
+                .setItems(items, new android.content.DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(android.content.DialogInterface dialog, int which) {
+                        String csv = which == 0
+                                ? CsvExport.journal(JournalActivity.this.store, Journal.MAX_ENTRIES)
+                                : CsvExport.harvest(JournalActivity.this.store);
+                        if (csv.split("\n").length < 2) {
+                            Ui.toast(JournalActivity.this, "Пока нет данных для экспорта");
+                            return;
+                        }
+                        shareCsv(csv, which == 0 ? "zi-garden-журнал.csv" : "zi-garden-урожай.csv");
+                    }
+                })
+                .show();
+    }
+
+    /** Отправить CSV как текст (можно сохранить в файл или переслать). */
+    private void shareCsv(String text, String file) {
+        android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(android.content.Intent.EXTRA_SUBJECT, file);
+        send.putExtra(android.content.Intent.EXTRA_TEXT, text);
+        try {
+            startActivity(android.content.Intent.createChooser(send, "Отправить " + file + "…"));
         } catch (Exception e) {
             Ui.toast(this, "Не нашлось приложения для отправки");
         }

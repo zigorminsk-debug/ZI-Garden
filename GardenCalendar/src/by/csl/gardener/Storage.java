@@ -483,6 +483,26 @@ public class Storage {
         return out;
     }
 
+    /** Годы, за которые есть записи урожая (по возрастанию). */
+    public List<Integer> harvestYears() {
+        java.util.TreeSet<Integer> years = new java.util.TreeSet<>();
+        for (String key : this.p.getAll().keySet()) {
+            if (key == null || !key.startsWith("harvest_")) {
+                continue;
+            }
+            String rest = key.substring("harvest_".length());
+            int cut = rest.indexOf('_');
+            if (cut <= 0) {
+                continue;
+            }
+            try {
+                years.add(Integer.parseInt(rest.substring(0, cut)));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return new ArrayList<Integer>(years);
+    }
+
     /** Итог урожая за год в читаемом виде: «20.0 кг» или «20.0 кг, 5.0 шт»; пусто — «». */
     public String harvestSummary(int year, String plantId) {
         StringBuilder sb = new StringBuilder();

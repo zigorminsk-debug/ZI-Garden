@@ -1980,6 +1980,42 @@ public class LogicTest {
                 && srcMain45.contains("SearchActivity.class") && man45.contains(".SearchActivity"), "");
 
 
+        // ── 48. Экспорт данных в CSV ──
+        Storage st48 = new Storage(new Context());
+        st48.addJournal("spray", "apple", "Обработка «Актарой», 1.2 мл", "aktara");
+        st48.addJournal(Operation.PRUNE, "pear", "Обрезка кроны \"по весне\"", "");
+        st48.addHarvest(2026, "apple", 12.5, "кг");
+        st48.addHarvest(2026, "apple", 3.0, "шт");
+        st48.addHarvest(2025, "apple", 8.0, "кг");
+        check("csv: экранирование кавычек и разделителей в ячейках",
+                CsvExport.cell("a,b").equals("\"a,b\"")
+                && CsvExport.cell("он сказал \"да\"").equals("\"он сказал \"\"да\"\"\"")
+                && CsvExport.cell("просто").equals("просто"), "");
+        String csvJ48 = CsvExport.journal(st48, 200);
+        check("csv: журнал с заголовком, культурами и операциями по-русски",
+                csvJ48.startsWith("Дата;Культура;Операция;Работа;Материалы")
+                && csvJ48.contains("Яблоня") && csvJ48.contains("Груша")
+                && csvJ48.contains("Обработка (опрыскивание)") && csvJ48.contains("Обрезка"), "");
+        check("csv: ячейки с кавычками и запятыми обёрнуты и удвоены",
+                csvJ48.contains("\"Обработка «Актарой», 1.2 мл\"")
+                && csvJ48.contains("\"Обрезка кроны \"\"по весне\"\"\""), "");
+        check("csv: годы урожая перечисляются по возрастанию",
+                st48.harvestYears().size() == 2 && st48.harvestYears().get(0).intValue() == 2025
+                && st48.harvestYears().get(1).intValue() == 2026, "");
+        String csvH48 = CsvExport.harvest(st48);
+        check("csv: урожай по годам, культурам и единицам",
+                csvH48.startsWith("Год;Культура;Единица;Количество")
+                && csvH48.contains("2026;Яблоня;кг;12.5")
+                && csvH48.contains("2026;Яблоня;шт;3.0")
+                && csvH48.contains("2025;Яблоня;кг;8.0"), "");
+        String srcJrn48 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/JournalActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("csv: кнопка экспорта в журнале с выбором набора данных",
+                srcJrn48.contains("Экспорт в CSV") && srcJrn48.contains("CsvExport.journal(")
+                && srcJrn48.contains("CsvExport.harvest(") && srcJrn48.contains("createChooser"), "");
+
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
