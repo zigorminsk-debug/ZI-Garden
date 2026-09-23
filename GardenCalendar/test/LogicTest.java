@@ -1921,6 +1921,8 @@ public class LogicTest {
             if (!f45.exists()) { diagrams45 = false; System.out.println("  нет схемы: " + d45); }
         }
         check("посадка: у каждой культуры есть картинка-схема в ресурсах", diagrams45, "");
+        check("посадка: у каждой культуры индивидуальная схема — без переиспользования",
+                new java.util.HashSet<>(diagramIds45).size() == PlantingGuide.all().size(), "");
         check("посадка: поиск по культуре (apple есть, zzz нет)",
                 PlantingGuide.byPlant("apple") != null && PlantingGuide.byPlant("zzz") == null, "");
         check("посадка: карточка с зумом картинок и всеми секциями",
