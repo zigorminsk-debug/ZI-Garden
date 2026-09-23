@@ -1037,9 +1037,8 @@ public class LogicTest {
         check("резервный канал: прямая ссылка на APK абсолютная",
                 htmlInfo != null && htmlInfo.apkUrl.startsWith("https://github.com/")
                 && htmlInfo.apkUrl.endsWith(".apk"), "");
-        check("резервный канал: страница без тега/APK → null",
-                UpdateInfo.fromHtmlPage("<a href=\"/foo\">no</a>") == null
-                && UpdateInfo.fromHtmlPage("<a href=\"/x/releases/tag/v1.2\">t</a>") == null, "");
+        check("резервный канал: страница без тега → null",
+                UpdateInfo.fromHtmlPage("<a href=\"/foo\">no</a>") == null, "");
         check("ошибки по-русски: DNS / таймаут / SSL / 403",
                 NetErrors.ru(new java.net.UnknownHostException()).contains("интернет")
                 && NetErrors.ru(new java.net.SocketTimeoutException()).contains("таймаут")
@@ -2378,6 +2377,26 @@ public class LogicTest {
                 && !mirror56.contains("\"body\": \"Автообновление")
                 && mirror56.contains("releases/download/")
                 && mirror56.contains("raw.githubusercontent.com"), "");
+
+        // ── 57. HTML-канал на современной разметке GitHub + чистые примечания ──
+        check("HTML-канал: ссылка на APK собирается из фиксированного имени ассета CI",
+                UpdateInfo.assetUrlForTag("v2.74").equals(
+                "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.74/ZI-Garden-csl.by-v2.5.apk"), "");
+        String modernHtml = "<html><body><a href=\"/zigorminsk-debug/ZI-Garden/releases/tag/v2.74\">v2.74</a>"
+                + "<a href=\"/zigorminsk-debug/ZI-Garden/releases/tag/v2.73\">v2.73</a></body></html>";
+        UpdateInfo modern = UpdateInfo.fromHtmlPage(modernHtml);
+        check("HTML-канал: современный список (только теги, ассеты на клиенте) даёт рабочий URL",
+                modern != null && "v2.74".equals(modern.tag) && modern.versionCode == 94000
+                && modern.apkUrl.endsWith("/releases/download/v2.74/ZI-Garden-csl.by-v2.5.apk"), "");
+        check("HTML-канал: старая разметка с прямой ссылкой по-прежнему предпочтительна",
+                UpdateInfo.fromHtmlPage("<a href=\"/o/r/releases/tag/v1.2\">v</a>"
+                        + "<a href=\"/o/r/releases/download/v1.2/app-9.apk\">apk</a>").apkUrl
+                .equals("https://github.com/o/r/releases/download/v1.2/app-9.apk"), "");
+        check("примечания: «Co-authored-by» вычищается из «Что нового»",
+                UpdateInfo.fromReleaseJson("{\"tag_name\":\"v9.9\",\"body\":\"Новое.\\n\\n"
+                        + "Co-authored-by: x <y@z.noreply>\",\"assets\":[{\"browser_download_url\":"
+                        + "\"https://github.com/o/r/releases/download/v9.9/a.apk\"}]}")
+                .notes.equals("Новое."), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
