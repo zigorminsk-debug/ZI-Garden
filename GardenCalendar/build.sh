@@ -54,7 +54,7 @@ mkdir -p "$GEN"
 sed -e "s/android:versionCode=\"[^\"]*\"/android:versionCode=\"$APP_VERSION_CODE\"/" \
     -e "s/android:versionName=\"[^\"]*\"/android:versionName=\"$APP_VERSION_NAME\"/" \
     "$ROOT/AndroidManifest.xml" > "$VMANIFEST"
-aapt2 link -o "$OUT/app.unsigned.apk" \
+if ! aapt2 link -o "$OUT/app.unsigned.apk" \
   -I "$PLATFORM/android.jar" \
   --manifest "$VMANIFEST" \
   --java "$GEN" \
@@ -62,22 +62,31 @@ aapt2 link -o "$OUT/app.unsigned.apk" \
   --min-sdk-version 21 --target-sdk-version 34 \
   --version-code "$APP_VERSION_CODE" --version-name "$APP_VERSION_NAME" \
   --replace-version \
-  "$OUT/res.zip"
+  "$OUT/res.zip" 2> "$OUT/aapt2.err"; then
+  while IFS= read -r line; do [ -n "$line" ] && echo "::error::aapt2: $line"; done < "$OUT/aapt2.err"
+  exit 1
+fi
 
 echo "[3/8] javac"
 find "$ROOT/src" "$GEN" -name '*.java' > "$OUT/sources.txt"
-javac --release 8 -nowarn -encoding UTF-8 \
+if ! javac --release 8 -nowarn -encoding UTF-8 \
   -sourcepath "$ROOT/src:$GEN" \
   -classpath "$PLATFORM/android.jar" \
-  -d "$OBJ" @"$OUT/sources.txt"
+  -d "$OBJ" @"$OUT/sources.txt" 2> "$OUT/javac.err"; then
+  while IFS= read -r line; do [ -n "$line" ] && echo "::error::javac: $line"; done < "$OUT/javac.err"
+  exit 1
+fi
 
 echo "[4/8] strip MethodParameters (JDK 21 javac emits null names -> d8 NPE)"
 python3 "$ROOT/tools/strip_method_params.py" $(find "$OBJ" -name '*.class')
 
 echo "[5/8] d8 -> classes.dex"
 find "$OBJ" -name '*.class' > "$OUT/cls.txt"
-d8 --release --lib "$PLATFORM/android.jar" --min-api 21 \
-  --output "$OUT/dex" $(cat "$OUT/cls.txt")
+if ! d8 --release --lib "$PLATFORM/android.jar" --min-api 21 \
+  --output "$OUT/dex" $(cat "$OUT/cls.txt") 2> "$OUT/d8.err"; then
+  while IFS= read -r line; do [ -n "$line" ] && echo "::error::d8: $line"; done < "$OUT/d8.err"
+  exit 1
+fi
 
 echo "[6/8] zip classes.dex + zipalign"
 cd "$OUT/dex" && zip -q -0 ../app.unsigned.apk classes.dex && cd "$ROOT"
