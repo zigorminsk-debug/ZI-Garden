@@ -56,7 +56,7 @@ public class ForecastView extends View {
         // высота растёт вместе с текстом — пропорции зон не меняются при любом шрифте
         float ts = textScale(getContext());
         setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthSpec),
-                Ui.dp(getContext(), 150.0f) * (0.30f + ts));
+                (int) (Ui.dp(getContext(), 150.0f) * (0.30f + ts)));
     }
 
     @Override
