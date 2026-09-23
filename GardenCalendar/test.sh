@@ -29,6 +29,17 @@ fi
 javac -nowarn -encoding UTF-8 -d "$OUT" \
   -classpath "$JSON_JAR" \
   -sourcepath "$ROOT/test/stubs:$ROOT/test:$ROOT/src" \
-  "$ROOT/test/LogicTest.java"
+  "$ROOT/test/LogicTest.java" 2>"$OUT/javac.err" \
+  || { cat "$OUT/javac.err"; \
+       while IFS= read -r line; do [ -n "$line" ] && echo "::error::javac: $line"; done < "$OUT/javac.err"; \
+       exit 1; }
 
-java -Dfile.encoding=UTF-8 -cp "$OUT:$JSON_JAR" by.csl.gardener.LogicTest
+set +e
+java -Dfile.encoding=UTF-8 -cp "$OUT:$JSON_JAR" by.csl.gardener.LogicTest 2>"$OUT/java.err"
+JAVA_RC=$?
+set -e
+[ -s "$OUT/java.err" ] && cat "$OUT/java.err" >&2
+if [ "$JAVA_RC" -ne 0 ]; then
+  while IFS= read -r line; do [ -n "$line" ] && echo "::error::test: $line"; done < "$OUT/java.err"
+  exit "$JAVA_RC"
+fi

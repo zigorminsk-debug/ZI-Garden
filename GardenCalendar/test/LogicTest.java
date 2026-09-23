@@ -21,7 +21,11 @@ public class LogicTest {
 
     private static void check(String what, boolean ok, String detail) {
         System.out.println((ok ? "PASS  " : "FAIL  ") + what + (detail.isEmpty() ? "" : " — " + detail));
-        if (!ok) failures++;
+        if (!ok) {
+            failures++;
+            // Аннотация GitHub Actions: провал виден прямо в проверках, даже без чтения логов
+            System.out.println("::error::FAIL — " + what + (detail.isEmpty() ? "" : " — " + detail));
+        }
     }
 
     public static void main(String[] args) throws Exception {
