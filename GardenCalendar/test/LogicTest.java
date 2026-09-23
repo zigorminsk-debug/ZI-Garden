@@ -1935,6 +1935,13 @@ public class LogicTest {
         }
         check("посадка: в справочнике нет дублей культур",
                 plantIds45.size() == new java.util.HashSet<>(plantIds45).size(), "");
+        java.util.HashSet<String> covered45 = new java.util.HashSet<>(plantIds45);
+        boolean fullCover45 = true;
+        for (Plant p45 : Plant.all()) {
+            if (!covered45.contains(p45.id)) fullCover45 = false;
+        }
+        check("посадка: каждая культура справочника растений покрыта инструкцией",
+                fullCover45, "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
