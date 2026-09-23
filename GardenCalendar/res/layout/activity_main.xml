@@ -283,16 +283,20 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_main"
                 android:textSize="10sp" />
-            <Space
+            <Button
+                android:id="@+id/btn_phenology"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
+                android:layout_height="72dp"
                 android:layout_marginStart="6dp"
-                android:layout_weight="1" />
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:text="🌸\nФенология"
+                android:textAllCaps="false"
+                android:textColor="@color/text_main"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <TextView

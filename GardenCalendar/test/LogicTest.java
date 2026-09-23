@@ -2189,6 +2189,62 @@ public class LogicTest {
         check("онбординг: активность зарегистрирована в манифесте",
                 srcMan51.contains(".OnboardingActivity"), "");
 
+        // ── 52. Фенология: природный календарь работ ──
+        boolean phFields52 = true;
+        java.util.List<String> phSeasons52 = new java.util.ArrayList<>();
+        for (PhenologyGuide.Sign ph52 : PhenologyGuide.all()) {
+            if (ph52.emoji == null || ph52.emoji.trim().isEmpty()) phFields52 = false;
+            if (ph52.title == null || ph52.title.trim().length() < 5) phFields52 = false;
+            if (ph52.period == null || ph52.period.trim().length() < 5) phFields52 = false;
+            if (ph52.signal == null || ph52.signal.trim().length() < 15) phFields52 = false;
+            if (ph52.works == null || ph52.works.trim().length() < 20) phFields52 = false;
+            if (!phSeasons52.contains(ph52.season)) phSeasons52.add(ph52.season);
+        }
+        check("фенология: в справочнике не меньше 18 природных ориентиров",
+                PhenologyGuide.all().size() >= 18, "сейчас " + PhenologyGuide.all().size());
+        check("фенология: у каждого ориентира заполнены эмодзи, название, срок, сигнал и работы",
+                phFields52, "");
+        check("фенология: четыре сезона, в каждом не меньше 2 ориентиров",
+                phSeasons52.size() == 4 && phSeasons52.contains("Весна") && phSeasons52.contains("Лето")
+                && phSeasons52.contains("Осень") && phSeasons52.contains("Зима")
+                && PhenologyGuide.bySeason("Весна").size() >= 6
+                && PhenologyGuide.bySeason("Лето").size() >= 5
+                && PhenologyGuide.bySeason("Осень").size() >= 5
+                && PhenologyGuide.bySeason("Зима").size() >= 2, "");
+        boolean phSeasonFor52 = true;
+        for (int m52 = 1; m52 <= 12; m52++) {
+            String expect52;
+            if (m52 >= 3 && m52 <= 5) expect52 = "Весна";
+            else if (m52 >= 6 && m52 <= 8) expect52 = "Лето";
+            else if (m52 >= 9 && m52 <= 11) expect52 = "Осень";
+            else expect52 = "Зима";
+            if (!expect52.equals(PhenologyGuide.seasonFor(m52))) phSeasonFor52 = false;
+        }
+        check("фенология: сезон по месяцу считается верно для всех 12 месяцев", phSeasonFor52, "");
+        boolean phSummary52 = true;
+        for (String s52 : new String[]{"Весна", "Лето", "Осень", "Зима"}) {
+            if (PhenologyGuide.seasonSummary(s52) == null
+                    || PhenologyGuide.seasonSummary(s52).trim().length() < 40) phSummary52 = false;
+        }
+        check("фенология: сводка «что сейчас» есть для каждого сезона", phSummary52, "");
+        check("фенология: честная оговорка о сверке с прогнозом",
+                PhenologyGuide.INTRO != null && PhenologyGuide.INTRO.contains("прогноз"), "");
+        String srcMain52 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcLayout52 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMan52 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фенология: кнопка на главном экране (разметка + проводка)",
+                srcLayout52.contains("@+id/btn_phenology")
+                && srcMain52.contains("R.id.btn_phenology")
+                && srcMain52.contains("PhenologyActivity.class"), "");
+        check("фенология: активность зарегистрирована в манифесте",
+                srcMan52.contains(".PhenologyActivity"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

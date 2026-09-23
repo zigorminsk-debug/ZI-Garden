@@ -49,6 +49,7 @@
         <activity android:name=".VisitCalendarActivity" android:exported="false" android:label="Календарь посещения" />
         <activity android:name=".AboutActivity" android:exported="false" android:label="@string/about" />
         <activity android:name=".OnboardingActivity" android:exported="false" android:label="Знакомство с приложением" />
+        <activity android:name=".PhenologyActivity" android:exported="false" android:label="Фенология сада" />
         <activity android:name=".JournalActivity" android:exported="false" android:label="Журнал сада" />
         <!-- Принимает тап по .json-вложению из Gmail/проводника: предлагает восстановить данные. -->
         <activity
