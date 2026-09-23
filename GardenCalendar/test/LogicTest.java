@@ -2463,6 +2463,26 @@ public class LogicTest {
                 && srcAbout.contains("Ui.zoomPhoto")
                 && srcAbout.contains("R.drawable.banner_garden"), "");
 
+        // ── 60. Справка соответствует возможностям приложения ──
+        String help = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values/strings.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int iHelp = help.indexOf("about_text");
+        String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
+        check("справка: все разделы возможностей упомянуты",
+                helpText.contains("46") && helpText.contains("233")
+                && helpText.contains("12 элементов") && helpText.contains("13 приёмов")
+                && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
+                && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
+                && helpText.contains("Дневник") && helpText.contains("Поиск")
+                && helpText.contains("Почва и плодородие") && helpText.contains("виджета")
+                && helpText.contains("синхронизация") && helpText.contains("6 ступеней")
+                && helpText.contains("жестами") && helpText.contains("8:00 до 21:00"), "");
+        check("справка: источники и контакты на месте",
+                helpText.contains("Open-Meteo") && helpText.contains("Государственном реестре")
+                && helpText.contains("+375 29 337-14-12") && helpText.contains("csl.by")
+                && helpText.contains("без рекламы"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
