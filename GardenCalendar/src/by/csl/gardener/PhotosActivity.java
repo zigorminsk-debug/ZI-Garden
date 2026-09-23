@@ -185,14 +185,7 @@ public class PhotosActivity extends Activity {
             Ui.toast(this, "Не удалось открыть фото");
             return;
         }
-        ImageView view = new ImageView(this);
-        view.setImageBitmap(bm);
-        view.setAdjustViewBounds(true);
-        new AlertDialog.Builder(this)
-                .setTitle("📸 " + this.plantName)
-                .setView(view)
-                .setPositiveButton("Закрыть", (DialogInterface.OnClickListener) null)
-                .show();
+        Ui.zoomPhoto(this, bm);
     }
 
     /** Удаление с подтверждением. */

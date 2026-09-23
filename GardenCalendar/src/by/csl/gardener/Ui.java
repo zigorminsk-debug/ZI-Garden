@@ -235,20 +235,39 @@ public final class Ui {
         Toast.makeText(context, str, 1).show();
     }
 
-    /** Полноэкранный просмотр фото (тап — закрыть). Используется для снимков симптомов болезней. */
+    /**
+     * Полноэкранный просмотр фото с жестами: щипок — масштаб (до 8×),
+     * перетасивание — панорамирование, двойной тап — приблизить/сбросить,
+     * одиночный тап — закрыть. Используется для фото болезней, схем и снимков.
+     */
     public static void zoomPhoto(android.app.Activity activity, int resId) {
         final android.app.Dialog dialog = new android.app.Dialog(activity,
                 android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        android.widget.ImageView image = new android.widget.ImageView(activity);
-        image.setImageResource(resId);
-        image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-        image.setBackgroundColor(android.graphics.Color.BLACK);
-        image.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        ZoomView zoom = new ZoomView(activity);
+        zoom.setImageResource(resId);
+        zoom.setBackgroundColor(android.graphics.Color.BLACK);
+        zoom.setOnTap(new Runnable() {
+            public void run() {
                 dialog.dismiss();
             }
         });
-        dialog.setContentView(image);
+        dialog.setContentView(zoom);
+        dialog.show();
+    }
+
+    /** То же для фото из файла (фото-дневник, снимки растений) — Bitmap вместо ресурса. */
+    public static void zoomPhoto(android.app.Activity activity, android.graphics.Bitmap photo) {
+        final android.app.Dialog dialog = new android.app.Dialog(activity,
+                android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        ZoomView zoom = new ZoomView(activity);
+        zoom.setImageBitmap(photo);
+        zoom.setBackgroundColor(android.graphics.Color.BLACK);
+        zoom.setOnTap(new Runnable() {
+            public void run() {
+                dialog.dismiss();
+            }
+        });
+        dialog.setContentView(zoom);
         dialog.show();
     }
 }

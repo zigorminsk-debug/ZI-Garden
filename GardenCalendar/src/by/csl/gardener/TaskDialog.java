@@ -89,6 +89,13 @@ public final class TaskDialog {
             imageView.setAdjustViewBounds(true);
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+            // тап — полноэкранный просмотр схемы с жестами масштабирования
+            final int zoomRes = forTask;
+            imageView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Ui.zoomPhoto((android.app.Activity) context, zoomRes);
+                }
+            });
             linearLayout.addView(imageView);
             TextView text2 = Ui.text(context, Scheme.captionFor(forTask), 12.0f, context.getResources().getColor(R.color.text_sub), false);
             text2.setPadding(0, Ui.dp(context, 4.0f), 0, Ui.dp(context, 4.0f));

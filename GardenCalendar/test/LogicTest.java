@@ -2398,6 +2398,48 @@ public class LogicTest {
                         + "\"https://github.com/o/r/releases/download/v9.9/a.apk\"}]}")
                 .notes.equals("Новое."), "");
 
+        // ── 58. Погода: масштаб текста; фото: жесты масштабирования ──
+        String srcFc = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ForecastView.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("погода: текст полосы следует настройке шрифта (вполсилы, ограничен 0.9–1.45)",
+                srcFc.contains("static float textScale")
+                && srcFc.contains("Fonts.scale(ctx)")
+                && srcFc.contains("1.45f") && srcFc.contains("0.5f")
+                && srcFc.contains("0.9f"), "");
+        check("погода: высота полосы растёт вместе с текстом",
+                srcFc.contains("0.30f + ts"), "");
+        check("погода: базовые размеры текста крупнее прежних (7–8dp → 9–10dp)",
+                srcFc.contains("txt(ctx, 15.0f)") && srcFc.contains("txt(ctx, 10.0f)")
+                && srcFc.contains("txt(ctx, 9.0f)") && !srcFc.contains("Ui.dp(ctx, 7.0f)"), "");
+        String srcZoom = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/ZoomView.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фото: ZoomView — щипок, панорамирование, двойной тап, тап-закрыть, до 8×",
+                srcZoom.contains("ScaleGestureDetector") && srcZoom.contains("GestureDetector")
+                && srcZoom.contains("onDoubleTap") && srcZoom.contains("onSingleTapConfirmed")
+                && srcZoom.contains("MAX_ZOOM = 8.0f") && srcZoom.contains("clampPan"), "");
+        String srcUi58 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Ui.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int zoomUses = srcUi58.split("new ZoomView", -1).length - 1;
+        check("фото: полноэкранный просмотр — ZoomView (ресурс и Bitmap)",
+                zoomUses >= 2 && srcUi58.contains("setImageBitmap")
+                && srcUi58.contains("Theme_Black_NoTitleBar_Fullscreen"), "");
+        String srcPh58 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PhotosActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фото-дневник: снимок открывается жестовым просмотром, не маленьким диалогом",
+                srcPh58.contains("Ui.zoomPhoto(this, bm)") && !srcPh58.contains(".setView(view)"), "");
+        String srcCrop58 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/CropInfoSheet.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcTask58 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/TaskDialog.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("своё фото культуры и схемы задач открываются по тапу на весь экран",
+                srcCrop58.contains("Ui.zoomPhoto") && srcTask58.contains("Ui.zoomPhoto"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

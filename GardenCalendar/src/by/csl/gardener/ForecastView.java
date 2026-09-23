@@ -35,9 +35,28 @@ public class ForecastView extends View {
         invalidate();
     }
 
+    /**
+     * Масштаб текста полосы: следует настройке размера шрифта приложения
+     * вполсилы и ограничен (0.9–1.45), чтобы при самом крупном шрифте
+     * вся информация по-прежнему помещалась в каждый столбик.
+     */
+    static float textScale(Context ctx) {
+        float fs = Fonts.scale(ctx);
+        float s = 1.0f + (fs - 1.0f) * 0.5f;
+        return s < 0.9f ? 0.9f : (s > 1.45f ? 1.45f : s);
+    }
+
+    /** Размер текста полосы: базовый размер × масштаб шрифта. */
+    private float txt(Context ctx, float base) {
+        return Ui.dp(ctx, base) * textScale(ctx);
+    }
+
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthSpec), Ui.dp(getContext(), 150.0f));
+        // высота растёт вместе с текстом — пропорции зон не меняются при любом шрифте
+        float ts = textScale(getContext());
+        setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthSpec),
+                Ui.dp(getContext(), 150.0f) * (0.30f + ts));
     }
 
     @Override
@@ -57,20 +76,21 @@ public class ForecastView extends View {
         int cPrecip = ctx.getResources().getColor(R.color.accent);
         double[] range = ForecastModel.tempRange(this.cells);
         double precipScale = ForecastModel.precipScale(this.cells);
-        float dp2 = Ui.dp(ctx, 2.0f);
+        float ts = textScale(ctx);
+        float dp2 = Ui.dp(ctx, 2.0f) * ts; // отступы подписей растут вместе с текстом
         this.paint.setTextAlign(Paint.Align.CENTER);
         for (int i = 0; i < n; i++) {
             ForecastModel.Cell c = this.cells.get(i);
             float cx = colW * i + colW / 2.0f;
             // день недели и число
-            this.paint.setTextSize(Ui.dp(ctx, 9.0f));
+            this.paint.setTextSize(txt(ctx, 10.0f));
             this.paint.setColor(cSub);
             canvas.drawText(c.weekday, cx, h * 0.075f, this.paint);
             this.paint.setColor(cMain);
-            this.paint.setTextSize(Ui.dp(ctx, 10.0f));
+            this.paint.setTextSize(txt(ctx, 11.0f));
             canvas.drawText(String.valueOf(c.day), cx, h * 0.155f, this.paint);
             // иконка погоды
-            this.paint.setTextSize(Ui.dp(ctx, 13.0f));
+            this.paint.setTextSize(txt(ctx, 15.0f));
             canvas.drawText(c.icon, cx, h * 0.26f, this.paint);
             // столбик температур: зона 0.30–0.66 высоты
             float zTop = h * 0.30f;
@@ -87,9 +107,9 @@ public class ForecastView extends View {
             canvas.drawRoundRect(cx - Ui.dp(ctx, 5.0f), barTop, cx + Ui.dp(ctx, 5.0f), barBot,
                     Ui.dp(ctx, 3.0f), Ui.dp(ctx, 3.0f), this.paint);
             this.paint.setColor(cMain);
-            this.paint.setTextSize(Ui.dp(ctx, 8.0f));
+            this.paint.setTextSize(txt(ctx, 10.0f));
             canvas.drawText(String.format(Locale.US, "%.0f°", Double.valueOf(c.tMax)), cx, barTop - dp2, this.paint);
-            canvas.drawText(String.format(Locale.US, "%.0f°", Double.valueOf(c.tMin)), cx, barBot + Ui.dp(ctx, 8.0f), this.paint);
+            canvas.drawText(String.format(Locale.US, "%.0f°", Double.valueOf(c.tMin)), cx, barBot + Ui.dp(ctx, 8.0f) * ts, this.paint);
             // осадки: зона 0.74–0.96 высоты
             float pTop0 = h * 0.74f;
             float pBot0 = h * 0.96f;
@@ -99,17 +119,18 @@ public class ForecastView extends View {
                 this.paint.setColor(cPrecip);
                 canvas.drawRoundRect(cx - Ui.dp(ctx, 5.0f), pTop, cx + Ui.dp(ctx, 5.0f), pBot0,
                         Ui.dp(ctx, 2.0f), Ui.dp(ctx, 2.0f), this.paint);
-                this.paint.setTextSize(Ui.dp(ctx, 7.0f));
+                this.paint.setTextSize(txt(ctx, 9.0f));
                 canvas.drawText(String.format(Locale.US, "%.0f", Double.valueOf(c.precipMm)), cx, pTop - dp2, this.paint);
             } else {
                 this.paint.setColor(cSub);
-                this.paint.setTextSize(Ui.dp(ctx, 7.0f));
+                this.paint.setTextSize(txt(ctx, 9.0f));
                 canvas.drawText("—", cx, pBot0, this.paint);
             }
             // оранжевая точка: в этот день погода мешает работам
             if (c.warn) {
                 this.paint.setColor(cWarn);
-                canvas.drawCircle(colW * (i + 1) - Ui.dp(ctx, 6.0f), h * 0.075f - Ui.dp(ctx, 5.0f), Ui.dp(ctx, 2.5f), this.paint);
+                canvas.drawCircle(colW * (i + 1) - Ui.dp(ctx, 6.0f) * ts,
+                        h * 0.075f - Ui.dp(ctx, 5.0f) * ts, Ui.dp(ctx, 2.5f) * ts, this.paint);
             }
         }
     }

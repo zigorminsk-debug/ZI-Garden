@@ -36,6 +36,16 @@ public final class CropInfoSheet {
                 photoView.setImageBitmap(bmp);
                 photoView.setAdjustViewBounds(true);
                 photoView.setPadding(0, 0, 0, Ui.dp(activity, 8.0f));
+                // тап — полноэкранный просмотр с жестами масштабирования
+                final android.graphics.Bitmap fullBmp = PlantPhotos.load(activity, str,
+                        Ui.dp(activity, 1600.0f));
+                if (fullBmp != null) {
+                    photoView.setOnClickListener(new android.view.View.OnClickListener() {
+                        public void onClick(android.view.View v) {
+                            Ui.zoomPhoto(activity, fullBmp);
+                        }
+                    });
+                }
                 linearLayout.addView(photoView);
             }
         }
