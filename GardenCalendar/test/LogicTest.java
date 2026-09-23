@@ -1410,8 +1410,8 @@ public class LogicTest {
                     || !seg36.contains("\\n")) { allTop36 = false; }
             tiles36++;
         }
-        check("меню: все 15 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
-                tiles36 == 15 && allTop36, "");
+        check("меню: все 17 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
+                tiles36 == 17 && allTop36, "");
         check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
                 !tail36.contains("<Button"), "");
 
@@ -2319,9 +2319,9 @@ public class LogicTest {
                 && srcMain54.contains("setupPhenologyCard")
                 && srcMain54.contains("PhenologyActivity.show(MainActivity.this)"), "");
         int statsPos54 = srcLayout54.indexOf("@+id/stats");
-        check("главный экран: карточка фенологии — не кнопка, меню не тронуто (15 плиток до статистики)",
+        check("главный экран: карточка фенологии — не кнопка, меню не тронуто (17 плиток до статистики)",
                 statsPos54 > 0 && srcLayout54.substring(0, statsPos54).contains("@+id/phenology_card")
-                && srcLayout54.split("<Button").length == 16, "");
+                && srcLayout54.split("<Button").length == 18, "");
         String srcOb54 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
@@ -2482,6 +2482,28 @@ public class LogicTest {
                 helpText.contains("Open-Meteo") && helpText.contains("Государственном реестре")
                 && helpText.contains("+375 29 337-14-12") && helpText.contains("csl.by")
                 && helpText.contains("без рекламы"), "");
+
+        // ── 61. Дневник и лунный календарь — плитками главного меню ──
+        String srcMain61 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcLunar61 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/LunarActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String man61 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("дневник и луна: плитки на главном экране, равные остальным",
+                xmlMain.contains("@+id/btn_journal") && xmlMain.contains("@+id/btn_moon")
+                && xmlMain.contains("📔\\nДневник") && xmlMain.contains("🌙\\nЛуна"), "");
+        check("дневник и луна: плитки подключены, экраны в манифесте",
+                srcMain61.contains("R.id.btn_journal") && srcMain61.contains("JournalActivity.class")
+                && srcMain61.contains("R.id.btn_moon") && srcMain61.contains("LunarActivity.show")
+                && man61.contains(".LunarActivity") && man61.contains(".JournalActivity"), "");
+        check("лунный календарь: сетка месяца, фазы и советы из Moon, навигация по месяцам",
+                srcLunar61.contains("Moon.emoji") && srcLunar61.contains("Moon.guide")
+                && srcLunar61.contains("shift(-1)") && srcLunar61.contains("shift(1)")
+                && srcLunar61.contains("getActualMaximum"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

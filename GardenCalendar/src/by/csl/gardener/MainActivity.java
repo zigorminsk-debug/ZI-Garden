@@ -148,6 +148,16 @@ public class MainActivity extends Activity {
                 MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) PhenologyActivity.class));
             }
         });
+        findViewById(R.id.btn_journal).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, (Class<?>) JournalActivity.class));
+            }
+        });
+        findViewById(R.id.btn_moon).setOnClickListener(new View.OnClickListener() {
+            public final void onClick(View view) {
+                LunarActivity.show(MainActivity.this);
+            }
+        });
         findViewById(R.id.btn_pests).setOnClickListener(new View.OnClickListener() {
             public final void onClick(View view) {
                 MainActivity.this.pickCulture("pest");
