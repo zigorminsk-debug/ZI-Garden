@@ -1407,8 +1407,8 @@ public class LogicTest {
                     || !seg36.contains("\\n")) { allTop36 = false; }
             tiles36++;
         }
-        check("меню: все 12 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
-                tiles36 == 12 && allTop36, "");
+        check("меню: все 13 кнопок-плиток наверху, одного размера и стиля, с пиктограммой и подписью",
+                tiles36 == 13 && allTop36, "");
         check("меню: ниже блока работ кнопок нет (только статистика и подвал-контакты)",
                 !tail36.contains("<Button"), "");
 
@@ -1871,6 +1871,70 @@ public class LogicTest {
                 && srcHarv44.contains("Пропустить"), "");
         check("урожай: итоги сезона собираются по всем культурам",
                 srcJrn44.contains("harvestSummary(year, plant.id)"), "");
+
+
+        // ── 45. Посадка растений: справочник с картинками ──
+        String srcGuide45 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantingGuide.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcAct45 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String man45 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("AndroidManifest.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcMain45 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("посадка: в справочнике не меньше 20 культур",
+                PlantingGuide.all().size() >= 20, "сейчас " + PlantingGuide.all().size());
+        boolean fields45 = true;
+        java.util.List<String> diagramIds45 = new java.util.ArrayList<>();
+        for (PlantingGuide.Entry e45 : PlantingGuide.all()) {
+            if (e45.dates == null || e45.dates.trim().isEmpty()) fields45 = false;
+            if (e45.soil == null || e45.soil.trim().isEmpty()) fields45 = false;
+            if (e45.pit == null || e45.pit.trim().isEmpty()) fields45 = false;
+            if (e45.spacing == null || e45.spacing.trim().isEmpty()) fields45 = false;
+            if (e45.care == null || e45.care.trim().isEmpty()) fields45 = false;
+            if (e45.friends == null || e45.friends.trim().isEmpty()) fields45 = false;
+            if (e45.foes == null || e45.foes.trim().isEmpty()) fields45 = false;
+            if (e45.diagram == null || e45.diagram.trim().isEmpty()) fields45 = false;
+        }
+        check("посадка: у каждой культуры заполнены все разделы инструкции", fields45, "");
+        boolean plants45 = true;
+        for (PlantingGuide.Entry e45 : PlantingGuide.all()) {
+            boolean ok45 = false;
+            for (Plant p45 : Plant.all()) {
+                if (p45.id.equals(e45.plantId)) { ok45 = true; break; }
+            }
+            if (!ok45) plants45 = false;
+            diagramIds45.add(e45.diagram);
+        }
+        check("посадка: каждая запись соответствует культуре из справочника растений", plants45, "");
+        boolean diagrams45 = true;
+        java.io.File nodpi45 = new java.io.File("res/drawable-nodpi");
+        for (String d45 : diagramIds45) {
+            java.io.File f45 = new java.io.File(nodpi45, d45 + ".jpg");
+            if (!f45.exists()) {
+                f45 = new java.io.File(nodpi45, d45 + ".png");
+            }
+            if (!f45.exists()) { diagrams45 = false; System.out.println("  нет схемы: " + d45); }
+        }
+        check("посадка: у каждой культуры есть картинка-схема в ресурсах", diagrams45, "");
+        check("посадка: поиск по культуре (apple есть, zzz нет)",
+                PlantingGuide.byPlant("apple") != null && PlantingGuide.byPlant("zzz") == null, "");
+        check("посадка: карточка с зумом картинок и всеми секциями",
+                srcAct45.contains("Ui.zoomPhoto") && srcAct45.contains("Сроки посадки")
+                && srcAct45.contains("Яма / лунка") && srcAct45.contains("соседи"), "");
+        check("посадка: 13-я плитка меню зарегистрирована и подключена",
+                xmlMain36.contains("@+id/btn_planting") && srcMain45.contains("R.id.btn_planting")
+                && srcMain45.contains("PlantingActivity.class") && man45.contains(".PlantingActivity"), "");
+        java.util.List<String> plantIds45 = new java.util.ArrayList<>();
+        for (PlantingGuide.Entry e45 : PlantingGuide.all()) {
+            plantIds45.add(e45.plantId);
+        }
+        check("посадка: в справочнике нет дублей культур",
+                plantIds45.size() == new java.util.HashSet<>(plantIds45).size(), "");
 
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));

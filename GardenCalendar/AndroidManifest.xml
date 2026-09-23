@@ -42,6 +42,7 @@
         <activity android:name=".MaterialsActivity" android:exported="false" android:label="@string/materials" />
         <activity android:name=".SoilActivity" android:exported="false" android:label="Почва и плодородие" />
         <activity android:name=".DeficiencyActivity" android:exported="false" android:label="Дефициты элементов" />
+        <activity android:name=".PlantingActivity" android:exported="false" android:label="Посадка растений" />
         <activity android:name=".SettingsActivity" android:exported="false" android:label="@string/settings" />
         <activity android:name=".VisitCalendarActivity" android:exported="false" android:label="Календарь посещения" />
         <activity android:name=".AboutActivity" android:exported="false" android:label="@string/about" />
