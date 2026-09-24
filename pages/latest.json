@@ -1,7 +1,7 @@
 {
-  "tag_name": "v2.80",
-  "name": "2.80",
-  "body": "v2.80 (100000): один очевидный путь — только плитки\n\nУдалено легаси-меню «⋮» (Обновить погоду, Журнал, Настройки,\nО программе) — все четыре пункта дублировались плитками\nглавного экрана, а само меню на современных Android никто\nне находил (вчера из-за него потерялся дневник).\n\n- справка: «Все разделы открываются плитками главного экрана»\n- лунный календарь: сегодняшний день выделен фоном карточки\n\nЛогика: §62 — 3 проверки. Итого 420.",
+  "tag_name": "v2.81",
+  "name": "2.81",
+  "body": "fix: §34 — водяной знак теперь лёгкая копия баннера (watermark_garden)",
   "assets": [
     {
       "name": "app.apk",
@@ -9,7 +9,7 @@
     },
     {
       "name": "ZI-Garden-csl.by.apk",
-      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.80/ZI-Garden-csl.by-v2.5.apk"
+      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.81/ZI-Garden-csl.by-v2.5.apk"
     },
     {
       "name": "app-raw.apk",
