@@ -71,7 +71,9 @@ public final class Ui {
     public static void setContent(android.app.Activity activity, View content) {
         android.widget.FrameLayout wrap = new android.widget.FrameLayout(activity);
         android.widget.ImageView wm = new android.widget.ImageView(activity);
-        wm.setImageResource(R.drawable.banner_garden);
+        // лёгкая копия баннера для фона: при альфе 0.12 детализация неразличима,
+        // а памяти — 1 МБ вместо 6 МБ на каждом из 19 экранов
+        wm.setImageResource(R.drawable.watermark_garden);
         wm.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
         wm.setAlpha(WM_ALPHA);
         wrap.addView(wm, new android.widget.FrameLayout.LayoutParams(-1, -1));

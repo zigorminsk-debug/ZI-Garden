@@ -1,6 +1,5 @@
 package by.csl.gardener;
 
-import java.util.List;
 
 /** Сроки ожидания препаратов до сбора урожая (дней) и статус по выполненной обработке. */
 final class WaitDays {

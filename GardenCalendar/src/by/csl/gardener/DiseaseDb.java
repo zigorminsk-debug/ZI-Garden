@@ -117,11 +117,21 @@ public final class DiseaseDb {
         return out;
     }
 
+    /** Кэш «имя → id ресурса»: рефлексия с линейным поиском — только при первом обращении. */
+    private static final java.util.HashMap<String, Integer> RES_CACHE =
+            new java.util.HashMap<String, Integer>();
+
     /** Имя ресурса фото → R.drawable.dz_* (рефлексия: новые фото подхватываются без правки кода). */
     public static int imageRes(String name) {
         if (name == null) return 0;
+        Integer cached = RES_CACHE.get(name);
+        if (cached != null) {
+            return cached.intValue();
+        }
         try {
-            return R.drawable.class.getField(name).getInt(null);
+            int id = R.drawable.class.getField(name).getInt(null);
+            RES_CACHE.put(name, Integer.valueOf(id));
+            return id;
         } catch (Exception e) {
             return 0;
         }

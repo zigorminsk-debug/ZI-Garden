@@ -2514,6 +2514,22 @@ public class LogicTest {
         check("луна: сегодняшний день выделен фоном карточки",
                 srcLunar61.contains("card_bg"), "");
 
+        // ── 63. Быстро и стабильно: память и горячие пути ──
+        String srcUi63 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Ui.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фон экранов — лёгкий водяной знак (1 МБ в памяти вместо 6)",
+                srcUi63.contains("R.drawable.watermark_garden")
+                && !srcUi63.contains("wm.setImageResource(R.drawable.banner_garden)")
+                && new java.io.File("res/drawable-nodpi/watermark_garden.jpg").exists(), "");
+        check("баннер «О программе» — прежнее полноразмерное фото",
+                srcAbout.contains("R.drawable.banner_garden"), "");
+        String srcDb63 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DiseaseDb.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("болезни: рефлексия картинок кэшируется (линейный поиск — один раз на имя)",
+                srcDb63.contains("RES_CACHE") && srcDb63.contains("getField"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
