@@ -2094,8 +2094,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 29 агроприёмов",
-                TechniqueGuide.all().size() >= 29, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 35 агроприёмов",
+                TechniqueGuide.all().size() >= 35, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2121,9 +2121,10 @@ public class LogicTest {
         check("приёмы: файл каждой схемы существует в ресурсах", techDiagFiles50, "");
         check("приёмы: схемы уникальны — по одной на приём",
                 new java.util.HashSet<>(techDiagrams50).size() == TechniqueGuide.all().size(), "");
-        check("приёмы: четыре раздела — обрезка, подкормка и полив, рассада, размножение",
-                techGroups50.size() == 4 && techGroups50.contains("Обрезка и формировка")
+        check("приёмы: пять разделов — обрезка, подкормка и полив, зима, рассада, размножение",
+                techGroups50.size() == 5 && techGroups50.contains("Обрезка и формировка")
                 && techGroups50.contains("Подкормка и полив")
+                && techGroups50.contains("Подготовка к зиме")
                 && techGroups50.contains("Рассада") && techGroups50.contains("Размножение"), "");
         check("приёмы: поиск по id (pruning_spring есть, zzz нет)",
                 TechniqueGuide.byId("pruning_spring") != null && TechniqueGuide.byId("zzz") == null, "");
@@ -2472,7 +2473,7 @@ public class LogicTest {
         String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
         check("справка: все разделы возможностей упомянуты",
                 helpText.contains("46") && helpText.contains("233")
-                && helpText.contains("12 элементов") && helpText.contains("29 приёмов")
+                && helpText.contains("12 элементов") && helpText.contains("35 приёмов")
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
@@ -2639,6 +2640,37 @@ public class LogicTest {
                 srcTech64.contains("20–30 см") && srcTech64.contains("40–60 см")
                 && srcTech64.contains("+18…+25 °C") && srcTech64.contains("сухой полив")
                 && srcTech64.contains("растрескивание"), "");
+
+        // ── 68. Подготовка к зиме: 6 приёмов со схемами и региональной основой ──
+        check("зима: 6 приёмов и 6 схем на месте",
+                srcTech64.contains("winter_rose") && srcTech64.contains("winter_grape")
+                && srcTech64.contains("winter_clematis") && srcTech64.contains("winter_hydrangea")
+                && srcTech64.contains("winter_trees") && srcTech64.contains("winter_berries")
+                && new java.io.File("res/drawable-nodpi/winter_rose.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/winter_grape.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/winter_clematis.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/winter_hydrangea.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/winter_trees.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/winter_berries.jpg").exists(), "");
+        check("розы: не раньше −3…−5, воздушно-сухое укрытие, выпревание — главная угроза",
+                srcTech64.contains("−3…−5 °C") && srcTech64.contains("воздушно-сухое укрытие")
+                && srcTech64.contains("выпревают") && srcTech64.contains("железный купорос")
+                && srcTech64.contains("20–25 см"), "");
+        check("виноград: закалка лозы, подложка от вымокания, окучка головы, весной не спешить поднимать",
+                srcTech64.contains("закалка") && srcTech64.contains("НЕ на голую землю")
+                && srcTech64.contains("голову куста") && srcTech64.contains("возвратных заморозков"), "");
+        check("клематисы: центр кущения под окучкой при любой группе, зола от увядания",
+                srcTech64.contains("центр кущения") && srcTech64.contains("зол")
+                && srcTech64.contains("10–15 см"), "");
+        check("гортензии: крупнолистная под каркасом, снег — главный утеплитель, метельчатой достаточно мульчи",
+                srcTech64.contains("воздушным зазором") && srcTech64.contains("сантиметр снега на градус мороза")
+                && srcTech64.contains("первые 2–3 года"), "");
+        check("плодовые: влагозарядка до 60–100 л, побелка и в феврале, лапник иглами вниз от грызунов",
+                srcTech64.contains("влагозаряд") && srcTech64.contains("февральско-мартовском солнце")
+                && srcTech64.contains("иглами ВНИЗ") && srcTech64.contains("60–100 л"), "");
+        check("ягодные: малину гнуть по плюсу, землянику — без мульчи на сердечко, защита от выпирания",
+                srcTech64.contains("пригибают в сентябре") && srcTech64.contains("НЕ засыпая сердечко")
+                && srcTech64.contains("выпирания"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
