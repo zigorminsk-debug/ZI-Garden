@@ -2121,8 +2121,9 @@ public class LogicTest {
         check("приёмы: файл каждой схемы существует в ресурсах", techDiagFiles50, "");
         check("приёмы: схемы уникальны — по одной на приём",
                 new java.util.HashSet<>(techDiagrams50).size() == TechniqueGuide.all().size(), "");
-        check("приёмы: три раздела — обрезка, рассада, размножение",
-                techGroups50.size() == 3 && techGroups50.contains("Обрезка и формировка")
+        check("приёмы: четыре раздела — обрезка, подкормка и полив, рассада, размножение",
+                techGroups50.size() == 4 && techGroups50.contains("Обрезка и формировка")
+                && techGroups50.contains("Подкормка и полив")
                 && techGroups50.contains("Рассада") && techGroups50.contains("Размножение"), "");
         check("приёмы: поиск по id (pruning_spring есть, zzz нет)",
                 TechniqueGuide.byId("pruning_spring") != null && TechniqueGuide.byId("zzz") == null, "");
