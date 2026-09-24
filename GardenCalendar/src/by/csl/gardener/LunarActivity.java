@@ -163,6 +163,9 @@ public class LunarActivity extends Activity {
             cell.setOrientation(LinearLayout.VERTICAL);
             cell.setGravity(Gravity.CENTER);
             cell.setPadding(0, Ui.dp(this, 4.0f), 0, Ui.dp(this, 4.0f));
+            if (today) {
+                cell.setBackgroundResource(R.drawable.card_bg); // сегодняшний день выделен
+            }
             TextView moon = Ui.text(this, Moon.emoji(this.year, this.month, day), 16.0f,
                     getResources().getColor(R.color.text_main), false);
             moon.setGravity(Gravity.CENTER);

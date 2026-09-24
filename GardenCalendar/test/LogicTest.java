@@ -2505,6 +2505,15 @@ public class LogicTest {
                 && srcLunar61.contains("shift(-1)") && srcLunar61.contains("shift(1)")
                 && srcLunar61.contains("getActualMaximum"), "");
 
+        // ── 62. Один очевидный путь: плитки, без дублирующего меню «⋮» ──
+        check("меню «⋮» удалено: все его пункты дублировались плитками",
+                !srcMain61.contains("onCreateOptionsMenu")
+                && !srcMain61.contains("onOptionsItemSelected"), "");
+        check("справка: подсказывает, что разделы открываются плитками",
+                helpText.contains("плитками главного экрана"), "");
+        check("луна: сегодняшний день выделен фоном карточки",
+                srcLunar61.contains("card_bg"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

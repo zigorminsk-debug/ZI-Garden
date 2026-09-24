@@ -6,8 +6,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Button;
@@ -258,35 +256,6 @@ public class MainActivity extends Activity {
             }
         }
         this.pendingTaskId = null;
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 1, 0, "Обновить погоду");
-        menu.add(0, 4, 1, "📒 Журнал");
-        menu.add(0, 2, 2, R.string.settings);
-        menu.add(0, 3, 3, R.string.about);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        int itemId = menuItem.getItemId();
-        if (itemId == 1) {
-            loadWeather(false);
-            return true;
-        }
-        if (itemId == 4) {
-            startActivity(new Intent(this, (Class<?>) JournalActivity.class));
-            return true;
-        }
-        if (itemId == 2) {
-            startActivity(new Intent(this, (Class<?>) SettingsActivity.class));
-            return true;
-        }
-        if (itemId == 3) {
-            startActivity(new Intent(this, (Class<?>) AboutActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(menuItem);
     }
 
     private void trySilentGps() {
