@@ -2759,6 +2759,53 @@ public class LogicTest {
                 srcTech64.contains("за СЕМОДОЛЬНЫЕ ЛИСТЬЯ") && srcTech64.contains("ПРИЩИПНУТЬ на треть")
                 && srcTech64.contains("второго сокодвижения") && srcTech64.contains("косые срезы длиной 3–4 см"), "");
 
+        // ── 73. Перекрёстные ссылки: фенология → агроприёмы ──
+        int signsLinked73 = 0, links73 = 0;
+        boolean idsValid73 = true;
+        for (PhenologyGuide.Sign s73 : PhenologyGuide.all()) {
+            for (String id73 : s73.techniqueIds) {
+                if (TechniqueGuide.byId(id73) == null) {
+                    idsValid73 = false;
+                }
+            }
+            if (s73.techniqueIds.length > 0) {
+                signsLinked73++;
+                links73 += s73.techniqueIds.length;
+            }
+        }
+        check("ссылки фенология → приёмы: не меньше 12 признаков и 15 связей, битых id нет",
+                idsValid73 && signsLinked73 >= 12 && links73 >= 15,
+                "признаков со ссылками: " + signsLinked73 + ", связей: " + links73);
+        boolean cherry73 = false, hardeningCherry73 = false;
+        boolean frost73 = false, grape73 = false;
+        for (PhenologyGuide.Sign s73 : PhenologyGuide.all()) {
+            for (TechniqueGuide.Item it73 : s73.techniques()) {
+                if (s73.title.contains("черёмуха") && it73.id.equals("spray_fruit")) cherry73 = true;
+                if (s73.title.contains("черёмуха") && it73.id.equals("hardening_out")) hardeningCherry73 = true;
+                if (s73.title.contains("иней") && it73.id.equals("winter_rose")) frost73 = true;
+                if (s73.title.contains("иней") && it73.id.equals("winter_grape")) grape73 = true;
+            }
+        }
+        check("пример эталон: «зацвела черёмуха» → обработки плодовых + закалка рассады; «первый иней» → зимовка роз и винограда",
+                cherry73 && hardeningCherry73 && frost73 && grape73, "");
+        boolean currant73 = false, linden73 = false, colchicum73 = false, dormancy73 = false;
+        for (PhenologyGuide.Sign s73 : PhenologyGuide.all()) {
+            for (TechniqueGuide.Item it73 : s73.techniques()) {
+                if (s73.title.contains("смородина налилась") && it73.id.equals("spray_berries")) currant73 = true;
+                if (s73.title.contains("липа") && it73.id.equals("water_garden")) linden73 = true;
+                if (s73.title.contains("безвременник") && it73.id.equals("prop_division")) colchicum73 = true;
+                if (s73.title.contains("покой") && it73.id.equals("prop_wood_cutting")) dormancy73 = true;
+            }
+        }
+        check("связи по сезонам: смородина → обработки ягод, липа → полив, безвременник → деление, покой → черенки",
+                currant73 && linden73 && colchicum73 && dormancy73, "");
+        String srcPhenAct73 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PhenologyActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("фенология: чипы-ссылки на приёмы отрисованы и кликабельны (акцентный цвет, переход)",
+                srcPhenAct73.contains("Открыть приёмы") && srcPhenAct73.contains("showTechnique")
+                && srcPhenAct73.contains("R.color.accent") && srcPhenAct73.contains("R.color.green_50"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

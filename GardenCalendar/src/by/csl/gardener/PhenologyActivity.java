@@ -91,6 +91,34 @@ public class PhenologyActivity extends Activity {
                 TextView works = Ui.text(this, "👉 " + sign.works, 13.0f, cMain, false);
                 works.setPadding(0, Ui.dp(this, 6.0f), 0, 0);
                 card.addView(works);
+
+                // ── Перекрёстные ссылки: приёмы, привязанные к природному ориентиру ──
+                java.util.List<TechniqueGuide.Item> linked = sign.techniques();
+                if (!linked.isEmpty()) {
+                    TextView open = Ui.text(this, "📖 Открыть приёмы:", 12.0f, cSub, false);
+                    open.setPadding(0, Ui.dp(this, 8.0f), 0, 0);
+                    card.addView(open);
+                    for (final TechniqueGuide.Item it : linked) {
+                        TextView chip = Ui.text(this, it.icon + " " + it.title + "  →", 13.0f,
+                                getResources().getColor(R.color.accent), true);
+                        chip.setPadding(Ui.dp(this, 12.0f), Ui.dp(this, 7.0f),
+                                Ui.dp(this, 12.0f), Ui.dp(this, 7.0f));
+                        android.graphics.drawable.GradientDrawable chipBg =
+                                new android.graphics.drawable.GradientDrawable();
+                        chipBg.setColor(getResources().getColor(R.color.green_50));
+                        chipBg.setCornerRadius(Ui.dp(this, 18.0f));
+                        chip.setBackground(chipBg);
+                        chip.setOnClickListener(new android.view.View.OnClickListener() {
+                            @Override
+                            public void onClick(android.view.View v) {
+                                PlantingActivity.showTechnique(PhenologyActivity.this, it.id);
+                            }
+                        });
+                        LinearLayout.LayoutParams chipParams = new LinearLayout.LayoutParams(-2, -2);
+                        chipParams.topMargin = Ui.dp(this, 6.0f);
+                        card.addView(chip, chipParams);
+                    }
+                }
                 root.addView(card);
             }
         }
