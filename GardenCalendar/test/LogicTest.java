@@ -864,12 +864,14 @@ public class LogicTest {
         }
         check("памятки: ≥30 осмысленных советов без пустых", tipsOk,
                 "советов: " + WidgetTexts.TIPS.length);
-        for (String cls : new String[]{"WeatherWidgetProvider", "SeasonWidgetProvider", "TipWidgetProvider"}) {
+        for (String cls : new String[]{"WeatherWidgetProvider", "SeasonWidgetProvider", "TipWidgetProvider",
+                "MoonWidgetProvider", "PhenologyWidgetProvider", "DeficitWidgetProvider"}) {
             check("виджет: провайдер " + cls + " есть и зарегистрирован",
                     new java.io.File("src/by/csl/gardener/" + cls + ".java").exists()
                     && manifest.contains("." + cls + "\""), cls);
         }
-        for (String lay : new String[]{"widget_weather", "widget_season", "widget_tip"}) {
+        for (String lay : new String[]{"widget_weather", "widget_season", "widget_tip",
+                "widget_moon", "widget_phen", "widget_deficit"}) {
             check("виджет: layout и appwidget-info " + lay,
                     new java.io.File("res/layout/" + lay + ".xml").exists()
                     && new java.io.File("res/xml/" + lay + "_info.xml").exists(), lay);
@@ -2805,6 +2807,51 @@ public class LogicTest {
         check("фенология: чипы-ссылки на приёмы отрисованы и кликабельны (акцентный цвет, переход)",
                 srcPhenAct73.contains("Открыть приёмы") && srcPhenAct73.contains("showTechnique")
                 && srcPhenAct73.contains("R.color.accent") && srcPhenAct73.contains("R.color.green_50"), "");
+
+        // ── 74. Новые виджеты: луна, природа, минерал дня ──
+        check("виджет луны: опорное новолуние 06.01.2000 и полнолуние 21.01.2000 считаются верно, совет с заглавной",
+                WidgetTexts.moonPhase(2000, 1, 6).contains("Новолуние")
+                && WidgetTexts.moonPhase(2000, 1, 21).contains("Полнолуние")
+                && WidgetTexts.moonPhase(2026, 9, 24).contains("луна")
+                && Character.isUpperCase(WidgetTexts.moonAdvice(2026, 9, 24).charAt(0))
+                && WidgetTexts.moonAdvice(2026, 9, 24).endsWith("."), "");
+        check("виджет природы: заголовок и ориентиры сезона (весна — 6, зима — глубокий покой)",
+                WidgetTexts.phenologyTitle(5).contains("весна")
+                && WidgetTexts.phenologyTitle(12).contains("зима")
+                && WidgetTexts.phenologyLines(5, 3).size() == 3
+                && WidgetTexts.phenologyLines(5, 6).size() == 6
+                && WidgetTexts.phenologyLines(1, 2).get(1).contains("Глубокий покой")
+                && WidgetTexts.phenologyLines(5, 3).get(0).contains("Сокодвижение"), "");
+        java.util.Set<String> defNames74 = new java.util.HashSet<>();
+        boolean defCycle74 = true;
+        for (int doy74 = 0; doy74 < 24; doy74++) {
+            defNames74.add(WidgetTexts.deficitHead(doy74));
+            if (!WidgetTexts.deficitHead(doy74).equals(WidgetTexts.deficitHead(doy74 + 12))) {
+                defCycle74 = false;
+            }
+        }
+        check("виджет минерал дня: цикл из 12 уникальных элементов, симптом и скорая помощь на месте",
+                defCycle74 && defNames74.size() == 12
+                && WidgetTexts.deficitHead(0).contains("(")
+                && WidgetTexts.deficitFix(0).startsWith("💊 ")
+                && WidgetTexts.deficitHead(0).contains(" — ")
+                && WidgetTexts.deficitHead(0).length() >= 10
+                && WidgetTexts.deficitHead(0).length() <= 170, "");
+        String srcWidgets74 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Widgets.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("виджеты: refreshAll обновляет все семь провайдеров",
+                srcWidgets74.contains("TasksWidgetProvider") && srcWidgets74.contains("WeatherWidgetProvider")
+                && srcWidgets74.contains("SeasonWidgetProvider") && srcWidgets74.contains("TipWidgetProvider")
+                && srcWidgets74.contains("MoonWidgetProvider") && srcWidgets74.contains("PhenologyWidgetProvider")
+                && srcWidgets74.contains("DeficitWidgetProvider"), "");
+        String srcOnboard74 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("тексты: семь виджетов в справке и онбординге, счётчик приёмов не устарел",
+                srcStr33.contains("Семь виджетов") && !srcStr33.contains("Четыре виджета")
+                && srcOnboard74.contains("Семь виджетов") && !srcOnboard74.contains("Четыре виджета")
+                && srcOnboard74.contains("39 агроприёмов") && !srcOnboard74.contains("13 агроприёмов"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

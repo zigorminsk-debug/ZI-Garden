@@ -165,6 +165,80 @@ final class WidgetTexts {
             "🐌 Мешковина ночью — ловушка для слизней: утром соберите под ней."
     };
 
+    // ── Виджет «Лунный календарь» ──
+
+    /** Фаза на дату: «🌒 Растущая луна». */
+    static String moonPhase(int year, int month1, int day) {
+        int idx = Moon.phaseIndex(year, month1, day);
+        return Moon.EMOJI[idx] + " " + Moon.NAMES[idx];
+    }
+
+    /** Совет дня по лунным традициям, с заглавной буквы. */
+    static String moonAdvice(int year, int month1, int day) {
+        String advice = Moon.advice(Moon.phaseIndex(year, month1, day));
+        return advice.substring(0, 1).toUpperCase(Locale.US) + advice.substring(1) + ".";
+    }
+
+    // ── Виджет «Сейчас в природе» ──
+
+    /** Заголовок: «🌸 Сейчас в природе: весна». */
+    static String phenologyTitle(int month1) {
+        return "🌸 Сейчас в природе: " + PhenologyGuide.seasonFor(month1).toLowerCase();
+    }
+
+    /** Ориентиры текущего сезона: «💧 Сокодвижение у берёзы — конец марта … начало апреля». */
+    static List<String> phenologyLines(int month1, int max) {
+        List<String> out = new ArrayList<>();
+        for (PhenologyGuide.Sign s : PhenologyGuide.bySeason(PhenologyGuide.seasonFor(month1))) {
+            if (out.size() >= max) {
+                break;
+            }
+            out.add(s.emoji + " " + s.title + " — " + s.period);
+        }
+        return out;
+    }
+
+    // ── Виджет «Минерал дня» ──
+
+    /** Заголовок карточки: «Бор (B) — точка роста отмирает…». */
+    static String deficitHead(int dayOfYear) {
+        DeficiencyGuide.Item it = deficitFor(dayOfYear);
+        return it.name + " (" + it.symbol + ") — " + firstSentence(it.signs);
+    }
+
+    /** Скорая помощь: «💊 Борная кислота 0,02–0,05%…». */
+    static String deficitFix(int dayOfYear) {
+        return "💊 " + firstSentence(deficitFor(dayOfYear).fix);
+    }
+
+    private static DeficiencyGuide.Item deficitFor(int dayOfYear) {
+        List<DeficiencyGuide.Item> all = DeficiencyGuide.all();
+        int idx = ((dayOfYear % all.size()) + all.size()) % all.size();
+        return all.get(idx);
+    }
+
+    /** Первое предложение (до точки или точки с запятой), не длиннее 140 символов. */
+    private static String firstSentence(String s) {
+        if (s == null) {
+            return "";
+        }
+        int dot = s.indexOf(". ");
+        int semi = s.indexOf("; ");
+        int cut = -1;
+        if (dot > 0 && semi > 0) {
+            cut = Math.min(dot, semi);
+        } else if (dot > 0) {
+            cut = dot;
+        } else if (semi > 0) {
+            cut = semi;
+        }
+        String head = cut > 0 ? s.substring(0, cut).trim() + "." : s;
+        if (head.length() > 140) {
+            head = head.substring(0, 140).trim() + "…";
+        }
+        return head;
+    }
+
     static String tipOfDay(int dayOfYear) {
         if (dayOfYear < 1) {
             dayOfYear = 1;

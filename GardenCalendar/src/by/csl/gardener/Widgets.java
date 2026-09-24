@@ -11,5 +11,8 @@ public final class Widgets {
         WeatherWidgetProvider.refresh(context);
         SeasonWidgetProvider.refresh(context);
         TipWidgetProvider.refresh(context);
+        MoonWidgetProvider.refresh(context);
+        PhenologyWidgetProvider.refresh(context);
+        DeficitWidgetProvider.refresh(context);
     }
 }
