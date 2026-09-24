@@ -9,7 +9,7 @@ import java.util.Calendar;
  * Точности ±несколько часов достаточно: фаза меняется раз в ~3.7 суток.
  */
 final class Moon {
-    static final double SYNODIC = 29.530588853; // длинa лунного месяца, сутки
+    static final double SYNODIC = 29.530588853; // длина лунного месяца, сутки
     private static final double JD_NEW_MOON = 2451550.26;
 
     static final String[] EMOJI = {"🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"};

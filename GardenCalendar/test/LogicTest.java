@@ -2094,8 +2094,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 13 агроприёмов",
-                TechniqueGuide.all().size() >= 13, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 20 агроприёмов",
+                TechniqueGuide.all().size() >= 20, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2471,7 +2471,7 @@ public class LogicTest {
         String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
         check("справка: все разделы возможностей упомянуты",
                 helpText.contains("46") && helpText.contains("233")
-                && helpText.contains("12 элементов") && helpText.contains("13 приёмов")
+                && helpText.contains("12 элементов") && helpText.contains("20 приёмов")
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
@@ -2529,6 +2529,38 @@ public class LogicTest {
                 java.nio.charset.StandardCharsets.UTF_8);
         check("болезни: рефлексия картинок кэшируется (линейный поиск — один раз на имя)",
                 srcDb63.contains("RES_CACHE") && srcDb63.contains("getField"), "");
+
+        // ── 64. Обрезка по видам плодовых: наука и схемы ──
+        String srcTech64 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int pruneGroup64 = 0;
+        java.util.List<String> pruneDiagrams64 = new java.util.ArrayList<>();
+        for (TechniqueGuide.Item it64 : TechniqueGuide.all()) {
+            if ("Обрезка и формировка".equals(it64.group)) {
+                pruneGroup64++;
+                pruneDiagrams64.add(it64.diagram);
+            }
+        }
+        check("обрезка по видам: 11 приёмов группы «Обрезка и формировка», схемы уникальны",
+                pruneGroup64 == 11
+                && new java.util.HashSet<>(pruneDiagrams64).size() == 11, "");
+        check("обрезка по видам: яблоня, груша, слива, вишня, черешня, абрикос, персик",
+                srcTech64.contains("prun_apple") && srcTech64.contains("prun_pear")
+                && srcTech64.contains("prun_plum") && srcTech64.contains("prun_cherry")
+                && srcTech64.contains("prun_sweet_cherry") && srcTech64.contains("prun_apricot")
+                && srcTech64.contains("prun_peach"), "");
+        check("обрезка по видам: научные основы — тип плодоношения и видовые приёмы",
+                srcTech64.contains("кольчатках, копьецах")           // яблоня
+                && srcTech64.contains("8–10 и более лет")            // груша, кольчатки
+                && srcTech64.contains("до 50–60 см")                 // слива
+                && srcTech64.contains("НЕ укорачивать")              // вишня кустовидная
+                && srcTech64.contains("толще 8 см")                  // черешня
+                && srcTech64.contains("чеканка")                     // абрикос
+                && srcTech64.contains("8–10 почек") && srcTech64.contains("2 почки"), ""); // персик
+        check("обрезка: порядок культур исправлен — семечковые раньше, косточковые ближе к почкам",
+                srcTech64.contains("начинают с яблони и груши")
+                && !srcTech64.contains("сначала косточковые (просыпаются раньше)"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
