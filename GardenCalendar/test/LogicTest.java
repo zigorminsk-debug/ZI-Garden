@@ -2094,8 +2094,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 20 агроприёмов",
-                TechniqueGuide.all().size() >= 20, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 24 агроприёмов",
+                TechniqueGuide.all().size() >= 24, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2471,7 +2471,7 @@ public class LogicTest {
         String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
         check("справка: все разделы возможностей упомянуты",
                 helpText.contains("46") && helpText.contains("233")
-                && helpText.contains("12 элементов") && helpText.contains("20 приёмов")
+                && helpText.contains("12 элементов") && helpText.contains("24 приёма")
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
@@ -2542,9 +2542,9 @@ public class LogicTest {
                 pruneDiagrams64.add(it64.diagram);
             }
         }
-        check("обрезка по видам: 11 приёмов группы «Обрезка и формировка», схемы уникальны",
-                pruneGroup64 == 11
-                && new java.util.HashSet<>(pruneDiagrams64).size() == 11, "");
+        check("обрезка по видам: 15 приёмов группы «Обрезка и формировка», схемы уникальны",
+                pruneGroup64 == 15
+                && new java.util.HashSet<>(pruneDiagrams64).size() == 15, "");
         check("обрезка по видам: яблоня, груша, слива, вишня, черешня, абрикос, персик",
                 srcTech64.contains("prun_apple") && srcTech64.contains("prun_pear")
                 && srcTech64.contains("prun_plum") && srcTech64.contains("prun_cherry")
@@ -2561,6 +2561,28 @@ public class LogicTest {
         check("обрезка: порядок культур исправлен — семечковые раньше, косточковые ближе к почкам",
                 srcTech64.contains("начинают с яблони и груши")
                 && !srcTech64.contains("сначала косточковые (просыпаются раньше)"), "");
+
+        // ── 65. Обрезка винограда и декоративных: группы и видовые приёмы ──
+        check("обрезка винограда и декоративных: приёмы и схемы на месте",
+                srcTech64.contains("prun_grape") && srcTech64.contains("prun_roses")
+                && srcTech64.contains("prun_clematis") && srcTech64.contains("prun_hydrangea")
+                && new java.io.File("res/drawable-nodpi/prun_grape.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/prun_roses.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/prun_clematis.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/prun_hydrangea.jpg").exists(), "");
+        check("виноград: осенняя обрезка до укрытия, веер, плодовое звено (сучок + стрелка)",
+                srcTech64.contains("строго ДО укрытия")
+                && srcTech64.contains("веерная многорукавная")
+                && srcTech64.contains("8–10 глазков") && srcTech64.contains("2–4 почки")
+                && srcTech64.contains("«плач»"), "");
+        check("розы и гортензии: группы обрезки различаются — видовые ошибки исключены",
+                srcTech64.contains("рамблер") && srcTech64.contains("над внешней почкой")
+                && srcTech64.contains("цветут на приростах текущего года")
+                && srcTech64.contains("на побегах прошлого года")
+                && srcTech64.contains("срезали всё летнее цветение"), "");
+        check("клематисы: три группы обрезки описаны",
+                srcTech64.contains("2–3 пары почек")
+                && srcTech64.contains("после первой волны"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
