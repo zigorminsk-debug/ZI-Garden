@@ -2094,8 +2094,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 24 агроприёмов",
-                TechniqueGuide.all().size() >= 24, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 29 агроприёмов",
+                TechniqueGuide.all().size() >= 29, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2471,7 +2471,7 @@ public class LogicTest {
         String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
         check("справка: все разделы возможностей упомянуты",
                 helpText.contains("46") && helpText.contains("233")
-                && helpText.contains("12 элементов") && helpText.contains("24 приёма")
+                && helpText.contains("12 элементов") && helpText.contains("29 приёмов")
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
@@ -2609,6 +2609,35 @@ public class LogicTest {
                 new java.io.File("src/by/csl/gardener/DiseaseDataA.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
         check("порог ожогов коллоидной серы един: выше +30 °C не применяют",
                 srcDzA66.contains("выше +30 °C не применяют") && !srcDzA66.contains("+35"), "");
+
+        // ── 67. Подкормка и полив: 5 приёмов со схемами и научной основой ──
+        check("подкормка и полив: 5 приёмов и 5 схем на месте",
+                srcTech64.contains("feed_fruit") && srcTech64.contains("feed_berries")
+                && srcTech64.contains("feed_veg") && srcTech64.contains("feed_grape")
+                && srcTech64.contains("water_garden")
+                && new java.io.File("res/drawable-nodpi/feed_fruit.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/feed_berries.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/feed_veg.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/feed_grape.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/water_garden.jpg").exists(), "");
+        check("плодовые: азот по талой почве в проекции кроны, осенью фосфор-калий, прирост 40 см — ориентир",
+                srcTech64.contains("по талой почве") && srcTech64.contains("ПРОЕКЦИИ КРОНЫ")
+                && srcTech64.contains("суперфосфат 60 г + сульфат калия 40 г")
+                && srcTech64.contains("прирост больше 40 см")
+                && srcTech64.contains("С июля азот исключают"), "");
+        check("ягодные: окно после сбора — цветковые почки земляники, магний чёрной смородине",
+                srcTech64.contains("цветковые почки") && srcTech64.contains("сульфат магния")
+                && srcTech64.contains("сернокислые формы"), "");
+        check("овощи: стартер рассадным, бор свёкле от гнили, нитратный стоп зелени",
+                srcTech64.contains("стартер") && srcTech64.contains("сердцевидная гниль")
+                && srcTech64.contains("за 2 недели до среза — стоп"), "");
+        check("виноград: 4 корневых, стадия «гороха», борный лист, стоп азота",
+                srcTech64.contains("с горошину") && srcTech64.contains("борная кислота 5 г на 10 л")
+                && srcTech64.contains("стоп азота") && srcTech64.contains("виноград не терпит хлор"), "");
+        check("полив: глубина промачивания по культурам, тёплая вода, «сухой полив»",
+                srcTech64.contains("20–30 см") && srcTech64.contains("40–60 см")
+                && srcTech64.contains("+18…+25 °C") && srcTech64.contains("сухой полив")
+                && srcTech64.contains("растрескивание"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
