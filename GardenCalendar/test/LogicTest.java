@@ -2672,6 +2672,23 @@ public class LogicTest {
                 srcTech64.contains("пригибают в сентябре") && srcTech64.contains("НЕ засыпая сердечко")
                 && srcTech64.contains("выпирания"), "");
 
+        // ── 69. Аудит раздела «Почва и плодородие»: язык и агрономика ──
+        String srcSoil69 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/SoilGuide.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("почва: опечатки аудита исправлены (масличная, целую машину, известковать)",
+                srcSoil69.contains("масличную редьку") && !srcSoil69.contains("масляничн")
+                && srcSoil69.contains("целую машину") && !srcSoil69.contains("везную")
+                && srcSoil69.contains("Известковать") && !srcSoil69.contains("Известить"), "");
+        check("почва: признак по червям внятный — меньше 5 это голод, норма 5–10",
+                srcSoil69.contains("меньше 5 на штык лопаты") && srcSoil69.contains("норма здоровой почвы — 5–10"), "");
+        check("почва: агрономика ключевых правил — сидерат до цветения, известь отдельно от навоза, севооборот с килой",
+                srcSoil69.contains("до цветения сидерата")
+                && srcSoil69.contains("Известь осенью, навоз — весной")
+                && srcSoil69.contains("капуста — через 4–5 из-за килы")
+                && srcSoil69.contains("мочевины 20–30 г/м²"), "");
+        check("почва: голубике — кислая почва, pH не перевёрнут и не выпадает из источников",
+                srcSoil69.contains("pH 3,5–5,0"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
