@@ -2873,6 +2873,26 @@ public class LogicTest {
                     tvs75 > 0 && tvs75 == texts75, "TextView=" + tvs75 + ", текстов=" + texts75);
         }
 
+        // ── 76. Превью в пикере виджетов: картинка и живой лейаут ──
+        String[][] prev76 = {
+                {"widget_info", "tasks", "widget_tasks"},
+                {"widget_weather_info", "weather", "widget_weather"},
+                {"widget_season_info", "season", "widget_season"},
+                {"widget_tip_info", "tip", "widget_tip"},
+                {"widget_moon_info", "moon", "widget_moon"},
+                {"widget_phen_info", "phen", "widget_phen"},
+                {"widget_deficit_info", "deficit", "widget_deficit"}};
+        for (String[] pr76 : prev76) {
+            String src76 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("res/xml/" + pr76[0] + ".xml").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            check("превью в пикере " + pr76[2] + ": previewImage + previewLayout + PNG на месте",
+                    src76.contains("android:previewImage=\"@drawable/widget_preview_" + pr76[1] + "\"")
+                    && src76.contains("android:previewLayout=\"@layout/" + pr76[2] + "\"")
+                    && new java.io.File("res/drawable-nodpi/widget_preview_" + pr76[1] + ".png").exists(),
+                    pr76[0]);
+        }
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
