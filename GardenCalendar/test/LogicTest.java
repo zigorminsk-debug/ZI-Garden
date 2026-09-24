@@ -2584,6 +2584,32 @@ public class LogicTest {
                 srcTech64.contains("2–3 пары почек")
                 && srcTech64.contains("после первой волны"), "");
 
+        // ── 66. Лицензия MIT, полнота и уникальность справочника болезней ──
+        String lic66 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("../LICENSE").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("лицензия MIT приложена и упомянута в справке",
+                lic66.contains("MIT License") && lic66.contains("Copyright (c) 2026")
+                && helpText.contains("лицензией MIT") && helpText.contains("github.com/zigorminsk-debug"), "");
+        check("в справочнике ровно 233 карточки — как заявлено в «О программе»",
+                dzAll.size() == 233, "найдено " + dzAll.size());
+        HashSet<String> imgs66 = new HashSet<>();
+        int stub66 = 0, mats66 = 0;
+        for (Disease dz : dzAll) {
+            if (dz.image != null) imgs66.add(dz.image);
+            if (dz.spring.length() < 15 || dz.summer.length() < 15 || dz.autumn.length() < 15) stub66++;
+            if (dz.mats != null) for (String m : dz.mats) if (Material.byId(m) == null) mats66++;
+        }
+        check("у каждой болезни и вредителя — своё уникальное фото",
+                imgs66.size() == dzAll.size(), "уникальных " + imgs66.size() + " из " + dzAll.size());
+        check("сезоны профилактики заполнены у всех карточек (без заглушек)",
+                stub66 == 0, "коротких полей: " + stub66);
+        check("препараты из карточек болезней есть в каталоге материалов",
+                mats66 == 0, "битых ссылок: " + mats66);
+        String srcDzA66 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DiseaseDataA.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("порог ожогов коллоидной серы един: выше +30 °C не применяют",
+                srcDzA66.contains("выше +30 °C не применяют") && !srcDzA66.contains("+35"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

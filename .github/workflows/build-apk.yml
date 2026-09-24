@@ -138,3 +138,42 @@ jobs:
               git fetch origin arena/01a0aa7c-zi-garden && git rebase origin/arena/01a0aa7c-zi-garden
             fi
           done
+
+  pages-deploy:
+    name: Сайт GitHub Pages (OTA-канал 4)
+    needs: build-apk
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout ветки с зеркалом
+        uses: actions/checkout@v4
+        with:
+          ref: arena/01a0aa7c-zi-garden
+
+      - name: Включён ли GitHub Pages?
+        id: pg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api repos/zigorminsk-debug/ZI-Garden/pages > /dev/null 2>&1; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages включён — публикую зеркало как сайт."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages ещё не включён: Settings → Pages → Source: GitHub Actions. Публикация пропущена."
+          fi
+
+      - name: Артефакт сайта
+        if: steps.pg.outputs.enabled == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+
+      - name: Публикация сайта
+        if: steps.pg.outputs.enabled == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
