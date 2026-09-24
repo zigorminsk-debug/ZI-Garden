@@ -2689,6 +2689,34 @@ public class LogicTest {
         check("почва: голубике — кислая почва, pH не перевёрнут и не выпадает из источников",
                 srcSoil69.contains("pH 3,5–5,0"), "");
 
+        // ── 70. Аудит дефицитов и фенологии: подвижность элементов и согласованность ──
+        boolean mob70 = true;
+        for (DeficiencyGuide.Item it70 : DeficiencyGuide.all()) {
+            boolean wantYoung;
+            if (it70.symbol.equals("N") || it70.symbol.equals("P")
+                    || it70.symbol.equals("K") || it70.symbol.equals("Mg")) wantYoung = false;
+            else wantYoung = true;
+            if (it70.youngLeaves != wantYoung) { mob70 = false; break; }
+        }
+        check("дефициты: подвижность элементов по науке — N/P/K/Mg желтят низ, остальные верх",
+                mob70 && DeficiencyGuide.all().size() == 12, "");
+        String srcDef70 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DeficiencyGuide.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("дефициты: язык аудита чист — «буреет кромка», без «бурея»",
+                srcDef70.contains("там буреет кромка") && !srcDef70.contains("бурея кромка"), "");
+        String srcPhen70 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PhenologyGuide.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        check("фенология: 18 признаков распределены по всем четырём сезонам",
+                PhenologyGuide.all().size() == 18
+                && PhenologyGuide.bySeason("Весна").size() == 6
+                && PhenologyGuide.bySeason("Лето").size() == 5
+                && PhenologyGuide.bySeason("Осень").size() == 5
+                && PhenologyGuide.bySeason("Зима").size() == 2, "признаков: " + PhenologyGuide.all().size());
+        check("фенология: иней — подготовка укрытий, а не само укрытие (согласовано с приёмами зимовки)",
+                srcPhen70.contains("подготовка роз и винограда к укрытию")
+                && !srcPhen70.contains("укрытие роз и винограда")
+                && !srcPhen70.contains("состояением"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
