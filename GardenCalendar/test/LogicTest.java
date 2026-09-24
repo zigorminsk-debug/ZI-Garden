@@ -1368,8 +1368,8 @@ public class LogicTest {
         // ── 34. Водяной знак на остальных экранах ──
         String srcUi34 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/Ui.java").toPath()), java.nio.charset.StandardCharsets.UTF_8);
-        check("водяной знак: хелпер Ui.setContent с баннером и альфой 0.12",
-                srcUi34.contains("WM_ALPHA") && srcUi34.contains("banner_garden")
+        check("водяной знак: хелпер Ui.setContent с фоном-копией баннера и альфой 0.12",
+                srcUi34.contains("WM_ALPHA") && srcUi34.contains("watermark_garden")
                 && srcUi34.contains("setContent(android.app.Activity activity, View content)"), "");
         String[] act34 = {"MainActivity", "SettingsActivity", "PlantsActivity", "TasksActivity",
                 "CalendarActivity", "MaterialsActivity", "DiseaseActivity", "SoilActivity", "JournalActivity"};
