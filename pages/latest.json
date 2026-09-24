@@ -1,7 +1,7 @@
 {
-  "tag_name": "v2.81",
-  "name": "2.81",
-  "body": "fix: §34 — водяной знак теперь лёгкая копия баннера (watermark_garden)",
+  "tag_name": "v2.82",
+  "name": "2.82",
+  "body": "README: 20 агроприёмов с обрезкой по видам",
   "assets": [
     {
       "name": "app.apk",
@@ -9,7 +9,7 @@
     },
     {
       "name": "ZI-Garden-csl.by.apk",
-      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.81/ZI-Garden-csl.by-v2.5.apk"
+      "browser_download_url": "https://github.com/zigorminsk-debug/ZI-Garden/releases/download/v2.82/ZI-Garden-csl.by-v2.5.apk"
     },
     {
       "name": "app-raw.apk",
