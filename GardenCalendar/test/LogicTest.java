@@ -2893,6 +2893,34 @@ public class LogicTest {
                     pr76[0]);
         }
 
+        // ── 77. Виджеты в тёмной теме: текст не сливается с фоном ──
+        boolean wColors77 = true;
+        for (String lay77 : new String[]{"widget_tasks", "widget_weather", "widget_season", "widget_tip",
+                "widget_moon", "widget_phen", "widget_deficit"}) {
+            String src77 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("res/layout/" + lay77 + ".xml").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            if (src77.contains("android:textColor=\"#") || !src77.contains("@color/text_main")) {
+                wColors77 = false;
+            }
+        }
+        String night77 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/values-night/colors.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("виджеты: цвета текста через ресурсы — в тёмной теме карточка тёмная, текст светлый (не сливается)",
+                wColors77
+                && night77.contains("name=\"card_fill\"") && night77.contains("#1A211B")
+                && night77.contains("name=\"text_main\"") && night77.contains("#E4EAE2")
+                && night77.contains("name=\"green_900\"") && night77.contains("#A5D6A7"), "");
+        boolean darkPrev77 = true;
+        for (String k77 : new String[]{"tasks", "weather", "season", "tip", "moon", "phen", "deficit"}) {
+            if (!new java.io.File("res/drawable-night-nodpi/widget_preview_" + k77 + ".png").exists()) {
+                darkPrev77 = false;
+            }
+        }
+        check("тёмная тема: ночные превью всех семи виджетов на месте",
+                darkPrev77, "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

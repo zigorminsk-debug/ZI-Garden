@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="🌱 ZI Garden"
-            android:textColor="#1B5E20"
+            android:textColor="@color/green_900"
             android:textSize="15sp"
             android:textStyle="bold" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:textColor="#5C6660"
+            android:textColor="@color/text_sub"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -40,7 +40,7 @@
         android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#20271F"
+        android:textColor="@color/text_main"
         android:textSize="14sp" />
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_marginTop="3dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#20271F"
+        android:textColor="@color/text_main"
         android:textSize="14sp" />
 
     <TextView
@@ -62,7 +62,7 @@
         android:layout_marginTop="3dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#20271F"
+        android:textColor="@color/text_main"
         android:textSize="14sp" />
 
     <TextView
@@ -71,6 +71,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="Все задачи →"
-        android:textColor="#1565C0"
+        android:textColor="@color/accent"
         android:textSize="12sp" />
 </LinearLayout>
