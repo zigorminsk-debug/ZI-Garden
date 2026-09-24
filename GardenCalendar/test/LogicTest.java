@@ -2094,8 +2094,8 @@ public class LogicTest {
         String srcTech50 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/TechniqueGuide.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("приёмы: в справочнике не меньше 35 агроприёмов",
-                TechniqueGuide.all().size() >= 35, "сейчас " + TechniqueGuide.all().size());
+        check("приёмы: в справочнике не меньше 39 агроприёмов",
+                TechniqueGuide.all().size() >= 39, "сейчас " + TechniqueGuide.all().size());
         boolean techFields50 = true;
         java.util.List<String> techDiagrams50 = new java.util.ArrayList<>();
         java.util.List<String> techGroups50 = new java.util.ArrayList<>();
@@ -2121,10 +2121,11 @@ public class LogicTest {
         check("приёмы: файл каждой схемы существует в ресурсах", techDiagFiles50, "");
         check("приёмы: схемы уникальны — по одной на приём",
                 new java.util.HashSet<>(techDiagrams50).size() == TechniqueGuide.all().size(), "");
-        check("приёмы: пять разделов — обрезка, подкормка и полив, зима, рассада, размножение",
-                techGroups50.size() == 5 && techGroups50.contains("Обрезка и формировка")
+        check("приёмы: шесть разделов — обрезка, подкормка и полив, зима, обработки, рассада, размножение",
+                techGroups50.size() == 6 && techGroups50.contains("Обрезка и формировка")
                 && techGroups50.contains("Подкормка и полив")
                 && techGroups50.contains("Подготовка к зиме")
+                && techGroups50.contains("Обработки по фенофазам")
                 && techGroups50.contains("Рассада") && techGroups50.contains("Размножение"), "");
         check("приёмы: поиск по id (pruning_spring есть, zzz нет)",
                 TechniqueGuide.byId("pruning_spring") != null && TechniqueGuide.byId("zzz") == null, "");
@@ -2473,7 +2474,7 @@ public class LogicTest {
         String helpText = iHelp >= 0 ? help.substring(iHelp) : "";
         check("справка: все разделы возможностей упомянуты",
                 helpText.contains("46") && helpText.contains("233")
-                && helpText.contains("12 элементов") && helpText.contains("35 приёмов")
+                && helpText.contains("12 элементов") && helpText.contains("39 приёмов")
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
@@ -2716,6 +2717,33 @@ public class LogicTest {
                 srcPhen70.contains("подготовка роз и винограда к укрытию")
                 && !srcPhen70.contains("укрытие роз и винограда")
                 && !srcPhen70.contains("состояением"), "");
+
+        // ── 71. Обработки по фенофазам: 4 приёма, канон препаратов согласован ──
+        check("обработки: 4 приёма и 4 схемы на месте",
+                srcTech64.contains("spray_fruit") && srcTech64.contains("spray_berries")
+                && srcTech64.contains("spray_grape") && srcTech64.contains("spray_safety")
+                && new java.io.File("res/drawable-nodpi/spray_fruit.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/spray_berries.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/spray_grape.jpg").exists()
+                && new java.io.File("res/drawable-nodpi/spray_safety.jpg").exists(), "");
+        check("плодовые: голубое опрыскивание по зелёному конусу, цветоед за 2–3 дня до цветения, в цветение — ничего",
+                srcTech64.contains("зелёный конус") && srcTech64.contains("«голубое опрыскивание»")
+                && srcTech64.contains("цветоеда") && srcTech64.contains("за 2–3 дня до цветения")
+                && srcTech64.contains("5% мочевина"), "");
+        check("ягодные и виноград: горячий душ по спящим почкам, био в бутонизацию, сера не выше +30, стоп за 30 дней до сбора",
+                srcTech64.contains("+60…+70 °C") && srcTech64.contains("строго ДО цветения")
+                && srcTech64.contains("выше +30 °C серу не применяют")
+                && srcTech64.contains("за 30 дней до сбора")
+                && srcTech64.contains("5% железный купорос"), "");
+        check("безопасность: пчёлы, срок ожидания, чередование от резистентности",
+                srcTech64.contains("инсектициды — табу") && srcTech64.contains("срок ожидания")
+                && srcTech64.contains("не чаще 2 раз за сезон") && srcTech64.contains("резистентность")
+                && srcTech64.contains("Хорус против монилиоза"), "");
+        check("обработки: канон препаратов согласован с карточками болезней (Актара, Топаз, Скор/Раёк, Хорус, био)",
+                srcTech64.contains("Актара") && srcTech64.contains("Топаз")
+                && srcTech64.contains("Скор/Раёк") && srcTech64.contains("Хорус")
+                && srcTech64.contains("Фитоверм") && srcTech64.contains("Лепидоцид")
+                && srcTech64.contains("Битоксибациллин"), "");
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
