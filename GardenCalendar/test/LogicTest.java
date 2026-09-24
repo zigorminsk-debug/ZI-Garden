@@ -2853,6 +2853,26 @@ public class LogicTest {
                 && srcOnboard74.contains("Семь виджетов") && !srcOnboard74.contains("Четыре виджета")
                 && srcOnboard74.contains("39 агроприёмов") && !srcOnboard74.contains("13 агроприёмов"), "");
 
+        // ── 75. Превью виджетов: initialLayout без пустых строк ──
+        for (String lay75 : new String[]{"widget_tasks", "widget_weather", "widget_season", "widget_tip",
+                "widget_moon", "widget_phen", "widget_deficit"}) {
+            String src75 = new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("res/layout/" + lay75 + ".xml").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            int tvs75 = 0, texts75 = 0, idx75 = 0;
+            while ((idx75 = src75.indexOf("<TextView", idx75)) >= 0) {
+                tvs75++;
+                idx75 += 9;
+            }
+            idx75 = 0;
+            while ((idx75 = src75.indexOf("android:text=", idx75)) >= 0) {
+                texts75++;
+                idx75 += 13;
+            }
+            check("превью " + lay75 + ": каждая строка заполнена (в пикере нет пустых виджетов)",
+                    tvs75 > 0 && tvs75 == texts75, "TextView=" + tvs75 + ", текстов=" + texts75);
+        }
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

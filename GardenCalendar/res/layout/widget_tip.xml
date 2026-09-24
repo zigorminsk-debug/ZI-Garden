@@ -24,6 +24,7 @@
 
         <TextView
             android:id="@+id/widget_t_date"
+            android:text="сегодня"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
@@ -33,6 +34,7 @@
 
     <TextView
         android:id="@+id/widget_t_text"
+            android:text="Поливайте утром: влага впитается до полуденной жары."
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"

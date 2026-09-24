@@ -18,6 +18,7 @@
 
     <TextView
         android:id="@+id/widget_s_line1"
+            android:text="🍎 Парша яблони — активна в сырую погоду"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -28,6 +29,7 @@
 
     <TextView
         android:id="@+id/widget_s_line2"
+            android:text="🐛 Яблонный цветоед — стряхивайте жуков"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
@@ -38,6 +40,7 @@
 
     <TextView
         android:id="@+id/widget_s_line3"
+            android:text="🦟 Тля на смородине — осмотрите побеги"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"

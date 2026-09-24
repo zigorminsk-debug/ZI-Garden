@@ -24,6 +24,7 @@
 
         <TextView
             android:id="@+id/widget_p_date"
+            android:text="сегодня"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
@@ -33,6 +34,7 @@
 
     <TextView
         android:id="@+id/widget_p_text"
+            android:text="💧 Сокодвижение у берёзы — конец марта … начало апреля&#10;🌰 Ольха и лещина пылят серёжками — начало … середина апреля"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"

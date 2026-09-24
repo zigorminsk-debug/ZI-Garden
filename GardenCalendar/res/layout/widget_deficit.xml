@@ -24,6 +24,7 @@
 
         <TextView
             android:id="@+id/widget_d_date"
+            android:text="сегодня"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
@@ -33,6 +34,7 @@
 
     <TextView
         android:id="@+id/widget_d_signs"
+            android:text="Бор (B) — точка роста отмирает или искривляется, молодые листья мелкие уродливые"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -41,6 +43,7 @@
 
     <TextView
         android:id="@+id/widget_d_fix"
+            android:text="💊 Борная кислота 0,02–0,05% (2–5 г на ведро) по листу."
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"

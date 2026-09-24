@@ -24,6 +24,7 @@
 
         <TextView
             android:id="@+id/widget_date"
+            android:text="сегодня"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
@@ -33,6 +34,7 @@
 
     <TextView
         android:id="@+id/widget_line1"
+            android:text="Томаты — полив (сегодня)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -43,6 +45,7 @@
 
     <TextView
         android:id="@+id/widget_line2"
+            android:text="Яблоня — подкормка (завтра)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
@@ -53,6 +56,7 @@
 
     <TextView
         android:id="@+id/widget_line3"
+            android:text="Огурцы — сбор урожая"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
