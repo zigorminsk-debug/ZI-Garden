@@ -2480,7 +2480,7 @@ public class LogicTest {
                 && helpText.contains("18 признаков") && helpText.contains("Сейчас в природе")
                 && helpText.contains("Календарь посещения") && helpText.contains("Лунный")
                 && helpText.contains("Дневник") && helpText.contains("Поиск")
-                && helpText.contains("Почва и плодородие") && helpText.contains("виджета")
+                && helpText.contains("Почва и плодородие") && helpText.contains("виджет")
                 && helpText.contains("синхронизация") && helpText.contains("6 ступеней")
                 && helpText.contains("жестами") && helpText.contains("8:00 до 21:00"), "");
         check("справка: источники и контакты на месте",
