@@ -241,6 +241,21 @@ public class DiseaseActivity extends Activity {
                 }
             }
 
+            // ── Перекрёстная ссылка: календарь обработок по фенофазам ──
+            final Disease sprayDz = dz;
+            if (SprayLinks.techniqueFor(dz.id) != null) {
+                TextView spray = Ui.text(this, "🛡️ Календарь обработок по фенофазам →", 13.0f,
+                        getResources().getColor(R.color.accent), true);
+                spray.setPadding(0, Ui.dp(this, 8.0f), 0, 0);
+                spray.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        PlantingActivity.showTechnique(DiseaseActivity.this,
+                                SprayLinks.techniqueFor(sprayDz.id));
+                    }
+                });
+                card.addView(spray);
+            }
+
             final Disease shareDz = dz;
             final Plant sharePlant = plant;
             Button share = new Button(this);

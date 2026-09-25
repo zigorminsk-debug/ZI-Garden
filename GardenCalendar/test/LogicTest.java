@@ -2921,6 +2921,66 @@ public class LogicTest {
         check("тёмная тема: ночные превью всех семи виджетов на месте",
                 darkPrev77, "");
 
+        // ── 78. Перекрёстные ссылки, часть 2: болезни → обработки, приём → природа ──
+        StringBuilder dzSrc78 = new StringBuilder();
+        for (String f78 : new String[]{"DiseaseDataA", "DiseaseDataB", "DiseaseDataC", "DiseaseDataPests"}) {
+            dzSrc78.append(new String(java.nio.file.Files.readAllBytes(
+                    new java.io.File("src/by/csl/gardener/" + f78 + ".java").toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8));
+        }
+        boolean dzExist78 = true;
+        boolean techValid78 = true;
+        for (java.util.Map.Entry<String, String> e78 : SprayLinks.all().entrySet()) {
+            if (!dzSrc78.toString().contains("d(\"" + e78.getKey() + "\"")) {
+                dzExist78 = false;
+            }
+            if (TechniqueGuide.byId(e78.getValue()) == null) {
+                techValid78 = false;
+            }
+        }
+        check("болезни → обработки: все id болезней существуют, приёмы валидны, эталонные пары на месте",
+                dzExist78 && techValid78 && SprayLinks.size() >= 20
+                && "spray_fruit".equals(SprayLinks.techniqueFor("apple_scab"))
+                && "spray_fruit".equals(SprayLinks.techniqueFor("cherry_monilia"))
+                && "spray_berries".equals(SprayLinks.techniqueFor("gooseberry_mildew"))
+                && "spray_berries".equals(SprayLinks.techniqueFor("currant_budmite"))
+                && "spray_grape".equals(SprayLinks.techniqueFor("grape_mildew"))
+                && "spray_grape".equals(SprayLinks.techniqueFor("grape_oidium"))
+                && SprayLinks.techniqueFor("tomato_lateblight") == null,
+                "связей: " + SprayLinks.size());
+        boolean sym78 = true;
+        for (PhenologyGuide.Sign s78 : PhenologyGuide.all()) {
+            for (String t78 : s78.techniqueIds) {
+                boolean found78 = false;
+                for (PhenologyGuide.Sign back78 : PhenologyGuide.signsForTechnique(t78)) {
+                    if (back78 == s78) {
+                        found78 = true;
+                    }
+                }
+                if (!found78) {
+                    sym78 = false;
+                }
+            }
+        }
+        int backCount78 = 0;
+        for (TechniqueGuide.Item it78 : TechniqueGuide.all()) {
+            backCount78 += PhenologyGuide.signsForTechnique(it78.id).size();
+        }
+        check("природа ↔ приёмы: обратные ссылки симметричны — все 19 пар находятся с обеих сторон",
+                sym78 && backCount78 == 19,
+                "обратных ссылок: " + backCount78);
+        String srcPlant78 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/PlantingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String srcDis78 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/DiseaseActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("переходы: болезнь ведёт к календарю обработок, приём — к «природа подскажет»",
+                srcPlant78.contains("Природа подскажет") && srcPlant78.contains("signsForTechnique")
+                && srcPlant78.contains("PhenologyActivity.show")
+                && srcDis78.contains("SprayLinks.techniqueFor")
+                && srcDis78.contains("PlantingActivity.showTechnique"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }

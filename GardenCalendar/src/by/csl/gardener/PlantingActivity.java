@@ -197,6 +197,29 @@ public class PlantingActivity extends Activity {
         card.addView(Ui.text(this, it.how, 13.0f, cMain, false));
         card.addView(label("⚠️ Частые ошибки"));
         card.addView(Ui.text(this, it.mistakes, 13.0f, cMain, false));
+
+        // ── Обратная перекрёстная ссылка: какие природные ориентиры подсказывают срок ──
+        List<PhenologyGuide.Sign> hints = PhenologyGuide.signsForTechnique(it.id);
+        if (!hints.isEmpty()) {
+            card.addView(label("🌸 Природа подскажет"));
+            StringBuilder sb = new StringBuilder();
+            for (PhenologyGuide.Sign s : hints) {
+                if (sb.length() > 0) {
+                    sb.append('\n');
+                }
+                sb.append(s.emoji).append(' ').append(s.title).append(" — ").append(s.period);
+            }
+            card.addView(Ui.text(this, sb.toString(), 13.0f, cMain, false));
+            TextView toPhen = Ui.text(this, "🌸 Календарь природы →", 13.0f,
+                    getResources().getColor(R.color.accent), true);
+            toPhen.setPadding(0, Ui.dp(this, 6.0f), 0, 0);
+            toPhen.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    PhenologyActivity.show(PlantingActivity.this);
+                }
+            });
+            card.addView(toPhen);
+        }
         root.addView(card);
     }
 

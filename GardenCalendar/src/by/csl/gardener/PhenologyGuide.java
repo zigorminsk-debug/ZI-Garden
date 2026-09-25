@@ -142,6 +142,23 @@ public final class PhenologyGuide {
     private PhenologyGuide() {
     }
 
+    /** Природные ориентиры, ведущие к этому приёму (обратная перекрёстная ссылка). */
+    public static List<Sign> signsForTechnique(String techniqueId) {
+        List<Sign> out = new ArrayList<>();
+        if (techniqueId == null) {
+            return out;
+        }
+        for (Sign s : ALL) {
+            for (String id : s.techniqueIds) {
+                if (id.equals(techniqueId)) {
+                    out.add(s);
+                    break;
+                }
+            }
+        }
+        return out;
+    }
+
     public static List<Sign> all() {
         return new ArrayList<>(ALL);
     }
