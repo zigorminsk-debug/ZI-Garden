@@ -43,23 +43,12 @@ public class Storage {
         this.p.edit().putStringSet("dz_" + plantId, new HashSet<>(set)).apply();
     }
 
+    /**
+     * Предвыбор культур для первой установки: ПУСТО — все галочки «Мои растения»
+     * сняты, пользователь отмечает только своё (проверяется §79).
+     */
     private Set<String> defaultPlants() {
-        HashSet hashSet = new HashSet();
-        hashSet.add("apple");
-        hashSet.add("pear");
-        hashSet.add("sweet_cherry");
-        hashSet.add("cherry");
-        hashSet.add("plum");
-        hashSet.add("currant_black");
-        hashSet.add("gooseberry");
-        hashSet.add("raspberry");
-        hashSet.add("strawberry");
-        hashSet.add("tomato");
-        hashSet.add("cucumber");
-        hashSet.add("cabbage");
-        hashSet.add("potato");
-        hashSet.add("greenhouse");
-        return hashSet;
+        return new HashSet<String>();
     }
 
     public int plantSize() {
@@ -220,7 +209,7 @@ public class Storage {
 
     /** Еженедельный дайджест-уведомление (воскресенье 10:00). По умолчанию включён. */
     public boolean weeklyDigestEnabled() {
-        return !"0".equals(this.p.getString("weekly_digest", "1"));
+        return !"0".equals(this.p.getString("weekly_digest", "0"));
     }
 
     public void setWeeklyDigest(boolean enabled) {
@@ -294,7 +283,7 @@ public class Storage {
     }
 
     public boolean notifyEnabled() {
-        return this.p.getBoolean("notify", true);
+        return this.p.getBoolean("notify", false);
     }
 
     public void setNotifyEnabled(boolean z) {

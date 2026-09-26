@@ -2981,6 +2981,28 @@ public class LogicTest {
                 && srcDis78.contains("SprayLinks.techniqueFor")
                 && srcDis78.contains("PlantingActivity.showTechnique"), "");
 
+        // ── 79. Чистая первая установка: ни одной отмеченной галочки ──
+        String srcStore79 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/Storage.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int dpStart79 = srcStore79.indexOf("private Set<String> defaultPlants()");
+        int dpEnd79 = srcStore79.indexOf("\n    }", dpStart79);
+        String dpBody79 = dpStart79 >= 0 && dpEnd79 > dpStart79
+                ? srcStore79.substring(dpStart79, dpEnd79) : "";
+        check("чистая установка: «Мои растения» без предвыбора — defaultPlants() пуст",
+                dpBody79.contains("defaultPlants()") && !dpBody79.contains(".add(")
+                && srcStore79.contains("getStringSet(\"plants\", defaultPlants())"),
+                dpBody79.contains(".add(") ? "остались предвыбранные культуры" : "");
+        check("чистая установка: напоминания и недельный дайджест выключены по умолчанию",
+                srcStore79.contains("getBoolean(\"notify\", false)")
+                && srcStore79.contains("getString(\"weekly_digest\", \"0\")"), "");
+        String srcOnboard79 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("src/by/csl/gardener/OnboardingActivity.java").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        check("чистая установка: онбординг ничего не отмечает (только флаг «пройден»)",
+                !srcOnboard79.contains("setPlants") && !srcOnboard79.contains("setNotify")
+                && !srcOnboard79.contains("setPlantSize") && srcOnboard79.contains("setOnboardingDone(true)"), "");
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
