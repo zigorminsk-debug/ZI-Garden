@@ -3007,7 +3007,7 @@ public class LogicTest {
         boolean artFrames80 = true;
         int artCount80 = 0;
         String[][] seasonFrames80 = {
-                {"autumn", "30"}, {"winter", "15"}, {"spring", "15"}, {"summer", "15"}};
+                {"autumn", "36"}, {"winter", "18"}, {"spring", "18"}, {"summer", "18"}};
         for (String[] sf80 : seasonFrames80) {
             int n80 = Integer.parseInt(sf80[1]);
             String anim80 = new String(java.nio.file.Files.readAllBytes(
@@ -3028,8 +3028,8 @@ public class LogicTest {
                 }
             }
         }
-        check("анимации сезона: 75 кадров (30+15+15+15, ключи + перетекания) и 4 зацикленных animation-list",
-                artFrames80 && artCount80 == 75, "кадров: " + artCount80);
+        check("анимации сезона: 90 кадров (36+18+18+18, ключи + медленные перетекания) и 4 зацикленных animation-list",
+                artFrames80 && artCount80 == 90, "кадров: " + artCount80);
         String srcMain80 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
