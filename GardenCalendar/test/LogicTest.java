@@ -3048,7 +3048,7 @@ public class LogicTest {
         String srcMainLay81 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("res/layout/activity_main.xml").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        int box81 = srcMainLay81.indexOf("@+id/season_art\n");
+        int box81 = srcMainLay81.indexOf("@+id/season_art\"");
         String boxTag81 = box81 > 0 ? srcMainLay81.substring(Math.max(0, box81 - 40), box81) : "";
         int a81 = srcMainLay81.indexOf("@+id/season_art_a");
         String tagA81 = a81 > 0 ? srcMainLay81.substring(Math.max(0, a81 - 40), a81) : "";
