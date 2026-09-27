@@ -10,13 +10,26 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <ImageView
+        <FrameLayout
             android:id="@+id/season_art"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="Акварельная сцена сезона — нажмите, чтобы увеличить"
-            android:scaleType="fitCenter" />
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/season_art_a"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="Акварельная сцена сезона — нажмите, чтобы увеличить"
+                android:scaleType="fitCenter" />
+
+            <ImageView
+                android:id="@+id/season_art_b"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/location"

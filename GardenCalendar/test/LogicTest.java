@@ -3007,17 +3007,9 @@ public class LogicTest {
         boolean artFrames80 = true;
         int artCount80 = 0;
         String[][] seasonFrames80 = {
-                {"autumn", "36"}, {"winter", "18"}, {"spring", "18"}, {"summer", "18"}};
+                {"autumn", "6"}, {"winter", "3"}, {"spring", "3"}, {"summer", "3"}};
         for (String[] sf80 : seasonFrames80) {
             int n80 = Integer.parseInt(sf80[1]);
-            String anim80 = new String(java.nio.file.Files.readAllBytes(
-                    new java.io.File("res/drawable/anim_season_" + sf80[0] + ".xml").toPath()),
-                    java.nio.charset.StandardCharsets.UTF_8);
-            if (!anim80.contains("oneshot=\"false\"")
-                    || !anim80.contains("season_" + sf80[0] + "_" + n80)
-                    || !anim80.contains("season_" + sf80[0] + "_01")) {
-                artFrames80 = false;
-            }
             for (int i80 = 1; i80 <= n80; i80++) {
                 String name80 = "season_" + sf80[0] + "_"
                         + (i80 < 10 ? "0" : "") + i80 + ".jpg";
@@ -3028,35 +3020,45 @@ public class LogicTest {
                 }
             }
         }
-        check("анимации сезона: 90 кадров (36+18+18+18, ключи + медленные перетекания) и 4 зацикленных animation-list",
-                artFrames80 && artCount80 == 90, "кадров: " + artCount80);
+        check("анимации сезона: 15 ключевых акварельных сцен (6+3+3+3) на месте",
+                artFrames80 && artCount80 == 15, "сцен: " + artCount80);
         String srcMain80 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("главный экран: координаты заменены анимацией, город остался подписью, тап — полноэкранный зум",
+        check("главный экран: координаты заменены сценой; растворение — системный наплыв двух слоёв, тап — зум",
                 !srcMain80.contains("%.4f") && !srcMain80.contains("currencyCode")
-                && srcMain80.contains("R.id.season_art") && srcMain80.contains("anim.start()")
-                && srcMain80.contains("Ui.zoomPhoto")
-                && srcMain80.contains("SeasonArt.animationFor"), "");
+                && srcMain80.contains("season_art_a") && srcMain80.contains("season_art_b")
+                && srcMain80.contains("animate().alpha(1.0f)")
+                && srcMain80.contains("SEASON_HOLD_MS = 3000L")
+                && srcMain80.contains("SEASON_DISSOLVE_MS = 2000L")
+                && srcMain80.contains("removeCallbacksAndMessages")
+                && srcMain80.contains("Ui.zoomPhoto"), "");
         String srcArt80 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/SeasonArt.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        check("SeasonArt: все четыре сезона закрыты — анимация и кадр для полного просмотра",
-                srcArt80.contains("anim_season_autumn") && srcArt80.contains("anim_season_winter")
-                && srcArt80.contains("anim_season_spring") && srcArt80.contains("anim_season_summer")
-                && srcArt80.contains("season_autumn_01") && srcArt80.contains("season_winter_01")
-                && srcArt80.contains("season_spring_01") && srcArt80.contains("season_summer_01")
-                && srcArt80.contains("PhenologyGuide.seasonFor"), "");
+        check("SeasonArt: ключевые кадры всех четырёх сезонов + ритм «3 секунды план, 2 — растворение»",
+                srcArt80.contains("keyFrames")
+                && srcArt80.contains("season_autumn_01") && srcArt80.contains("season_autumn_06")
+                && srcArt80.contains("season_winter_01") && srcArt80.contains("season_spring_01")
+                && srcArt80.contains("season_summer_01")
+                && srcArt80.contains("PhenologyGuide.seasonFor")
+                && srcMain80.contains("SeasonArt.keyFrames"), "");
 
-        // ── 81. Главный экран: season_art — именно ImageView (не TextView с чужими атрибутами) ──
+        // ── 81. Главный экран: наплыв — FrameLayout с двумя ImageView внутри ──
         String srcMainLay81 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("res/layout/activity_main.xml").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
-        int art81 = srcMainLay81.indexOf("@+id/season_art");
-        String artTag81 = art81 > 0 ? srcMainLay81.substring(Math.max(0, art81 - 40), art81) : "";
-        check("анимация сезона: season_art — ImageView, иначе каст в MainActivity роняет приложение",
-                artTag81.contains("<ImageView") && !artTag81.contains("TextView"),
-                artTag81.trim());
+        int box81 = srcMainLay81.indexOf("@+id/season_art\n");
+        String boxTag81 = box81 > 0 ? srcMainLay81.substring(Math.max(0, box81 - 40), box81) : "";
+        int a81 = srcMainLay81.indexOf("@+id/season_art_a");
+        String tagA81 = a81 > 0 ? srcMainLay81.substring(Math.max(0, a81 - 40), a81) : "";
+        int b81 = srcMainLay81.indexOf("@+id/season_art_b");
+        String tagB81 = b81 > 0 ? srcMainLay81.substring(Math.max(0, b81 - 40), b81) : "";
+        check("наплыв сезона: контейнер FrameLayout, оба слоя — ImageView (иначе каст роняет приложение)",
+                boxTag81.contains("<FrameLayout")
+                && tagA81.contains("<ImageView") && !tagA81.contains("TextView")
+                && tagB81.contains("<ImageView") && !tagB81.contains("TextView"),
+                tagA81.trim());
 
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);

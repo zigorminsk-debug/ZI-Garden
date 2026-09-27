@@ -25,6 +25,18 @@ public class MainActivity extends Activity {
     }
 
     private static final int REQ_NOTIFY = 1001;
+
+    /** Ритм акварельной сцены, как в советской анимации: долгий статичный план… */
+    private static final long SEASON_HOLD_MS = 3000L;
+    /** …и медленное туманное растворение кадра в кадре (непрерывная альфа, 60 fps). */
+    private static final long SEASON_DISSOLVE_MS = 2000L;
+
+    private final android.os.Handler seasonHandler = new android.os.Handler();
+    private Runnable seasonStep;
+    private int[] seasonKeys;
+    private int seasonIdx;
+    private boolean seasonArtRunning;
+
     private Calendar lastDay;
     private boolean loading;
     private String pendingTaskId;
@@ -344,24 +356,50 @@ public class MainActivity extends Activity {
         TextView textView3 = (TextView) findViewById(R.id.forecast);
         TextView textView4 = (TextView) findViewById(R.id.weather_updated);
         Region detect = Region.detect(this.store.lat(), this.store.lon());
-        // Вместо строки координат — акварельная анимация сезона (кадры чередует SeasonArt)
-        android.widget.ImageView seasonArt = (android.widget.ImageView) findViewById(R.id.season_art);
-        final int animRes = SeasonArt.animationFor(SeasonArt.currentMonth());
-        seasonArt.setImageResource(animRes);
-        seasonArt.post(new Runnable() {
-            @Override
-            public void run() {
-                android.graphics.drawable.AnimationDrawable anim =
-                        (android.graphics.drawable.AnimationDrawable) seasonArt.getDrawable();
-                anim.start();
-            }
-        });
-        seasonArt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Ui.zoomPhoto(MainActivity.this, SeasonArt.frameFor(SeasonArt.currentMonth()));
-            }
-        });
+        // Вместо строки координат — акварельная анимация сезона:
+        // ключевые сцены меняются медленным растворением (наплывом), как в советской анимации
+        if (!this.seasonArtRunning) {
+            this.seasonArtRunning = true;
+            this.seasonKeys = SeasonArt.keyFrames(SeasonArt.currentMonth());
+            this.seasonIdx = 0;
+            final android.widget.ImageView artA =
+                    (android.widget.ImageView) findViewById(R.id.season_art_a);
+            final android.widget.ImageView artB =
+                    (android.widget.ImageView) findViewById(R.id.season_art_b);
+            artA.setImageResource(this.seasonKeys[0]);
+            artA.setAlpha(1.0f);
+            artB.setAlpha(0.0f);
+            android.view.View artBox = findViewById(R.id.season_art);
+            artBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Ui.zoomPhoto(MainActivity.this,
+                            MainActivity.this.seasonKeys[MainActivity.this.seasonIdx]);
+                }
+            });
+            this.seasonStep = new Runnable() {
+                @Override
+                public void run() {
+                    final int next = (MainActivity.this.seasonIdx + 1)
+                            % MainActivity.this.seasonKeys.length;
+                    artB.setImageResource(MainActivity.this.seasonKeys[next]);
+                    artB.setAlpha(0.0f);
+                    artB.animate().alpha(1.0f)
+                            .setDuration(SEASON_DISSOLVE_MS)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    artA.setImageResource(MainActivity.this.seasonKeys[next]);
+                                    artB.setAlpha(0.0f);
+                                    MainActivity.this.seasonIdx = next;
+                                    MainActivity.this.seasonHandler.postDelayed(
+                                            MainActivity.this.seasonStep, SEASON_HOLD_MS);
+                                }
+                            }).start();
+                }
+            };
+            this.seasonHandler.postDelayed(this.seasonStep, SEASON_HOLD_MS);
+        }
         StringBuilder sb = new StringBuilder("📍 ");
         sb.append(this.store.city());
         sb.append(" · ");
@@ -544,5 +582,11 @@ public class MainActivity extends Activity {
             return;
         }
         Ui.toast(this, "Прогноз обновлён");
+    }
+
+    @Override
+    protected void onDestroy() {
+        this.seasonHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 }
