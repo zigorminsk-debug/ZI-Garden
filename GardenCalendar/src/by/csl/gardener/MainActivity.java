@@ -344,15 +344,28 @@ public class MainActivity extends Activity {
         TextView textView3 = (TextView) findViewById(R.id.forecast);
         TextView textView4 = (TextView) findViewById(R.id.weather_updated);
         Region detect = Region.detect(this.store.lat(), this.store.lon());
+        // Вместо строки координат — акварельная анимация сезона (кадры чередует SeasonArt)
+        android.widget.ImageView seasonArt = (android.widget.ImageView) findViewById(R.id.season_art);
+        final int animRes = SeasonArt.animationFor(SeasonArt.currentMonth());
+        seasonArt.setImageResource(animRes);
+        seasonArt.post(new Runnable() {
+            @Override
+            public void run() {
+                android.graphics.drawable.AnimationDrawable anim =
+                        (android.graphics.drawable.AnimationDrawable) seasonArt.getDrawable();
+                anim.start();
+            }
+        });
+        seasonArt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Ui.zoomPhoto(MainActivity.this, SeasonArt.frameFor(SeasonArt.currentMonth()));
+            }
+        });
         StringBuilder sb = new StringBuilder("📍 ");
         sb.append(this.store.city());
         sb.append(" · ");
         sb.append(detect.displayName);
-        sb.append(" · ");
-        sb.append(detect.currencyCode);
-        sb.append("\n");
-        sb.append(String.format(Locale.US, "%.4f, %.4f", Double.valueOf(this.store.lat()), Double.valueOf(this.store.lon())));
-        sb.append(this.store.locationSource().equals("gps") ? " · GPS" : "");
         textView.setText(sb.toString());
         Weather weather = this.weather;
         if (weather == null || !weather.hasForecast()) {
