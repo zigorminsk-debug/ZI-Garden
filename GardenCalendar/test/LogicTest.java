@@ -3045,6 +3045,16 @@ public class LogicTest {
                 && srcArt80.contains("season_spring_1") && srcArt80.contains("season_summer_1")
                 && srcArt80.contains("PhenologyGuide.seasonFor"), "");
 
+        // ── 81. Главный экран: season_art — именно ImageView (не TextView с чужими атрибутами) ──
+        String srcMainLay81 = new String(java.nio.file.Files.readAllBytes(
+                new java.io.File("res/layout/activity_main.xml").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int art81 = srcMainLay81.indexOf("@+id/season_art");
+        String artTag81 = art81 > 0 ? srcMainLay81.substring(Math.max(0, art81 - 40), art81) : "";
+        check("анимация сезона: season_art — ImageView, иначе каст в MainActivity роняет приложение",
+                artTag81.contains("<ImageView") && !artTag81.contains("TextView"),
+                artTag81.trim());
+
         System.out.println("\n" + (failures == 0 ? "ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "ПРОВАЛЕНО ПРОВЕРОК: " + failures));
         if (failures > 0) System.exit(1);
     }
