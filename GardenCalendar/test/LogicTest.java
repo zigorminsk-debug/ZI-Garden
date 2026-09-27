@@ -3007,26 +3007,29 @@ public class LogicTest {
         boolean artFrames80 = true;
         int artCount80 = 0;
         String[][] seasonFrames80 = {
-                {"autumn", "6"}, {"winter", "3"}, {"spring", "3"}, {"summer", "3"}};
+                {"autumn", "30"}, {"winter", "15"}, {"spring", "15"}, {"summer", "15"}};
         for (String[] sf80 : seasonFrames80) {
             int n80 = Integer.parseInt(sf80[1]);
             String anim80 = new String(java.nio.file.Files.readAllBytes(
                     new java.io.File("res/drawable/anim_season_" + sf80[0] + ".xml").toPath()),
                     java.nio.charset.StandardCharsets.UTF_8);
             if (!anim80.contains("oneshot=\"false\"")
-                    || !anim80.contains("season_" + sf80[0] + "_" + n80)) {
+                    || !anim80.contains("season_" + sf80[0] + "_" + n80)
+                    || !anim80.contains("season_" + sf80[0] + "_01")) {
                 artFrames80 = false;
             }
             for (int i80 = 1; i80 <= n80; i80++) {
-                if (new java.io.File("res/drawable-nodpi/season_" + sf80[0] + "_" + i80 + ".jpg").exists()) {
+                String name80 = "season_" + sf80[0] + "_"
+                        + (i80 < 10 ? "0" : "") + i80 + ".jpg";
+                if (new java.io.File("res/drawable-nodpi/" + name80).exists()) {
                     artCount80++;
                 } else {
                     artFrames80 = false;
                 }
             }
         }
-        check("анимации сезона: 15 кадров (6+3+3+3) и 4 зацикленных animation-list на месте",
-                artFrames80 && artCount80 == 15, "кадров: " + artCount80);
+        check("анимации сезона: 75 кадров (30+15+15+15, ключи + перетекания) и 4 зацикленных animation-list",
+                artFrames80 && artCount80 == 75, "кадров: " + artCount80);
         String srcMain80 = new String(java.nio.file.Files.readAllBytes(
                 new java.io.File("src/by/csl/gardener/MainActivity.java").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8);
@@ -3041,8 +3044,8 @@ public class LogicTest {
         check("SeasonArt: все четыре сезона закрыты — анимация и кадр для полного просмотра",
                 srcArt80.contains("anim_season_autumn") && srcArt80.contains("anim_season_winter")
                 && srcArt80.contains("anim_season_spring") && srcArt80.contains("anim_season_summer")
-                && srcArt80.contains("season_autumn_1") && srcArt80.contains("season_winter_1")
-                && srcArt80.contains("season_spring_1") && srcArt80.contains("season_summer_1")
+                && srcArt80.contains("season_autumn_01") && srcArt80.contains("season_winter_01")
+                && srcArt80.contains("season_spring_01") && srcArt80.contains("season_summer_01")
                 && srcArt80.contains("PhenologyGuide.seasonFor"), "");
 
         // ── 81. Главный экран: season_art — именно ImageView (не TextView с чужими атрибутами) ──

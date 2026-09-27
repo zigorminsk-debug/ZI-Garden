@@ -31,15 +31,15 @@ public final class SeasonArt {
     public static int frameFor(int month1) {
         String season = PhenologyGuide.seasonFor(month1);
         if ("Зима".equals(season)) {
-            return R.drawable.season_winter_1;
+            return R.drawable.season_winter_01;
         }
         if ("Весна".equals(season)) {
-            return R.drawable.season_spring_1;
+            return R.drawable.season_spring_01;
         }
         if ("Лето".equals(season)) {
-            return R.drawable.season_summer_1;
+            return R.drawable.season_summer_01;
         }
-        return R.drawable.season_autumn_1;
+        return R.drawable.season_autumn_01;
     }
 
     /** Текущий месяц 1–12. */
